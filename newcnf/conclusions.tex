@@ -1,0 +1,17 @@
+We presented a clausification algorithm for \folb{}. It takes a \folb{} formula as input and produces an equisatisfiable set of first-order clauses. Our algorithm is based on the \newcnf{} clausification algorithm for first-order logic and extends it to support \folb{} formulas.
+
+Our algorithm aims to minimise the number of clauses and the size of the resulting signature it produces. It combines translation of \folb{} to first-order logic and clausification. This combination allowed us to integrate into the translation clausification techniques such as skolemisation, formula naming and tautology elimination.
+
+% The new translation is different from the old one:
+% * boolean variables are skolemised with predicates and not functions
+% * boolean variables that do not need to be skolemised are exhaustively instantiated with the two possible boolean constants $\true$ and $\false$ in a way that does not increase the size of the translation
+% * it never introduces an equality that does not appear in the original formula (guards instead of definitions)
+% * parametrised by a \ITE\ expansion threashold 
+% * Don't need FOOL paramodulation
+
+We implemented the extended \newcnf{} algorithm in the Vampire theorem prover. Our experimental results showed an increase of performance of Vampire compared to its version with the translation of \folb{} formulas to full first-order logic. We observed that new problems can be solved by expansion of \ITE\ and instantiation of boolean variables with boolean constants. We observed that both inlining and naming of \LETIN\ expressions can make a theorem prover succeed or fail. 
+
+For future work we are interested in developing syntactical criteria that determine whether a given \LETIN\ or \ITE\ expression should be named or inlined, or expanded or inlined, respectively. 
+
+%We do not have problems that use let with functions with arguments. They would've been useful though.
+

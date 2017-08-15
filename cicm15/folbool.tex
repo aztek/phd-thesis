@@ -1,0 +1,154 @@
+First-order logic with the boolean sort (\folb) extends many-sorted first-order logic (FOL) in two ways:
+\begin{enumerate}
+\item formulas can be treated as terms of the built-in boolean sort; and
+\item one can use \ITE\ and \LETIN\ expressions defined below.
+\end{enumerate}
+\folb\ is the smallest logic containing both the SMT-LIB core theory and the monomorphic first-order part of the TPTP language. It extends the SMT-LIB core theory by adding \LETIN\ expressions defining functions and TPTP by the first-class boolean sort.
+
+
+\subsection{Syntax}
+
+We assume a countable infinite set of \emph{variables}.
+
+\begin{definition}\label{def:folb-signature}\em
+  A \emph{signature} of first-order logic with the boolean sort is a triple $\Sigma = (S, F, \context)$, where:
+
+  \begin{enumerate}
+  \item $S$ is a set of \emph{sorts}, which contains a special sort $\bool$. A \emph{type} is either a sort or a non-empty sequence $\sigma_1,\ldots,\sigma_n,\sigma$ of sorts, written as $\sigma_1 \times \ldots \times \sigma_n \to \sigma$. When $n = 0$, we will simply write $\sigma$ instead of $\to\sigma$. We call a \emph{type assignment} a mapping from a set of variables and function symbols to types, which maps variables to sorts.
+
+    \item $F$ is a set of \emph{function symbols}. We require $F$ to contain binary function symbols $\vee$, $\wedge$, $\implies$ and $\liff$, used in infix form, a unary function symbol $\neg$, used in prefix form, and nullary function symbols $\true$, $\false$.
+
+    \item $\context$ is a \emph{type assignment} which maps each function symbol $f$ into a type $\tau$. When the signature is clear from the context, we will write $\ofsort{f}{\tau}$ instead of $\context(f)=\tau$ and say that $f$ is of the type $\tau$.
+
+    We require the symbols $\vee, \wedge, \implies, \liff$ to be of the type $\bool \times \bool \to \bool$, $\neg$ to be of the type $\bool \to \bool$ and $\true,\false$ to be of the type $\bool$. \QED
+  \end{enumerate}
+\end{definition}
+In the sequel we assume that $\Sigma = (S,F,\context)$ is an arbitrary but fixed signature.
+
+To define the semantics of \folb, we will have to extend the signature and also assign sorts to variables. Given a type assignment $\context$, we define $\context,x:\sigma$ to be the type assignment that maps a variable $x$ to $\sigma$ and coincides otherwise with $\context$. Likewise, we define $\context,f:\tau$ to be the type assignment that maps a function symbol $f$ to $\tau$ and coincides otherwise with $\context$.
+
+Our next aim is to define the set of terms and their sorts with respect to a type assignment $\context$. This will be done using a relation $\context \vdash t:\sigma$, where $\sigma \in S$, terms can then be defined as all such expressions $t$.
+
+\begin{definition}\label{def:folb-terms}\rm
+  The relation $\context \vdash t:\sigma$, where $t$ is an expression and $\sigma \in S$ is defined inductively as follows. If $\context \vdash t:\sigma$, then we will say that $t$ is a \emph{term of the sort $\sigma$} w.r.t.\ $\context$.
+%We will also write $\context \vdash t_1:\sigma_1,\ldots,$
+  \begin{enumerate}
+    \item If $\context(x) = \sigma$, then $\context \vdash x:\sigma$.
+
+    \item If $\context(f) = \sigma_1 \times \ldots \times \sigma_n \to \sigma$, $\context \vdash t_1:\sigma_1$, \ldots, $\context \vdash t_n:\sigma_n$, then $\context \vdash  f(t_1, \ldots, t_n) : \sigma$.
+
+    \item If $\context \vdash \phi:\bool$, $\context \vdash t_1:\sigma$ and $\context \vdash t_2:\sigma$, then $\context \vdash (\ite{\phi}{t_1}{t_2}):\sigma$.
+
+    \item Let $f$ be a function symbol and $x_1,\ldots,x_n$ pairwise distinct variables. If $\context,x_1:\sigma_1,\ldots,x_n:\sigma_n \vdash s:\sigma$ and $\context,f:(\sigma_1\times \ldots \times\sigma_n \to\sigma) \vdash t : \tau$, then $\context \vdash (\letin{f(x_1:\sigma_1, \ldots, x_n:\sigma_n)}{s}{t}) : \tau$.
+
+    \item If $\context \vdash  s:\sigma$ and $\context \vdash  t:\sigma$, then $\context \vdash (s \eql t) : \bool$.
+
+    \item If $\context,x : \sigma \vdash \phi : \bool$, then $\context \vdash (\forall x : \sigma)\phi : \bool$ and $\context \vdash (\exists x:\sigma)\phi : \bool$. \QED
+  \end{enumerate}
+\end{definition}
+We only defined a \LETIN\ expression for a single function symbol. It is not hard to extend it to a \LETIN\ expression that binds multiple pairwise distinct function symbols in parallel, the details of such an extension are straightforward.
+
+When $\context$ is the type assignment function of $\Sigma$ and $\context \vdash t : \sigma$, we will say that $t$ is a \emph{$\Sigma$-term of the sort $\sigma$}, or simply that $t$ is \emph{a term of the sort $\sigma$}. It is not hard to argue that every $\Sigma$-term has a unique sort.
+
+According to our definition, not every term-like expression has a sort. For example, if $x$ is a variable and $\context$ is not defined on $x$, then $x$ is a not a $term$ w.r.t.\ $\context$. To make the relation between term-like expressions and terms clear, we introduce a notion of free and bound occurrences of variables and function symbols. We call the following occurrences of variables and function symbols \emph{bound}:
+
+\begin{enumerate}
+\item any occurrence of $x$ in $(\forall x:\sigma) \phi$ or in $(\exists x:\sigma) \phi$;
+\item in the term $\letin{f(x_1:\sigma_1, \ldots, x_n:\sigma_n)}{s}{t}$ any occurrence of a variable $x_i$ in $f(x_1:\sigma_1, \ldots, x_n:\sigma_n)$ or in $s$, where $i = 1,\ldots, n$.
+\item in the term $\letin{f(x_1:\sigma_1, \ldots, x_n:\sigma_n)}{s}{t}$ any occurrence of the function symbol $f$ in $f(x_1:\sigma_1, \ldots, x_n:\sigma_n)$ or in $t$.
+\end{enumerate}
+All other occurrences are called \emph{free}. We say that a variable or a function symbol is \emph{free} in a term $t$ if it has at least one free occurrence in $t$. A term is called \emph{closed} if it has no occurrences of free variables.
+
+\begin{theorem}\rm
+  Suppose $\context \vdash t : \sigma$. Then
+  \begin{enumerate}
+    \item for every free variable $x$ of $t$, $\context$ is defined on $x$;
+    \item for every free function symbol $f$ of $t$, $\context$ is defined on $f$;
+    \item if $x$ is a variable not free in $t$, and $\sigma'$ is an arbitrary sort, then
+      $\context, x : \sigma' \vdash t : \sigma$;
+    \item if $f$ is a function symbol not free in $t$, and $\tau$ is an arbitrary type, then $\context, f : \tau \vdash t : \sigma$. \QED
+  \end{enumerate}
+\end{theorem}
+
+\begin{definition}\rm
+  A \emph{predicate symbol} is any function symbol of the type $\sigma_1 \times \ldots \times \sigma_n \to \bool$.
+  A \emph{$\Sigma$-formula} is a $\Sigma$-term of the sort $\bool$. All $\Sigma$-terms that are not $\Sigma$-formulas are called \emph{non-boolean terms}. \QED
+\end{definition}
+
+Note that, in addition to the use of \LETIN\ and \ITE, \folb\ is a proper extension of first-order logic. For example, in \folb\ formulas can be used as arguments to terms and one can quantify over booleans. As a consequence, every quantified boolean formula is a formula in \folb.
+
+\subsection{Semantics}
+
+As usual, the semantics of \folb\ is defined by introducing a notion of \emph{interpretation} and defining how a term is evaluated in an interpretation.
+
+\begin{definition}\label{def:folb-interpretation}\rm
+  Let $\context$ be a type assignment.
+  A \emph{$\context$-interpretation} $\intI$ is a map, defined as follows. Instead of $\intI(e)$ we will write $\interpret{e}{\intI}$, for every element $e$ in the domain of $\intI$.
+  \begin{enumerate}
+    \item Each sort $\sigma \in S$ is mapped to a nonempty domain $\interpret{\sigma}{\intI}$. We require $\interpret{\bool}{\intI} = \left\{0, 1\right\}$.
+
+    \item If $\context \vdash x:\sigma$, then $\interpret{x}{\intI} \in \interpret{\sigma}{\intI}$.
+
+    \item If $\context(f) = \sigma_1 \times \ldots \times \sigma_n \to \sigma$, then $\interpret{f}{\intI}$ is a function from $\interpret{\sigma_1}{\intI} \times \ldots \times \interpret{\sigma_n}{\intI}$ to $\interpret{\sigma}{\intI}$.
+
+    \item We require $\interpret{\true}{\intI} = 1$ and $\interpret{\false}{\intI} = 0$. We require $\interpret{\wedge}{\intI}$, $\interpret{\vee}{\intI}$, $\interpret{\implies}{\intI}$, $\interpret{\liff}{\intI}$ and $\interpret{\neg}{\intI}$ respectively to be the logical conjunction, disjunction, implication, equivalence and negation, defined over $\{0,1\}$ in the standard way. \QED
+  \end{enumerate}
+%  We will call the symbols $\true$, $\false$, $\wedge$, $\vee$, $\implies$, $\liff$ and $\neg$ \emph{interpreted} and all other symbols \emph{uninterpreted}.\AV{don't know if this will be used}
+\end{definition}
+
+Given a $\context$-interpretation $\intI$ and a function symbol $f$, we define $\variant{\intI}{f}{g}$ to be the mapping that maps $f$ to $g$ and coincides otherwise with $\intI$.
+Likewise, for a variable $x$ and value $a$ we define $\variant{\intI}{x}{a}$ to be the mapping that maps $x$ to $a$ and coincides otherwise with $\intI$.
+
+\begin{definition}\label{def:folb-term-evaluation}\rm
+  Let $\intI$ be a $\context$-interpretation, and $\context \vdash t:\sigma$. The \emph{value of $t$ in $\intI$}, denoted as $\eval{t}{\intI}$, is a value in $\interpret{\sigma}{\intI}$ inductively defined as follows:
+  \[
+    \begin{array}{rcl}
+      \eval{x}{\intI}&=&\interpret{x}{\intI}.
+      \\*[1ex]
+      \eval{f(t_1, \ldots, t_n)}{\intI}&=&\interpret{f}{\intI}(\eval{t_1}{\intI}, \ldots, \eval{t_n}{\intI}).
+      \\*[1ex]
+      \eval{s \eql t}{\intI} & = &
+        \left\{ \begin{array}{ll}
+                  1, & \text{if } \eval{s}{\intI} = \eval{t}{\intI}; \\*[1ex]
+                  0, & \text{otherwise.}
+                \end{array}\right.
+      \\*[1ex]
+      \eval{(\forall x : \sigma)\phi}{\intI} & = &
+        \left\{ \begin{array}{ll}
+                  1, & \text{if } \eval{\phi}{\replacement{\intI}{x}{a}} = 1\\*[1ex]
+                     & \text{~~~for all } a \in \interpret{\sigma}{\intI}; \\*[1ex]
+                  0, & \text{otherwise.}
+                \end{array}\right.
+      \\*[1ex]
+      \eval{(\exists x : \sigma)\phi}{\intI} & = &
+        \left\{ \begin{array}{ll}
+                  1, & \text{if } \eval{\phi}{\replacement{\intI}{x}{a}} = 1\\*[1ex]
+                     & \text{~~~for some } a \in \interpret{\sigma}{\intI}; \\*[1ex]
+                  0, & \text{otherwise.}
+                \end{array}\right.
+      \\*[1ex]
+      \eval{\ite{\phi}{s}{t}}{\intI}&=&\left\{ \begin{array}{ll}
+        \eval{s}{\intI},&\text{if $\eval{\phi}{\intI} = 1$;} \\*[1ex]
+        \eval{t}{\intI},&\text{otherwise.}
+      \end{array}\right.
+    \end{array}
+  \]
+  \[
+    \begin{array}{rcl}
+      \eval{\letin{f(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{s}{t}}{\intI}&=&\eval{t}{\replacement{\intI}{f}{g}},
+    \end{array}
+  \]
+  where $g$ is such that for all $i = 1, \ldots, n$ and $a_i \in \interpret{\sigma_i}{\intI}$, we have $g(a_1, \ldots, a_n) = \eval{s}{\replacement{\intI}{x_1 \ldots x_n}{a_1 \ldots a_n}}$. \QED
+\end{definition}
+
+\begin{theorem}\label{thm:semantics}\rm
+  Let $\context \vdash \phi : \bool$ and $\intI$ be a $\context$-interpretation. Then
+  \begin{enumerate}
+    \item for every free variable $x$ of $\phi$, $\intI$ is defined on $x$;
+    \item for every free function symbol $f$ of $\phi$, $\intI$ is defined on $f$;
+    \item if $x$ is a variable not free in $\phi$, $\sigma$ is an arbitrary sort, and $a \in \interpret{\sigma}{\intI}$ then $\eval{\phi}{\intI} = \eval{\phi}{\replacement{\intI}{x}{a}}$;
+    \item if $f$ is a function symbol not free in $\phi$, $\sigma_1,\ldots,\sigma_n,\sigma$ are arbitrary sorts and $g \in \interpret{\sigma_1}{\intI} \times \ldots \times \interpret{\sigma_n}{\intI} \to \interpret{\sigma}{\intI}$, then $\eval{\phi}{\intI} = \eval{\phi}{\replacement{\intI}{f}{g}}$. \QED
+  \end{enumerate}
+\end{theorem}
+
+Let $\context \vdash \phi : \bool$. A $\context$-interpretation $\intI$ is called a \emph{model} of $\phi$, denoted by $\intI \models \phi$, if $\eval{\phi}{\intI} = 1$. If $\intI \models \phi$, we also say that $\intI$ \emph{satisfies} $\phi$. We say that $\phi$ is \emph{valid}, if $\intI \models \phi$ for all $\context$-interpretations $\intI$, and \emph{satisfiable}, if $\intI \models \phi$ for at least one $\context$-interpretation $\intI$. Note that Theorem~\ref{thm:semantics} implies that any interpretation, which coincides with $\intI$ on free variables and free function symbols of $\phi$ is also a model of $\phi$.

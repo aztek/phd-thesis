@@ -1,0 +1,282 @@
+\begin{figure*}[b]
+  \vspace{-1em}
+  \begin{center}
+    \parbox{0cm}{
+      \begin{tabbing}
+        res \ass\ x;\\
+        \IF\ (x $>$ y) \\\inc
+        \THEN\ max \ass\ x;\\
+        \ELSE\ max \ass\ y;\\\dec
+        \IF\ (max $>$ 0) \\\inc
+        \THEN\ res \ass\ res $+$ max;\\
+        \ELSE\ res \ass\ res $-$ max;\\[.5em]\dec
+        \reserved{assert} res $\geq$ x
+      \end{tabbing}
+    }
+  \end{center}
+  \vspace{-2em}
+  \caption{Sequence of conditionals.\label{fig:seqITE}}
+\end{figure*}
+
+\begin{figure*}[tb]
+{\small
+\vspace{-1em}
+\begin{lstlisting}
+tff(x, type, x: $int).
+tff(y, type, y: $int).
+tff(max, type, max: $int).
+tff(res, type, res: $int).
+tff(res1, type, res1: $int).
+
+tff(transition_relation, hypothesis,
+    res1 = $let(res := x,
+             $let(max := $ite($greater(x, y),
+                                $let(max := x, max),
+                                $let(max := y, max)),
+               $let(res := $ite($greater(max, 0),
+                                  $let(res := $sum(res, max), res),
+                                  $let(res := $difference(res, max),
+                                        res)),
+                 res)))).
+
+tff(safety_property, conjecture, $greatereq(res1, x)).
+\end{lstlisting}
+\caption{Representation of the partial correctness statement of the code on Figure~\ref{fig:seqITE} in Vampire\label{fig:VampireITE}.}
+}
+\end{figure*}
+
+In this section we illustrate how FOOL makes first-order theorem
+provers better suited to applications in program analysis and
+verification.
+Firstly,  we give concrete examples exemplifying the use of FOOL for
+expressing program properties. We avoid various
+program analysis steps, such as SSA form computations and renaming
+program variables; instead we show how program properties can directly
+be expressed in FOOL.
+ We also present a technique for
+automatically generating the next state relation of any program with
+assignments, \ITE, and sequential composition.
+For doing so,  we introduce a simple extension of FOOL,
+allowing for a general translation that is linear in the size of the
+program.
+This is a new result intended to understand which extensions of
+first-order logic are adequate for naturally representing fragments of
+imperative programs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Encoding the Next State Relation}\label{sec:foolp}
+
+Consider the program given in
+Figure~\ref{fig:seqITE}, written in a C-like syntax, using a sequence
+of two conditional statements.
+The program first computes the maximal value $\mathit{max}$ of two integers $x$ and
+$y$ and then adds the absolute value of $\mathit{max}$ to $x$. A safety assertion,
+in FOL, is specified at the end of the loop, using the
+{\bf assert} construct. This program is clearly safe, the
+assertion is satisfied. To prove program safety, one needs to reason
+about the program's transition relation, in particular reason about
+conditional statements, and express the final value of
+the program variable $\mathit{res}$. The partial correctness of the program
+of Figure~\ref{fig:seqITE} can be \emph{automatically} expressed in FOOL,
+and then Vampire can be used to prove program safety.
+This requires us to encode (i)
+the next state value of $\mathit{res}$ (and $\mathit{max}$) as a hypothesis
+in the extended TFF0 syntax of FOOL,
+by using the \ITE\ ({\tt \$ite}) and \LETIN\ ({\tt \$let})
+constructs, and (ii)
+the safety property as the conjecture to be proven by Vampire.
+
+Figure~\ref{fig:VampireITE} shows this extended TFF0 encoding.
+The use of \ITE\ and \LETIN\ constructs allows us to have a
+direct  encoding of the  transition relation of
+Figure~\ref{fig:seqITE} in FOOL. Note that each expression from the program appears only once in the encoding.
+
+We now explain how the encoding of the next state values of program
+variables can be generated automatically.
+We consider programs using assignments \texttt{:=},
+\ITE\ and sequential composition $;$.
+We begin by making an assumption about the structure of programs (which we relax later). A program $P$ is in \emph{restricted form} if for any subprogram of the form \IF\ e \THEN\ $P_1$ \ELSE\ $P_2$ the subprograms $P_1$ and $P_2$ only make assignments to the same single variable. Given a program $P$ in restricted form let us define its translation $[P]$ inductively as follows:
+%
+\begin{itemize}
+	\item $[$x\ASS e$]$ is $\letin{x}{e}{x}$;
+	\item $[$\IF\ e \THEN\ $P_1$ \ELSE\ $P_2]$, where $P_1$ and
+          $P_2$ update $x$,  is $\letin{x}{\ite{e}{[P_1]}{[P_2]}}{x}$;
+	\item $[P_1$;$P_2]$ is $\mathtt{let}~D~\mathtt{in}~[P_2]$ where $[P_1]$ is $\mathtt{let}~D~\mathtt{in}~x$.
+\end{itemize}
+%
+Given a program $P$, the next state value for variable $x$ can be
+given by $[P$; x\ASS x$]$,
+i.e. by ensuring the final statement of the program updates the
+variable of interest.
+The restricted form is required as conditionals must be viewed
+as assignments in the translation and assignments can only be made to single variables.
+
+\begin{figure*}[tb]
+  \vspace{-1em}
+  \begin{center}
+    \parbox{0cm}{
+      \begin{tabbing}
+        \IF\ (x $>$ y) \\\inc
+        \THEN\ t \ass\ x; x \ass\ y; y \ass\ t;\\\dec
+        \reserved{assert} y $\geq$ x
+      \end{tabbing}
+    }
+  \end{center}
+  \vspace*{-2em}
+  \caption{Updating multiple variables.\label{fig:tmpSwap}}
+\end{figure*}
+
+To demonstrate the limitations of this restriction let us consider the simple program in Figure~\ref{fig:tmpSwap} that ensures that x is not larger than y. We cannot apply the translation as the conditional updates three variables. To generalise the approach we can extend FOOL with \emph{tuple expressions}, let us call this extension \foolp. In this extended logic the next state values for Figure~\ref{fig:tmpSwap} can be encoded as follows:
+%
+\[
+\begin{array}{ll}
+\mathtt{let}\; (x,y,t) =& \mathtt{if}\; x > y \;\mathtt{then} \\
+&\quad\mathtt{let}\; (x,y,t) = (x,y,x) \;\mathtt{in}\\
+&\quad\quad\mathtt{let}\; (x,y,t) = (y,y,t) \;\mathtt{in}\\
+&\quad\quad\quad\mathtt{let}\;(x,y,t) = (x,t,t)  \;\mathtt{in}\; (x,y,t) \\
+&\mathtt{else}\; (x,y,t)\\
+\mathtt{in}\; (x,y,t) \\
+\end{array}
+\]
+%
+We now give a brief sketch of the extended logic \foolp\ and the associated translation. We omit details since its full definition and semantics would require essentially repeating definitions from \cite{FOOL}.  \foolp\ extends \fool\ by tuples; for all expressions $t_i$ of type $\sigma_i$ we can use a \emph{tuple expression} $(t_1,\ldots,t_n)$ of type $(\sigma_1,\ldots,\sigma_n)$. The logic should also include a suitable tuple projection function, which we do not discuss here.
+
+This extension allows for a more general translation in two senses:
+first, the previous restricted form is lifted; and second, it now
+gives the next state values of {\it all} variables updated by the program. Given a program $P$ its translation $[P]$ will have the form $\letin{(x_1,\ldots,x_n)}{E}{(x_1,\ldots,x_n)}$, where $x_1,\ldots,x_n$ are all variables updated by $P$, that is, all variables used in the left-hand-side of an assignment. We inductively define $[P]$ as follows:
+\begin{itemize}
+	\item $[\text{x}_i \text{\ASS} e]$ is $\letin{(\ldots,x_i,\ldots)}{(\ldots,e,\ldots)}{(x_1,\ldots,x_n)}$,
+	\item $[$\IF\ e \THEN\ $P_1$ \ELSE\ $P_2]$ is $\letin{(x_1,\ldots,x_n)}{\ite{e}{[P_1]}{[P_2]}}{(x_1,\ldots,x_n)},$
+	\item $[P_1$;$P_2]$ is $\mathtt{let}~D~\mathtt{in}~[P_2]$ where $[P_1]$ is $\mathtt{let}~D~\mathtt{in}~(x_1,\ldots,x_n)$.
+\end{itemize}
+This translation is bounded by $O(v\cdot n)$, where $v$ is the number
+of variables in the program and $n$ is the program size (number of
+statements) as each program statement is used once with one or two
+instances of $(x_1,\ldots,x_n)$.
+This becomes $O(n)$ if we assume that the number of
+variables is fixed. The translation could be refined so that some introduced  \LETIN\
+expressions only use a subset of program variables.
+Finally, this translation preserves the semantics
+of the program.
+
+\begin{theorem}\rm
+  Let $P$ be a program with variables $(x_1,\ldots,x_n)$ and let $u_1,\ldots,u_n, v_1, \ldots, v_n$ be values (where $u_i$ and $v_i$ are of the same type as $x_i$). If $P$ changes the state $\{x_1\to u_1,\ldots,x_n\to u_n\}$ to $\{x_1\to v_1,\ldots,x_n\to v_n\}$ then the value of $[P]$ in $\{x_1\to u_1,\ldots,x_n\to u_n\}$ is $(v_1,\ldots,v_n)$.
+\end{theorem}
+
+This translation encodes the next state values of program variables by
+directly following the structure of the program. This leads to a
+succinct representation that, importantly, does not lose any
+information or attempt to translate the program too early. This allows
+the theorem prover to apply its own translation to FOL that it can
+handle efficiently.   While \foolp{} is not yet fully supported in
+Vampire, we believe experimenting with \foolp{} on
+examples coming from program analysis and verification is an
+interesting task for future work.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A Program with a Loop and Arrays}
+
+\begin{figure*}[bt]
+{
+  \vspace{-1em}
+  \begin{center}
+    \parbox{0cm}{
+  \begin{tabbing}
+    $a$ \ass\ $0$; $b$ \ass\ $0$; $c$ \ass\ $0$; \\[.5em]
+    \reserved{invariant} a = b + c $\wedge$ \\
+    {\color{white}\reserved{invariant}} a $\geq$ 0 $\wedge$ b $\geq$ 0 $\wedge$ c $\geq$
+    0 $\wedge$ a $\leq$ k $\wedge$ \\
+    {\color{white}\reserved{invariant}} $(\forall p) (0\leq p<b \implies
+    (\exists i) (0 \leq i < a \wedge A[i] > 0 \wedge B[p] = A[i]))$\\[1em]
+    \WHILE\ ($a \leq k$) \DO \\ \inc
+      \IF\ ($A[a] > 0$) \\ \inc
+        \THEN\ \=\+ $B[b]$ \ass\ $A[a]$\semicol $b$ \ass\ $b+1$\semicol \\ \dec
+        \ELSE\ \=\+ $C[c]$ \ass\ $A[a]$\semicol $c$ \ass\ $c+1$\semicol \\ \dec \dec
+      $a$ \ass\ $a+1$\semicol \\ \dec
+    \OD\\[.5em]
+    \reserved{assert} $(\forall p)(0 \leq p<b \implies B[p]> 0)$
+  \end{tabbing}
+    }
+  \end{center}
+  \vspace{-2em}
+  \caption{Array partition.\label{fig:partition}}
+}
+\end{figure*}
+
+\begin{figure*}[tb]
+{\small
+\begin{lstlisting}
+tff(a, type, a: $int).
+tff(b, type, b: $int).
+tff(c, type, c: $int).
+tff(k, type, k: $int).
+tff(arrayA, type, arrayA: $array($int, $int)).
+tff(arrayB, type, arrayB: $array($int, $int)).
+tff(arrayC, type, arrayC: $array($int, $int)).
+
+tff(invariant_property, hypothesis,
+    inv <=> ((a = $sum(b, c)) & $greatereq(a, 0) & $greatereq(b, 0)
+                                 & $greatereq(c, 0) & $lesseq(a, k) &
+             ![P:$int]: ($lesseq(0, P) & $less(P, b) =>
+               (?[I:$int]: ($lesseq(0, I) & $less(I, a) &
+                  $greater($select(arrayA, I), 0) &
+                  $select(arrayB, P) = $select(arrayA, I)))))).
+
+tff(safety_property, conjecture,
+    (inv & ~$lesseq(a, k)) =>
+      (![P:$int]: ($lesseq(0, P) & $less(P, b) =>
+                    $greater($select(arrayB, P), 0)))).
+\end{lstlisting}
+\caption{Representation of the partial correctness statement of the code on Figure~\ref{fig:partition} in Vampire\label{fig:loop_safety_Vampire}.}
+}
+\end{figure*}
+
+Let us now show the use of FOOL in Vampire for reasoning about
+programs with loops. Consider the program given in
+Figure~\ref{fig:partition}, written in a C-like syntax.  The program
+fills an integer-valued array $B$ by the strictly positive values
+of a source array $A$, and an integer-valued array $C$ with
+the non-positive values of $A$. A safety assertion, in FOL, is
+specified at the end of the loop, using the {\bf assert}
+construct. The program of Figure~\ref{fig:partition} is clearly safe
+as the assertion is satisfied when the loop is exited.
+However, to prove program safety we need additional
+loop properties, that is loop invariants, that hold at any loop
+iteration. These can be automatically generated using existing approaches, for
+example the symbol elimination method for invariant generation in
+Vampire~\cite{fase2009}. In this case we use the FOL property
+specified in the {\bf invariant} construct of  Figure~\ref{fig:partition}. This invariant
+property states that at any loop iteration, (i) the  sum of visited
+array elements in $A$ is the sum of visited elements in $B$ and $C$
+(that is, $a = b + c$), (ii) the number of visited array
+elements in $A$, $B$, $C$ is positive (that is, $a\geq 0$, $b\geq 0$,
+and $c\geq 0$), with $a\leq k$, and (iii) each array element
+$B[0],\ldots,B[b-1]$ is a strictly positive element in
+$A$. Formulating the latter property requires quantifier alternation
+in FOL, resulting in the quantified property with $\forall\exists$
+listed in the invariant of  Figure~\ref{fig:partition}.
+We can verify the safety of the program using Hoare-style reasoning in Vampire.
+The partial correctness property is that the invariant and the negation of the loop condition implies the safety assertion.
+This is the conjecture to be proven by Vampire.
+Figure~\ref{fig:loop_safety_Vampire} shows the encoding in the
+extended TFF0 syntax of this partial
+correctness statement; note that this uses the built-in theory of
+polymorphic arrays in Vampire, where $arrayA$, $arrayB$ and $arrayC$
+correspond respectively to the arrays $A$, $B$ and $C$.
+
+So far, we assumed that the given invariant in
+Figure~\ref{fig:partition} is
+indeed an invariant. Using \foolp{} described in
+Section~\ref{sec:foolp}, we can verify the inductiveness
+property of the invariant, as follows: (i) express the the transition
+relation of the loop in \foolp, and (ii) prove that, if the invariant
+holds at an arbitrary loop iteration $i$, then it also holds at loop
+iteration $i+1$. For proving this, we can again use \foolp\ to
+formulate
+the next state values of loop variables in the invariant at loop
+iteration $i+1$.
+Moreover, \foolp{} can also be used to express formulas as
+inputs to the symbol elimination method for invariant generation in
+Vampire. We leave the task of using \foolp{} for invariant generation
+as further work.

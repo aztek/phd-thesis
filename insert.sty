@@ -1,0 +1,68 @@
+\newcommand*{\thesis}[1]{\gdef\@thesis{#1}%
+}
+\newcommand*{\@thesis}{Thesis for the Degree of Licentiate of Engineering}
+
+\newcommand*{\department}[1]{\gdef\@department{#1}%
+}
+\newcommand*{\@department}{Department of Computer Science and Engineering}
+
+\newcommand*{\institution}[1]{\gdef\@institution{#1}%
+}
+\newcommand*{\@institution}{Chalmers University of Technology}
+
+\newcommand*{\infopageinstitution}[1]{\gdef\@infopageinstitution{#1}%
+}
+\newcommand*{\@infopageinstitution}{\@institution}
+
+\newcommand*{\reportnumber}[1]{\gdef\@reportnumber{#1}%
+}
+\newcommand*{\@reportnumber}{XXXX}
+
+\newcommand*{\issn}[1]{\gdef\@issn{#1}%
+}
+\newcommand*{\@issn}{XXXX-XXXX}
+
+\newcommand*{\infopagetitle}[1]{\gdef\@infopagetitle{#1}%
+}
+\newcommand*{\@infopagetitle}{\@title}
+
+\renewcommand*{\maketitle}{%
+\begin{titlepage}
+  \thispagestyle{empty}
+  \centering
+  \normalsize
+  \includegraphics[width=\textwidth]{graphics/LO_CH+GUeng_SV_no_avancez.pdf}\\
+  \vspace{1cm}
+
+{\huge\@title\unskip\strut\par}
+
+\vspace{1cm}
+
+{\large\@author}
+
+\vspace{2cm}
+
+{\small The licentiate seminar will be held in room {\bf EF}, EDIT building,\\
+R\"{a}nnv\"{a}gen 6B, 
+Chalmers University of Technology,\\
+on {\bf Tuesday, 3rd May 2016} at {\bf 10:00}\\~\\}
+
+{\small Discussion leader: {\bf Geoff Sutcliffe}, \\ 
+University of Miami, FL, USA\\~\\}
+
+{\small The thesis is available at the Department of Computer Science and
+Engineering, Chalmers University of Technology}
+
+\vfill
+
+\begin{flushleft}
+{\footnotesize Department of Computer Science and Engineering}\\[1mm]
+{\footnotesize Chalmers University of Technology and\\[-1.5mm]University of Gothenburg}\\[1mm]
+{\footnotesize SE-412 96 Gothenburg, Sweden\\[-1mm]Telephone +46 (0)31-772 1000}\\
+\end{flushleft}
+\begin{flushright}\vspace{-2.8cm}
+\includegraphics[height=3cm]{graphics/AVANCEZ_black.pdf}
+\end{flushright}
+\end{titlepage}
+}
+\endinput

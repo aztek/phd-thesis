@@ -1,0 +1,175 @@
+Using built-in arrays and reasoning in the first-order theory of arrays are common in program analysis, for example for finding loop invariants in programs using arrays~\cite{fase2009}. Previous versions of Vampire supported theories of integer arrays and arrays of integer arrays~\cite{Vampire13}. No other array sorts were supported and in order to implement one it would be necessary to hardcode a new sort and add the theory axioms corresponding to that sort. In this section we describe a polymorphic theory of arrays implemented in Vampire.
+
+\subsection{Definition}
+The polymorphic theory of arrays is the union of theories of arrays parametrised by two sorts: sort $\tau$ of indexes and sort $\sigma$ of values. It would have been proper to call these theories the theories of maps from $\tau$ to $\sigma$, however we decided to call them arrays for the sake of compatibility with arrays as defined in SMT-LIB.
+
+A theory of arrays is a first-order theory that contains a sort
+$\arrayt(\tau,\sigma)$, function symbols $\selectf :
+\arrayt(\tau,\sigma) \times \tau \to \sigma$ and $\storef :
+\arrayt(\tau,\sigma) \times \tau \times \sigma \to
+\arrayt(\tau,\sigma)$, and three axioms.
+The function symbol $\selectf$ represents a binary operation of
+extracting an array element by its index.
+The function symbol $\storef$ represents a ternary operation of updating an array at a given index with a given value. The array axioms are:
+\begin{enumerate}
+%  \item array congruence $$(\forall a:\arrayt(\tau,\sigma))(\forall i:\tau)(\forall j:\tau)(i \eql j \implies \select{a}{i} \eql \select{a}{j});$$
+  \item read-over-write 1
+        \begin{align*}
+          &(\forall a:\arrayt(\tau,\sigma))(\forall v:\sigma)(\forall i:\tau)(\forall j:\tau)\\
+          &\quad(i \eql j \implies \select{\store{a}{i}{v}}{j} \eql v);
+        \end{align*}
+  \item read-over-write 2
+        \begin{align*}
+          &(\forall a:\arrayt(\tau,\sigma))(\forall v:\sigma)(\forall i:\tau)(\forall j:\tau)\\
+          &\quad(i \neql j \implies \select{\store{a}{i}{v}}{j} \eql \select{a}{j});
+        \end{align*}
+%  \item extensionality $$(\forall a:\arrayt(\tau,\sigma))(\forall b:\arrayt(\tau,\sigma))((\forall i:\tau)(\select{a}{i} \eql \select{b}{i}) \liff a\eql b).$$
+  \item extensionality
+        \begin{align*}
+          &(\forall a:\arrayt(\tau,\sigma))(\forall b:\arrayt(\tau,\sigma))\\
+          &\quad((\forall i:\tau)(\select{a}{i} \eql \select{b}{i}) \implies a\eql b).
+        \end{align*}
+\end{enumerate}
+We will call every concrete instance of the theory of arrays for
+concrete sorts $\tau$ and $\sigma$ the \emph{$(\tau,\sigma)$-instance}.
+
+%One can use the polymorphic theory of arrays to express program properties. For example, the following formula expresses the fact that an integer array $a$ of size $n$ is sorted.
+%\begin{equation}\label{eq:arrays-example}
+%  (\forall i:\tau)(i \geq 0 \land i < n \implies \select{a}{i} \leq \select{a}{i + 1})
+%\end{equation}
+
+One can use the polymorphic theory of arrays to express program properties. Recall the code snippet involving arrays mentioned in Section~\ref{sect:fool}:
+\begin{verbatim}
+array[3] := 5;
+array[2] + array[3];
+\end{verbatim}
+Formula~\eqref{eq:let-function-example} used an interpreted function to represent the array in this code. We can alternatively use arrays to represent it as follows
+\begin{equation}\label{eq:arrays-example}
+\begin{aligned}
+&\mathtt{let}\;\binding{\arrayt}{\store{array}{3}{5}}\;\mathtt{in}\\
+&\quad\select{\arrayt}{2} + \select{\arrayt}{3}
+\end{aligned}
+\end{equation}
+
+\subsection{Implementation in Vampire}
+
+Vampire implements reasoning in the polymorphic theory of arrays by adding corresponding sorts axioms when the input uses array sorts and/or functions.
+
+Whenever the input problem uses a sort $\arrayt(\tau,\sigma)$, Vampire adds this sort and function symbols $\selectf$ and $\storef$ of the types $\arrayt(\tau,\sigma) \times \tau \to \sigma$ and $\arrayt(\tau,\sigma) \times \tau \times \sigma \to \arrayt(\tau,\sigma)$, respectively.
+
+If the input problem contains $\storef$, Vampire adds the following axioms for the sorts $\tau$ and $\sigma$ used in the corresponding array theory instance:
+
+\begin{equation}\label{eq:array-axiom-1}
+  \begin{aligned}
+    &(\forall a:\arrayt(\tau,\sigma))(\forall i:\tau)(\forall v:\sigma)\\
+    &\quad(\select{\store{a}{i}{v}}{i} \eql v)
+  \end{aligned}
+\end{equation}
+\begin{equation}\label{eq:array-axiom-2}
+  \begin{aligned}
+    &(\forall a:\arrayt(\tau,\sigma))(\forall i:\tau)(\forall j:\tau)(\forall v:\sigma)\\
+    &\quad(i \neql j \implies \select{\store{a}{i}{v}}{j} \eql \select{a}{j})
+  \end{aligned}
+\end{equation}
+\begin{equation}\label{eq:array-axiom-3}
+  \begin{aligned}
+    &(\forall a:\arrayt(\tau,\sigma))(\forall b:\arrayt(\tau,\sigma))\\
+    &\quad(a \not\eql b \implies (\exists i:\tau)(\select{a}{i} \neql \select{b}{i}))
+  \end{aligned}
+\end{equation}
+These axioms are equivalent to the axioms read-over-write~1, read-over-write~2 and extensionality.
+
+If the input contains only $\selectf$ but not $\storef$ for this instance, then only extensionality \eqref{eq:array-axiom-3} is added.
+
+Theory axioms are not added when the \verb'--theory_axioms' option is set to \verb'off' (the default value is \verb'on'), which leaves an option for the user to try her or his own axiomatisation of arrays.
+
+Vampire uses the extensionality resolution rule~\cite{ATVA14} to efficiently reason with the extensionality axiom.
+
+To express arrays, the TPTP syntax extension supported by Vampire
+allows, for every pair of sorts $\tau$ and $\sigma$, denoted by
+\lstinline't' and \lstinline's' in the TFF0 syntax, to denote the sort
+$\arrayt(\tau,\sigma)$ by \darray{\lstinline's'}{\lstinline't'}. Function symbols $\selectf$
+and $\storef$ can be expressed as ad-hoc polymorphic \dselect\ and
+\texttt{\$store}, respectively for every pairs of sorts
+$\tau,\sigma$. Previously,
+the theories of integer arrays and arrays of integer arrays were
+represented as sorts \darrayone\ and \darraytwo\ in Vampire,
+with the corresponding sort-specific function symbols \dselectone, \dselecttwo, \dstoreone\  and
+\dstoretwo. Our new implementation in Vampire, with
+support for the polymorphic theory of arrays, deprecates these
+two concrete array theories. Instead, one can now use the sorts
+\darray{\dint}{\dint} and \darray{\dint}{\darray{\dint}{\dint}}.
+%The example~\eqref{eq:arrays-example} can be expressed in the extended TFF0 using the built-in theory of integers. Here \lstinline'$greatereq', \lstinline'$less' and \lstinline'$sum' represent operations of greater-or-equal comparison, less comparison and integer addition, respectively.
+%\begin{lstlisting}
+%![I : $int]: (($greatereq(i, 0) & $less(i, n)) =>
+%                 $lesseq($select(a, i), $select(a, $sum(i, 1))))
+%\end{lstlisting}
+For example, formula~\eqref{eq:arrays-example} can be written in the extended TFF0 syntax as follows:
+\begin{lstlisting}
+$let(array := $store(array,3,5),
+     $sum($select(array,2), $select(array,3))).
+\end{lstlisting}%$
+
+%------------------------------------------------------------------------------
+\subsection{Theory of Boolean Arrays}
+
+An interesting special case of the polymorphic theory of arrays is the theory of boolean arrays. In that theory the $\selectf$ function has the type $\arrayt(\tau,\bool) \times \tau \to \bool$ and the $\storef$ function has the type $\arrayt(\tau,\bool) \times \tau \times \bool \to \arrayt(\tau,\bool)$. This means that applications of $\selectf$ can be used as formulas and $\storef$ can have a formula as the third argument.
+
+Vampire implements the theory of booleans arrays similarly to other sorts, by adding theory axioms when the option \verb'--theory_axioms' is enabled. However, the theory axioms are different for the following reason. The axioms of the theory of boolean arrays are syntactically correct in FOOL but not in FOL, because they use quantification over booleans. However, Vampire adds theory axioms only after a translation of FOOL to FOL. For this reason, Vampire uses the following set of axioms for boolean arrays:
+\begin{equation*}
+  \begin{aligned}
+    &(\forall a:\arrayt(\tau,\bool))(\forall i:\tau)(\forall v:\bool)\\
+    &\quad(\select{\store{a}{i}{v}}{i} \liff (v \eql \true))
+  \end{aligned}
+\end{equation*}
+\begin{equation*}
+  \begin{aligned}
+    &(\forall a:\arrayt(\tau,\bool))(\forall i:\tau)(\forall j:\tau)(\forall v:\bool)\\
+    &\quad(i \neql j \implies \select{\store{a}{i}{v}}{j} \liff \select{a}{j})
+  \end{aligned}
+\end{equation*}
+\begin{equation*}
+  \begin{aligned}
+    &(\forall a:\arrayt(\tau,\bool))(\forall b:\arrayt(\tau,\bool))\\
+    &\quad(a \not\eql b \implies (\exists i:\tau)(\select{a}{i} \oplus \select{b}{i}))
+  \end{aligned}
+\end{equation*}
+where $\oplus$ is the ``exclusive or'' connective.
+
+\newcommand{\encrypt}{\mathit{encrypt}}
+\newcommand{\key}{\mathit{key}}
+\newcommand{\msg}{\mathit{message}}
+\newcommand{\plaintext}{\mathit{plaintext}}
+\newcommand{\cipher}{\mathit{cipher}}
+
+One can use the theory of boolean arrays, for example, to express properties of bit vectors. In the following example we give a formalisation of a basic property of XOR encryption, where the key, the message and the cipher are bit vectors. Let $\encrypt$ be a function of the type $\arrayt(\Z,\bool) \times \arrayt(\Z,\bool) \to \arrayt(\Z,\bool)$. We will write $\encrypt(\msg, \key)$ to denote the result of bit-wise application of the XOR operation to $\msg$ and $\key$. For simplicity we will assume that the message and the key are of equal length. The definition of $\encrypt$ can be expressed with the following axiom:
+\begin{align*}
+  &(\forall \msg:\arrayt(\Z,\bool))(\forall \key:\arrayt(\Z,\bool))(\forall i:\Z)\\
+  &\quad(\select{\encrypt(\msg,\key)}{i} \eql \\
+  &\quad\quad\select{\msg}{i} \oplus \select{\key}{i}).
+\end{align*}
+
+An important property of XOR encryption is its vulnerability to the known plaintext attack. It means that knowing a message and its cipher, one can obtain the key that was used to encrypt the message by encrypting the message with the cipher. This property can be expressed by the following formula.
+\begin{align*}
+  &(\forall \plaintext:\arrayt(\Z,\bool))(\forall \cipher:\arrayt(\Z,\bool))\\
+  &\quad(\forall \key:\arrayt(\Z,\bool))(\cipher \eql \encrypt(\plaintext,\key) \implies\\
+  &\quad\quad\key \eql \encrypt(\plaintext,\cipher))
+\end{align*}
+
+The sort $\arrayt(\Z,\bool)$ is represented in the extended TFF0 syntax as \darray{\dint}{\dbool}. The presented property of XOR encryption can be expressed in the extended TFF0 in the following way.
+\begin{lstlisting}
+tff(encrypt, type, encrypt: ($array($int,$o) *
+    $array($int,$o)) > $array($int,$o)).
+
+tff(xor_encryption, axiom,
+    ![Message:$array($int,$o),
+      Key:$array($int,$o), I:$int]:
+      ($select(encrypt(Message, Key), I) =
+        ($select(Message, I) <~> $select(Key,I)))).
+
+tff(known_plaintext_attack, conjecture,
+    ![Plaintext:$array($int,$o),
+      Cipher:$array($int,$o), Key:$array($int,$o)]:
+        ((Cipher = encrypt(Plaintext, Key)) =>
+          (Key = encrypt(Plaintext, Cipher)))).
+\end{lstlisting}

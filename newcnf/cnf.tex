@@ -1,0 +1,68 @@
+% !TEX root = ../main.tex
+
+% nonnengart2001computing also have (in the simple approach): 
+% elimination of equivalences as part of NNF transform 
+% (but one wants to decide about equivalences during naming)
+% miniscoping and variable renaming just before skolemization
+% (but let's ignore miniscoping and assume nice variables rightaway or a detail below the level of this presentation) 
+%
+%???? polarity dependent elimination of equivalences section has an argument about ugly invisible tautologies 
+% (like the ones we mention below)
+%
+
+Traditional approaches to clausification~\cite{nonnengart2001computing} produce a clausal normal form of a given first-order formula in several stages, where each stage represents a single pass through the formula tree. These stages usually include (in this order): formula simplification, translation into negation normal form, formula naming, elimination of equivalences, skolemisation, and distribution of disjunctions over conjunctions. \newcnf{} takes a different approach that employs a single top-down traversal of the formula in which these stages are combined. This approach enables optimisations that are not available if the stages of clausification are independent. For example, compared the traditional staged approach \newcnf{} can introduce fewer Skolem functions on formulas with a complex nesting of equivalences and quantifiers. %Another example is an easy detection of intermediate tautologies, which are discarded on the fly. \newcnf{} thus maintains a more accurate count of sub-formula occurrences, on which the decision whether to name a sub-formula is based.
+
+The main advantage of \newcnf{} for this work, however, is that its top-down traversal provides a suitable context not only for clausification of first-order formulas, but also of the extension of first-order logic with \folb{} features.
+
+\newcnf{} works with the input first-order formula represented as a set of \emph{intermediate clauses}. An intermediate clause $\genclause{C}{\subst}$ is a pair of a multiset $C$ of signed first-order formulas and a substitution $\subst$ that maps variables to terms. We denote by $\genlit{\psi}{\sign}$ a first-order formula $\psi$, signed with $\sign \in \{\possign,\negsign\}$. Signs are used for polarity dependent elimination of equalities~\cite{nonnengart2001computing}. Substitution $\subst$ is used for skolemisation. During the trans\-la\-tion, $\subst$ is extended by skolemised variables and their corresponding Skolem terms. %, and at the end of the translation applied to each formula in $C$.
+
+\newcnf{} starts with the input first-order formula $\phi$ and a set $\GC$ of intermediate clauses that contains a single intermediate clause $\genclause{\{\genlit{\phi}{\possign}\}}{\emptySubst}$, where $\emptySubst$ is an empty substitution. Then it makes a series of replacements of in\-ter\-me\-di\-ate clauses in $\GC$ until all intermediate clauses in $\GC$ contain only signed atomic formulas. A replacement of an intermediate clause might introduce Skolem functions and names of subformulas. Each replacement preserves the following invariant: the input formula is equivalent with respect to the original signature to the conjunction of universally quantified formulas of the form $\bigwedge_{\genlit{\psi}{\sign} \in C} \psi'$ for every $\genclause{C}{\subst}$ in $\GC$, where every $\psi'$ is $\psi \subst$ if $\sign = \possign$ and $\neg\psi \subst$ if $\sign = \negsign$. When every $\psi$ in each intermediate clause is atomic, $\GC$ contains the representation of a clausal normal form of the input formula.
+
+% the conjunction of universally quantified formulas of the form $$\bigvee_{\genlit{\phi}{\possign} \in G} \phi\subst \vee \bigvee_{\genlit{\phi}{\negsign} \in G} \neg \phi\subst$$ for every $\genclause{C}{\subst}$ in $\GC$.
+
+%\newcnf{} implements polarity dependent elimination of equalities~\cite{nonnengart2001computing}. For that, \newcnf{} signs formulas with a positive or negative sign. We denote by $\genlit{\phi}{\sign}$ a first-order formula $\phi$, signed with $\sign \in \{\possign,\negsign\}$. The substitution is used for skolemisation. During the translation $\subst$ is extended by skolemised variables and their corresponding Skolem terms.
+
+%\newcnf{} maintains a set of \emph{intermediate clauses}. An intermediate clause $\genclause{C}{\subst}$ is a pair of a multiset $C$ of signed formulas and a substitution $\subst$. The substitution is used for skolemisation. During the translation $\subst$ is extended by skolemised variables and their corresponding Skolem terms. At the end of the translation $\subst$ is applied to every signed formulas of the intermediate clause. An intermediate clause $\genclause{C}{\subst}$ that only contains atomic signed formulas can be translated to a first-order clause by computing the set of literals \[ \{ A\subst \ |\ \genlit{A}{\possign} \in G \} \cup \{ \neg A\subst \ |\ \genlit{A}{\negsign} \in G \}.\] 
+
+%\newcnf{} translates a first-order formula $\phi$ to its set of first-order clauses. It starts with a set $\GC$ of intermediate clauses that contains a single intermediate clause $\genclause{\{\genlit{\phi}{\possign}\}}{\emptySubst}$, where $\emptySubst$ is an empty substitution. Then it makes a series of replacements of intermediate clauses in $\GC$ until all the intermediate clauses in $\GC$ contain only atomic formulas. Finally, it builds the resulting set of first-order clauses by translating each intermediate clause in $\GC$ to a first-order clause.
+
+For every subformula of $\phi$, \newcnf{} maintains its list of occurrences in the intermediate clauses of $\GC$. These occurrences are used for naming of formulas and are updated whenever intermediate clauses are added or removed from $\GC$. 
+
+The replacements of intermediate clauses are guided by the structure of $\phi$. \newcnf{} traverses $\phi$ top-down, visiting every non-atomic subformula of $\phi$ exactly once in an order that respects the subformula relation. It means that for each distinct subformulas $\psi_1$ and $\psi_2$ of $\phi$ such that $\psi_1$ is a subformula of $\psi_2$, $\psi_2$ is visited before $\psi_1$.
+
+For every subformula $\psi$, \newcnf{} computes its number of occurrences in intermediate clauses in $\GC$. If this number exceeds a pre-specified naming threshold, the formula $\psi$ is named as follows. Let $y_1,\ldots,y_n$ be free variables of $\psi$ and $\tau_1,\ldots,\tau_n$ be their sorts. \newcnf{} introduces a new predicate symbol $P$ of the sort $\sigma_1\times\ldots\times\sigma_n$. Then, each occurrence $\genlit{\psi}{\sign}$ in intermediate clauses in $\GC$ is replaced by $\genlit{P(y_1,\ldots,y_n)}{\sign}$. Finally, two intermediate clauses $\genclause{\{\genlit{P(y_1,\ldots,y_n)}{\negsign},\genlit{\psi}{\possign}\}}{\emptySubst}$ and $\genclause{\{\genlit{P(y_1,\ldots,y_n)}{\possign},\genlit{\psi}{\negsign}\}}{\emptySubst}$ are added to $\GC$. If the number of occurrences of $\psi$ does not exceed the naming threshold, each of the intermediate clauses that have an occurrence of $\genlit{\psi}{\possign}$ or $\genlit{\psi}{\negsign}$ is replaced with one or more new intermediate clauses according to the rules, described below.
+
+Let $\psi$ be a subformula of $\phi$ and $\genclause{C}{\subst}$ be an intermediate clause such that $C$ has an occurrence of $\genlit{\psi}{\sign}$. The intermediate clauses that are added to $\GC$ depend on the top-level connective of $\psi$. For $\sign = \possign$ we have the following rules. The rules for $\sign = \negsign$ are dual.
+\begin{itemize}
+\item
+	Suppose that $\psi$ is of the form $\neg \gamma$. Add an intermediate clause to $\GC$ obtained from $C$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma}{\negsign}$.
+
+\item
+	Suppose that $\psi$ is of the form $\gamma_1 \lor \gamma_2$. Add an intermediate clause to $\GC$ obtained from $C$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma_1}{\possign}, \genlit{\gamma_2}{\possign}$.
+	
+\item
+	Suppose that $\psi$ is of the form $\gamma_1 \land \gamma_2$. Add two intermediate clauses to $\GC$ obtained from $C$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma_1}{\possign}$ and $\genlit{\gamma_2}{\possign}$, respectively.
+
+\item
+	Suppose that $\psi$ in of the form $\gamma_1 \liff \gamma_2$. Add two intermediate clauses to $\GC$ obtained from $C$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma_1}{\possign}, \genlit{\gamma_2}{\negsign}$ and $\genlit{\gamma_1}{\negsign}, \genlit{\gamma_2}{\possign}$, respectively.
+
+\item
+	Suppose that $\psi$ in of the form $\gamma_1 \lniff \gamma_2$. Add two intermediate clauses to $\GC$ obtained from $C$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma_1}{\possign}, \genlit{\gamma_2}{\possign}$ and $\genlit{\gamma_1}{\negsign}, \genlit{\gamma_2}{\negsign}$, respectively.
+
+\item
+	Suppose that $\psi$ is of the form $(\forall x:\tau)\gamma$. Add an intermediate clause obtained from $C$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma}{\possign}$.
+
+\item
+	Suppose that $\psi$ is of the form $(\exists x:\tau)\gamma$. Let $y_1,\ldots,y_n$ be all free variables of $\psi$ and $\tau_1,\ldots,\tau_n$ be their sorts. Introduce a fresh Skolem function symbol $\sk$ of the sort $\tau_1,\ldots,\tau_n\to\tau$. Add an intermediate clause $\genclause{C'}{\subst'}$, where $C'$ is obtained from $C$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma}{\possign}$, and $\subst'$ extends $\subst$ with $x \mapsto \sk(y_1,\ldots,y_n)$.
+\end{itemize}
+
+When all subformulas of $\phi$ are traversed and the respective rules of replacing intermediate clauses are applied, the set $\GC$ only contains intermediate clauses with signed atomic formulas. $D$ is then converted to a set of first-order clauses by applying the substitution of each intermediate clause to its respective formulas.
+
+Whenever an intermediate clause $\genclause{C}{\subst}$ is constructed, \newcnf{} eliminates immediate tautologies and redundant formulas. It means that
+\begin{enumerate}
+  \item if $C$ contains both $\genlit{\psi}{\possign}$ and $\genlit{\psi}{\negsign}$, $\genclause{C}{\subst}$ is not added to $\GC$;
+  \item if $C$ contains multiple occurrences of a formula with the same sign, only one occurrence is kept in $C$;
+  \item if $C$ contains $\genlit{\top}{\possign}$ or $\genlit{\bot}{\negsign}$, $\genclause{C}{\subst}$ is not added to $\GC$;
+  \item if $C$ contains $\genlit{\bot}{\possign}$ or $\genlit{\top}{\negsign}$, it is not kept in $C$.
+\end{enumerate}
+These rules are not required for replacing intermediate clauses, however they simplify formulas and make the resulting set of clauses smaller.

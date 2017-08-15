@@ -1,0 +1,71 @@
+\usepackage[nottoc]{tocbibind}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead{}
+
+\usepackage{setspace}
+\renewcommand{\baselinestretch}{1.1} 
+
+\usepackage[T1]{fontenc}
+\usepackage[stretch=10]{microtype}
+\usepackage{hyphenat}
+
+\usepackage[labelsep=period]{caption}
+
+\usepackage{geometry}
+\geometry{papersize={169mm,239mm},inner={15mm},outer={30mm},top={20mm},bottom={30mm},bindingoffset={13mm}}
+
+% \widowpenalty10000
+% \clubpenalty10000
+
+% title page
+\usepackage{titlepage}
+
+\usepackage{titlesec}
+
+\titleformat{\chapter}[display]
+  {\linespread{1.0}\huge} % format
+  {\vspace{-80pt}\sc\large Chapter \thechapter} % label
+  {0pt} % sep
+  {}[\vspace{1em}]
+
+\titleformat{name=\chapter,numberless}[display]
+  {\linespread{1.0}\huge}
+  {}
+  {-86pt}
+  {}[\vspace{1em}]
+
+\titlespacing*{\chapter}{0pt}{120pt}{6pt}
+
+% paper chapter headers
+\newcommand{\paperchapter}[5]{%
+  \chapter[#1]{#2}
+  {\linespread{1.15}\large\emph #3\par}
+  {\vspace{1.5em}\paragraph{Abstract.}{{#4}}}
+  \vfill
+  {\noindent{#5}}
+  \cleardoublepage
+}
+
+% \usepackage{secdot}
+
+% \titlelabel{\thetitle~}
+% \renewcommand{\thechapter}{\arabic{chapter}.}
+% \renewcommand{\thesection}{\thechapter\arabic{section}.}
+% \renewcommand{\thesubsection}{\thesection\arabic{subsection}.}
+
+\usepackage[pageref]{backref}
+\usepackage{textcomp}
+\renewcommand*{\backref}[1]{}
+\renewcommand*{\backrefalt}[4]{%
+    \ifcase #1 \\\----\ Not cited%
+    \or        \\\----\ One citation on page~#2%
+    \else      \\\----\ #1 citations on pages~#2%
+    \fi}
+\bibliographystyle{plain}

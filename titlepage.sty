@@ -1,0 +1,67 @@
+\newcommand*{\thesis}[1]{\gdef\@thesis{#1}%
+}
+\newcommand*{\@thesis}{Thesis for the Degree of Licentiate of Engineering}
+
+\newcommand*{\department}[1]{\gdef\@department{#1}%
+}
+\newcommand*{\@department}{Department of Computer Science and Engineering}
+
+\newcommand*{\institution}[1]{\gdef\@institution{#1}%
+}
+\newcommand*{\@institution}{Chalmers University of Technology}
+
+\newcommand*{\infopageinstitution}[1]{\gdef\@infopageinstitution{#1}%
+}
+\newcommand*{\@infopageinstitution}{\@institution}
+
+\newcommand*{\reportnumber}[1]{\gdef\@reportnumber{#1}%
+}
+\newcommand*{\@reportnumber}{XXXX}
+
+\newcommand*{\issn}[1]{\gdef\@issn{#1}%
+}
+\newcommand*{\@issn}{XXXX-XXXX}
+
+\newcommand*{\infopagetitle}[1]{\gdef\@infopagetitle{#1}%
+}
+\newcommand*{\@infopagetitle}{\@title}
+
+\renewcommand*{\maketitle}{%
+\begin{titlepage}
+\thispagestyle{empty}
+{
+  \centering
+  \includegraphics[width=1.0\textwidth]{graphics/LO_CH+GUeng_SV_no_avancez.pdf}\\
+  \vspace{2cm}
+  {\small\sc\@thesis}\\
+  \vspace{0.15cm}
+  {\Huge\@title\unskip\strut\par}
+  \vspace{2cm}
+  {\LARGE\@author}
+  \vfill
+  \includegraphics[height=3cm]{graphics/AVANCEZ_black.pdf}\\[2mm]
+  {\small\sc\@department}\\[-1mm]
+  {\small\sc\@institution}\\[3mm]
+  {\small Gothenburg, Sweden}\\[-0.5mm]{\small\the\year}\\
+}
+\newpage
+\thispagestyle{empty}
+\quad \vfill
+\noindent\@infopagetitle\\*[3mm]
+
+{\noindent\copyright\ \the\year\ \@author}\\*[3mm]
+
+{\noindent Technical Report \@reportnumber}\\
+{ISSN \@issn}\\
+{\@department}\\
+
+{\noindent\sc\@infopageinstitution}\\[1mm]
+{SE-412 96 Gothenburg, Sweden}\\
+{Telephone +46 (0)31-772 1000}\\
+
+\noindent Printed at Reproservice, Chalmers University of Technology \\
+Gothenburg, Sweden, \the\year
+\setcounter{page}{0}
+\end{titlepage}
+}
+\endinput

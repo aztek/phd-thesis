@@ -1,0 +1,56 @@
+In
+Section~\ref{sec:folb-to-fol} we presented a model-preserving
+syntactic translation of \folb{} to FOL.
+Based on this translation, automated reasoning about \folb{} formulas
+can be done by translating a \folb{} formula into a FOL
+formula, and using an automated first-order theorem prover on the resulting FOL formula.
+State-of-the-art first-order theorem provers, such as Vampire~\cite{Vampire13}, E~\cite{E13} and
+Spass~\cite{Spass}, implement superposition calculus for proving first-order formulas. Naturally, we would like to have a translation exploiting such provers in an efficient manner.
+
+Note however that our translation adds the two-element domain axiom
+$\forall (x:\bool)\allowbreak(x \eql \true \vee x \eql \false)$ for the boolean sort. This axioms will be converted to the clause
+\begin{equation}\label{clause:T|F}
+  x \eql \true \vee x \eql \false,
+\end{equation}
+where $x$ is a boolean variable. In this section we
+explain why this axiom requires a special treatment and propose a solution to overcome problems caused by its presence.
+%
+%ththerefore be reduced to reasoning about the translated FOL formula
+%using established technics such as superposition calculi. The extra
+%axioms, added to the set of definitions at the last step of the
+%translation, however, might not be treated efficiently by a
+%superposition inference system. In this section
+%we will explain the difficulties raised by the presence of these axioms and formulate a property that must be satisfied by a superposition inference system in order to be able to reason in \folb{} efficiently.
+
+We assume some basic understanding of first-order theorem proving and superposition calculus, see, e.g.~\cite{Ganzinger01,NieuwenhuisRubio:HandbookAR:paramodulation:2001}. We fix a superposition inference system for first-order logic with equality, parametrised by a simplification ordering $\succ$ on literals and a well-behaved literal selection function \cite{Vampire13}, that is a function that guarantees completeness of the calculus. We denote selected literals by underlining them. We assume that equality literals are treated by a dedicated inference rule, namely, the ordered paramodulation rule~\cite{Robinson1969}:
+\[
+\infer[\quad\text{if}\ \theta = \mathrm{mgu}(l, s),]{(L[r] \vee C \vee D)\theta}%
+{\underline{l \eql r} \vee C & \underline{L[s]} \vee D}
+\]
+where $C,D$ are clauses, $L$ is a literal, $l,r,s$ are terms, $\mathrm{mgu}(l, s)$ is a most general unifier of $l$ and $s$, and $r\theta \not\succeq l\theta$.
+The notation $L[s]$ denotes that $s$ is a subterm of $L$, then $L[r]$ denotes the result of replacement of $s$ by $r$.
+
+Suppose now that we use an off-the-shelf superposition theorem prover to reason about FOL formulas obtained by our translation. W.l.o.g, we assume that $\true \succ \false$ in the term ordering used by the prover. Then self-paramodulation (from $\true$ to $\true$) can be applied to clause~\eqref{clause:T|F} as follows:
+\[
+\infer{x \eql y \vee x \eql \false \vee y \eql \false}%
+{\underline{x \eql \true} \vee x \eql \false & \underline{y \eql \true} \vee y \eql \false}
+\]
+
+The derived clause $x \eql y \vee x \eql false \vee y \eql \false$ is a recipe for disaster, since the literal $x \eql y$ must be selected and can be used for paramodulation into every non-variable term of a boolean sort. Very soon the search space will contain many clauses obtained as logical consequences of clause \eqref{clause:T|F} and results of paramodulation from variables applied to them. This will cause a rapid degradation of performance of superposition-based provers.
+
+To get around this problem, we propose the following solution. First, we will choose term
+orderings $\succ$ having the following properties: $\true\succ\false$ and $\true$ and
+$\false$ are the smallest ground terms w.r.t.\ $\succ$. Consider now all ground instances of \eqref{clause:T|F}. They have the form $s \eql \true \vee s \eql \false$, where $s$ is a ground term. When $s$ is either $\true$ or $\false$, this instance is a tautology, and hence redundant. Therefore, we should only consider instances for which $s \succ \true$. This prevents self-paramodulation of \eqref{clause:T|F}.
+
+Now the only possible inferences with \eqref{clause:T|F} are inferences of the form
+\[
+\infer[,]{C[\true] \vee s \eql \false}%
+{\underline{x \eql \true} \vee x \eql \false & C[s]}
+\]
+where $s$ is a non-variable term of the sort $\bool$.
+To implement this, we can remove clause \eqref{clause:T|F} and add as an extra inference rule to the superposition calculus the following rule:
+\[
+\infer[,]{C[\true] \vee s \eql \false}%
+{C[s]}
+\]
+where $s$ is a non-variable term of the sort $\bool$ other than $\true$ and $\false$.

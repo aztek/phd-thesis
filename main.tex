@@ -1,0 +1,80 @@
+\documentclass[10pt,twoside]{book}
+\usepackage{amssymb,amsmath,amsthm,mathrsfs,stmaryrd,dsfont,bbold}
+\usepackage[english]{babel}
+\usepackage[lighttt]{lmodern}
+\usepackage[inline]{enumitem}
+\usepackage{pifont}
+\usepackage{tikz}
+\usepackage{color}
+\usepackage{proof}
+\usepackage{url}
+
+\include{layout}
+
+\include{notation}
+
+\include{information}
+
+\newcommand{\EK}[1]{{\color{red}  EK: {#1}}}
+
+\begin{document}
+
+\frontmatter
+
+\maketitle
+
+\chapter*{Abstract}
+\input{abstract}
+
+\tableofcontents
+
+% \chapter*{Acknowledgements}
+% \input{acknowledgements}
+
+\mainmatter
+
+\chapter{Introduction}
+\label{chap:intro}
+\input{introduction}
+
+\def\paperOneContentsTitle{A First Class Boolean Sort in\\First-Order Theorem Proving and TPTP}
+\def\paperOneChapterTitle{A First Class Boolean Sort in\\First-Order Theorem Proving\\and TPTP}
+\def\paperOneAuthors{Evgenii~Kotelnikov, Laura~Kov\'acs and Andrei~Voronkov}
+\def\paperOneAbstract{To support reasoning about properties of programs operating with boolean values one needs theorem provers to be able to natively deal with the boolean sort. This way, program properties can be translated to first-order logic and theorem provers can be used to prove program properties efficiently. However, in the TPTP language, the input language of automated first-order theorem provers, the use of the boolean sort is limited compared to other sorts, thus hindering the use of first-order theorem provers in program analysis and verification. In this paper, we present an extension \folb\ of many-sorted first-order logic, in which the boolean sort is treated as a first-class sort. Boolean terms are indistinguishable from formulas and can appear as arguments to functions. In addition, \folb\ contains \ITE\ and \LETIN\ constructs. We define the syntax and semantics of \folb\ and its model-preserving translation to first-order logic. We also introduce a new technique of dealing with boolean sorts in superposition-based theorem provers. Finally, we discuss how the TPTP language can be changed to support \folb.}
+\def\paperOnePublication{Published in the \emph{Proceedings of the 8th Conference on Intelligent\\Computer Mathematics}, pages 71--86. Springer, 2015.}
+\paperchapter{\paperOneContentsTitle}
+             {\paperOneChapterTitle}
+             {\paperOneAuthors}
+             {\paperOneAbstract}
+             {\paperOnePublication}
+\label{chap:fool}
+\include{cicm15/main}
+
+\def\paperTwoContentsTitle{The Vampire and the FOOL}
+\def\paperTwoChapterTitle{The Vampire and the FOOL}
+\def\paperTwoAuthors{Evgenii~Kotelnikov, Laura~Kov\'{a}cs,\\Giles~Reger and Andrei~Voronkov}
+\def\paperTwoAbstract{This paper presents new features recently implemented in the theorem prover Vampire, namely support for first-order logic with a first class boolean sort (\folb{}) and polymorphic arrays. In addition to having a first class boolean sort, \folb{} also contains \ITE\ and \LETIN\ expressions. We argue that presented extensions facilitate reasoning-based program analysis, both by increasing the expressivity of first-order reasoners and by gains in efficiency.}
+\def\paperTwoPublication{Published the \emph{Proceedings of the 5th ACM SIGPLAN Conference on Certified Programs and Proofs}, pages 37--48. ACM New York, 2016.}
+\paperchapter{\paperTwoContentsTitle}
+             {\paperTwoChapterTitle}
+             {\paperTwoAuthors}
+             {\paperTwoAbstract}
+             {\paperTwoPublication}
+\label{chap:implementation}
+\include{cpp16/main}
+
+\def\paperThreeContentsTitle{A Clausal Normal Form Translation for \folb{}}
+\def\paperThreeChapterTitle{A Clausal Normal Form\\Translation for \folb{}}
+\def\paperThreeAuthors{Evgenii~Kotelnikov, Laura~Kov\'{a}cs,\\Martin~Suda and Andrei~Voronkov}
+\def\paperThreeAbstract{Superposition-based theorem provers for first-order logic usually operate on sets of first-order clauses. It is well-known that the translation of a first-order formula to clausal normal form (CNF) can crucially affect the performance of a prover. This paper presents a superposition-friendly translation of \folb{} formulas to first-order clauses. Compared to our previous approach, the new translation can produce a smaller set of clauses with fewer introduced symbols. \iffalse initial results of designing an efficient CNF translation for formulas of the \folb{} logic that we described earlier. \folb{} extends many-sorted first-order logic with a first class boolean sort and \ITE\ and \LETIN\ expressions. Our CNF translation extends \newcnf{}, a top-down clausification algorithm.\fi }
+\paperchapter{\paperThreeContentsTitle}
+             {\paperThreeChapterTitle}
+             {\paperThreeAuthors}
+             {\paperThreeAbstract}
+             {}
+\label{chap:cnf}
+\include{newcnf/main}
+
+\bibliography{refs}
+
+\end{document}
