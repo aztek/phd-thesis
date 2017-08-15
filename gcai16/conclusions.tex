@@ -1,0 +1,42 @@
+% !TEX root = main.tex
+
+Applications of program analysis and verification rely on SAT/SMT solvers and/or
+theorem provers to reason about program properties formulated in various logics.
+%SAT/SMT solvers and theorem provers first translate arbitrary logical properties into an equisatisfiable set of first-order clauses (CNF form) and reason further only about the CNF form of the input formula. 
+The efficiency of SAT/SMT solvers and theorem provers critically depends on the used clausification algorithm. 
+%a set Efficient algorithms for computing small CNF forms are therefore of critical importance in automated reasoning. 
+In this paper we presented a new clausification algorithm, called \nfcnf{}, for formulas expressed in \folb{}. 
+Our algorithm is a non-trivial extension of the recent \newcnf{} clausification
+algorithm for standard first-order logic.  \nfcnf{} for FOOL    
+%combines the translation of \folb{} to first-order logic and clausification. This combination allowed us to integrate into the translation clausification techniques such as 
+introduces \skolem{} predicates over boolean variables, avoids equalities over
+boolean variables, and uses formula naming and tautology elimination on complex
+formulas. 
+%The algorithm aims to produce sets of clauses that can be efficiently checked by first-order theorem provers. 
+It also avoids excessively duplicating clauses and introducing too many new
+symbols. 
+Thanks to the our new  \nfcnf{}  algorithm, proving FOOL formulas requires neither an
+axiomatisation of 
+the boolean sort nor modifications in superposition calculus. 
+We implemented our work in Vampire and
+experimentally showed its benefits on a large number of examples.  
+For future work we are interested in developing further criteria for
+controlling naming and inlining expressions during clausification. Using FOOL
+for more complex applications of program analysis is another interesting venue to
+exploit.
+
+
+%Our algorithms employs several new techniques for handling features of FOOL. In comparison with our old approach to translation of FOOL~\cite{VampireAndFOOL}
+%\begin{enumerate}
+%  \item boolean variables are skolemised with predicates and not functions;
+%  \item boolean variables that do not need to be skolemised are exhaustively instantiated with the two possible boolean constants $\true$ and $\false$ in a way that does not increase the size of the translation;
+%  \item no new equalities are ever introduced, definitions for common subexpressions always use guards;
+%  \item naming of \ITE\ and \LETIN\ expressions is controlled by parameters.
+%\end{enumerate}
+%Moreover, unlike with the old translation, the set of clauses produced by the new algorithm requires neither an axiomatisation of the boolean sort nor modifications of superposition calculus.
+
+%We implemented the extended \newcnf{} algorithm in the Vampire theorem prover. Our experimental results showed an increase of performance of Vampire compared to its version with the translation of \folb{} formulas to full first-order logic. We observed that new problems can be solved by expansion of \ITE\ and instantiation of boolean variables with boolean constants. We observed that both inlining and naming of \LETIN\ expressions can make a theorem prover succeed or fail. 
+
+%For future work we are interested in developing syntactical criteria that determine whether a given \LETIN\ or \ITE\ expression should be named or inlined, or expanded or inlined, respectively. 
+
+%We do not have problems that use let with functions with arguments. They would've been useful though.

@@ -1,0 +1,237 @@
+% !TEX root = main.tex
+
+% nonnengart2001computing also have (in the simple approach): 
+% elimination of equivalences as part of NNF transform 
+% (but one wants to decide about equivalences during naming)
+% miniscoping and variable renaming just before skolemization
+% (but let's ignore miniscoping and assume nice variables rightaway or a detail below the level of this presentation) 
+%
+%???? polarity dependent elimination of equivalences section has an argument about ugly invisible tautologies 
+% (like the ones we mention below)
+%
+
+Traditional approaches to
+clausification in FOL \cite{nonnengart2001computing,Vampire13} produce a clausal normal
+form in several stages, where each stage
+represents a single pass through the formula tree. These stages may include formula simplification, translation into (equivalence) negation normal form,
+formula naming, elimination of equivalences, skolemisation, and distribution of
+disjunctions over conjunctions. The \newcnf{} clausification algorithm
+of~\cite{newcnf_fol} takes a different approach and employs a single top-down
+traversal of the formula in which these stages are combined.  
+This enables optimisations that are not available if the stages of clausification are independent. For example, compared to the traditional staged approach, \newcnf{} can introduce fewer \skolem{} functions on formulas with complex nesting of equivalences and quantifiers. Moreover, it can detect and discard intermediate tautologies, 
+which are much more difficult to recognise by the staged approach.
+%
+ %Another example is an easy detection of intermediate tautologies, which are discarded on the fly. \newcnf{} thus maintains a more accurate count of sub-formula occurrences, on which the decision whether to name a sub-formula is based.
+%
+
+In this paper we use the \newcnf{} algorithm and extended it to a new clausification algorithm for FOOL~\cite{FOOL}. 
+The main advantage of \newcnf{} for our work, however, is that its top-down
+traversal provides a suitable context not only for clausification of first-order
+formulas, but also of the extension of first-order logic with \folb{}
+features. In this section we overview the main features of \newcnf{}. We will follow the notation used in~\cite{newcnf_fol} and in what follows will repeat some of the definitions. 
+
+\subsection{Preliminaries}
+
+Our setting is that of many-sorted first-order predicate logic with equality.
+
+% The following definition is taken from \cite{FOOL}.
+%\begin{definition}\label{def:folb-signature}\em
+%  A \emph{signature} of first-order logic with the boolean sort is a triple $\Sigma = (S, F, \context)$, where:
+%  \begin{enumerate}
+%  \item $S$ is a set of \emph{sorts}, which contains a special sort $\bool$. A \emph{type} is either a sort or a non-empty sequence $\sigma_1,\ldots,\sigma_n,\sigma$ of sorts, written as $\sigma_1 \times \ldots \times \sigma_n \to \sigma$. When $n = 0$, we will simply write $\sigma$ instead of $\to\sigma$. We call a \emph{type assignment} a mapping from a set of variables and function symbols to types, which maps variables to sorts.
+%
+%    \item $F$ is a set of \emph{function symbols}. We require $F$ to contain binary function symbols $\vee$, $\wedge$, $\implies$, $\liff$ and $\lniff$, used in infix form, a unary function symbol $\neg$, used in prefix form, and nullary function symbols $\true$, $\false$.
+%
+%    \item $\context$ is a \emph{type assignment} which maps each function symbol $f$ into a type $\tau$. When the signature is clear from the context, we will write $\ofsort{f}{\tau}$ instead of $\context(f)=\tau$ and say that $f$ is of the type $\tau$.
+%
+%    We require the symbols $\vee, \wedge, \implies, \liff, \lniff$ to be of the type $\bool \times \bool \to \bool$, $\neg$ to be of the type $\bool \to \bool$ and $\true,\false$ to be of the type $\bool$. \QED
+%  \end{enumerate}
+%\end{definition}
+
+A signature $\Sigma$ is a set of \emph{predicate} and \emph{function} symbols together with associated sorts. 
+A \emph{term} of the sort $\tau$ is of the form $f(t_1,\ldots,t_n)$, $c$ or $x$ where
+$f$ is a \emph{function symbol} of the sort $\tau_1\times\ldots\times\tau_n \to \tau$, 
+$t_1,\ldots, t_n$ are terms of sorts $\tau_1,\ldots,\tau_n$, respectively, 
+$c$ is a constant of sort $\tau$ and $x$ is a variable of sort $\tau$. 
+%
+An \emph{atom} is of the form $p(t_1,\ldots,t_n)$, $q$ or $t_1 \eql t_2$ where $p$ is a \emph{predicate symbol} of the sort $\tau_1\times\ldots\times\tau_n$, % \to \bool$
+$t_1, \ldots, t_n$ are terms of sorts $\tau_1,\ldots,\tau_n$, respectively,
+$q$ is a predicate symbol of sort $\bool$ and $\eql$ is the \emph{equality symbol}.  
+A literal is an atom or its negation.
+
+A \emph{formula} is of the form $\varphi_1 \wedge \ldots \wedge \varphi_n$, $\varphi_1 \vee \ldots \vee \varphi_n$, $\varphi_1 \implies \varphi_2$, $\varphi_1 \liff \varphi_2$, $\varphi_1 \lniff \varphi_2$, $\neg \varphi_1$, $\exists x : \tau. \varphi_1$, $\forall x : \tau. \varphi_1$, $\bot$, $\top$, or $l$ where $\varphi_i$  are formulas, $x$ is a variable, $\tau$ a sort and $l$ is a literal. Note that we treat conjunction and disjunction as $n$-ary operators; we assume that formulas are kept in \emph{flattened form}, e.g.\ $(\varphi_1 \wedge \varphi_2) \wedge \varphi_3$ is always represented as $\varphi_1 \wedge \varphi_2 \wedge \varphi_3$. Furthermore, we assume that usage of $\top$ and $\bot$ is simplified immediately. 
+%Let ${\sf fvars}(\varphi)$ be the \emph{free variables} of formula $\varphi$, 
+%i.e.~those variables in $\varphi$ with an occurrence not bound by a quantifier.
+
+A \emph{sign} is a either $\possign$ or $\negsign$. A \emph{signed formula} is a
+pair consisting of a formula $\phi$ and a sign $\sign \in \{\possign,\negsign\}$, denoted by
+$\genlit{\phi}{\sign}$.
+ The signed formula $\varphi^\possign$ (resp.\ $\varphi^\negsign$) means that $\varphi$ is true (resp.\ false). We will use the mapping $\formName$
+from signed formulas to formulas defined as follows:
+$\form{\genlit{\phi}{\possign}} = \phi$ and
+$\form{\genlit{\phi}{\negsign}} = \neg \phi$. 
+We call a \emph{sequent} a finite set of signed formulas. We say that a sequent
+$S_1,\ldots,S_n$ is true in a FOOL interpretation if so is the universal closure
+of the formula $\form{S_1} \lor \ldots \lor \form{S_n}$. Note
+that if $S_1,\ldots,S_n$ are signed \emph{atomic} FOL formulas, then
+$\form{S_1} \lor \ldots \lor \form{S_n}$ is a clause.
+
+\subsection{\newcnf{}}
+
+The \newcnf{} algorithm \cite{newcnf_fol} works with finite sets of sequents. During computation
+the algorithm may construct substitutions to be applied to existing (signed) formulas. 
+It is convenient for us to collect these substitutions without immediately applying
+them. For this reason, instead of a sequent $D\subst$, where $\subst$ is a
+substitution, we will use pairs $\genclause{D}{\subst}$ consisting of a sequent
+$D$ and a substitution $\subst$. We will (slightly informally) also refer to
+such pairs as sequents. 
+
+
+The \newcnf{} algorithm starts with the input first-order formula $\phi$ and a
+set $\GC$ of sequents that contains a single sequent
+$\genclause{\{\genlit{\phi}{\possign}\}}{\emptySubst}$, where $\emptySubst$ is
+the empty substitution. Then it makes a series of steps replacing sequents in
+$\GC$ by other sequents until all sequents in $\GC$ contain only signed atomic
+FOL formulas. Some of the steps introduce fresh (previously unused) symbols. 
+% A replacement of a sequent may introduce Skolem functions and names of subformulas. 
+Each update of $\GC$ preserves the following invariants: (1) if an interpretation ${\cal I}$
+satisfies all sequents after the update, then ${\cal I}$ also satisfies all sequents
+before the update; (2) if an interpretation ${\cal I}$
+satisfies all sequents before the update, then
+there exists an interpretation ${\cal I}'$ 
+that extends ${\cal I}$ on fresh symbols such that ${\cal I}'$
+satisfies all sequents after the update. 
+
+The replacements of sequents are guided by the structure of $\phi$. \newcnf{}
+traverses $\phi$ top-down, processing every non-atomic subformula of $\phi$
+exactly once in an order that respects the subformula relation. That is, for
+each two distinct subformulas $\psi_1$ and $\psi_2$ of $\phi$ such that $\psi_1$
+is a subformula of $\psi_2$, $\psi_2$ is processed before $\psi_1$.
+%
+For every subformula of $\phi$, \newcnf{} maintains a list of its occurrences as signed formulas in the sequents of $\GC$. 
+The occurrences are updated whenever sequents are removed from and added to $\GC$. 
+The main role of the list is to allow for a fast enumeration and lookup of all the occurrences when a particular subformula 
+is to be processed. As explained below, the number of occurrences is also used to decided whether a subformula should be named.
+The replacements are governed by a set of rules that are, essentially, the standard tableau rules for first-order logic. We briefly summarise these rules below, and refer to \cite{newcnf_fol} for details.
+
+We note that except for the rule for negation, which essentially 
+flips the sign of each occurrence of $\psi = \neg \gamma$ and replaces $\psi$ with its immediate sub-formula $\gamma$
+in all the sequents, the remaining rules come in pairs in which they are dual to each other. 
+For instance, dealing with a disjunction $\gamma_1 \lor \gamma_2$ with a positive $\sign = \possign$
+is analogous to dealing with a conjunction with a negative sign. 
+For simplicity, we only show the versions for $\sign = \possign$ below.
+
+Let $\psi$ be a subformula of $\phi$ and $\genclause{D}{\subst}$ be a sequent such that $D$ has an occurrence of $\genlit{\psi}{\possign}$.
+Before proceeding to the next subformula, \newcnf{} visits and replaces all such sequents $D$.
+%
+Depending on the top-level connective of $\psi$ the algorithm applies the following rules.
+\begin{itemize}
+\item
+Suppose that $\psi$ is of the form $\neg \gamma$. Add a sequent to $\GC$ obtained from $D$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma}{\negsign}$.
+
+\item
+Suppose that $\psi$ is of the form $\gamma_1 \lor \gamma_2$. Add a sequent to $\GC$ obtained from $D$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma_1}{\possign}, \genlit{\gamma_2}{\possign}$.
+
+\item
+Suppose that $\psi$ is of the form $\gamma_1 \land \gamma_2$. Add two sequents to $\GC$ obtained from $D$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma_1}{\possign}$ and $\genlit{\gamma_2}{\possign}$, respectively.
+
+\item
+Suppose that $\psi$ in of the form $\gamma_1 \liff \gamma_2$. Add two sequents to $\GC$ obtained from $D$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma_1}{\possign}, \genlit{\gamma_2}{\negsign}$ and $\genlit{\gamma_1}{\negsign}, \genlit{\gamma_2}{\possign}$, respectively.
+
+\item
+Suppose that $\psi$ in of the form $\gamma_1 \lniff \gamma_2$. Add two sequents to $\GC$ obtained from $D$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma_1}{\possign}, \genlit{\gamma_2}{\possign}$ and $\genlit{\gamma_1}{\negsign}, \genlit{\gamma_2}{\negsign}$, respectively.
+
+\item
+Suppose that $\psi$ is of the form $(\forall x:\tau)\gamma$. Add a sequent obtained from $D$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma}{\possign}$.
+
+\item
+Suppose that $\psi$ is of the form $(\exists x:\tau)\gamma$. Let $y_1,\ldots,y_n$ be all free variables of $\psi \subst$ and $\tau_1,\ldots,\tau_n$ be their sorts. Introduce a fresh Skolem function symbol $\sk$ of the sort $\tau_1\times\ldots\times\tau_n\to\tau$. Add a sequent $\genclause{D'}{\subst'}$, where $D'$ is obtained from $D$ by replacing the occurrence of $\genlit{\psi}{\possign}$ with $\genlit{\gamma}{\possign}$, 
+and $\subst'$ extends $\subst$ with $x \mapsto \sk(y_1,\ldots,y_n)$.
+\end{itemize}
+%
+When all subformulas of $\phi$ are traversed and the respective rules of replacing sequents are applied, the set $\GC$ only contains sequents with signed atomic formulas. $\GC$ is then converted to a set of first-order clauses by applying the substitution of each sequent to its respective formulas.
+
+Whenever the number of occurrences of a subformula $\psi$ in sequents in $\GC$ exceeds a pre-specified {\it naming threshold}, 
+$\psi$ is named as follows. Let $y_1,\ldots,y_n$ be free variables of $\psi$ and $\tau_1,\ldots,\tau_n$ be their sorts.
+\newcnf{} introduces a new predicate symbol $P$ of the sort
+$\tau_1\times\ldots\times\tau_n$. %  \to\bool$. 
+Then, each occurrence $\genlit{\psi}{\sign}$ in sequents in $\GC$ is replaced by $\genlit{P(y_1,\ldots,y_n)}{\sign}$.
+Finally, two sequents
+$\genclause{\{\genlit{P(y_1,\ldots,y_n)}{\negsign},\genlit{\psi}{\possign}\}}{\emptySubst}$
+and
+$\genclause{\{\genlit{P(y_1,\ldots,y_n)}{\possign},\genlit{\psi}{\negsign}\}}{\emptySubst}$
+are added to $\GC$ to serve as a definition of $\psi$. 
+% \todo{Shouldn't we mention polarity naming? EK: is the next sentence not enough?}
+As usual, in case $\psi$ always occurs in $C$ only under a single sign, 
+adding only the one respective defining sequent is sufficient. 
+%Also, in the case of FOOL, naming can be more complicated since variable renaming might be required.
+%\todo{The previous sentence is vague and a bit weird.}
+
+%If the number of occurrences of $\psi$ does not exceed the naming threshold, 
+%each of the sequents that have an occurrence of $\genlit{\psi}{\possign}$ or $\genlit{\psi}{\negsign}$
+%is replaced with one or more new sequents according to a specific rule,
+%depending on the top-level connective of $\psi$.
+
+% \newcommand{\spcr}{0.5em}
+% \begin{figure}[t]
+% \begin{center}
+% \fbox{\begin{minipage}{\textwidth}
+% \[
+% \begin{array}{l}
+
+% \text{Given a subformula $\psi$ and a sequent $\genclause{D}{\subst}$ such that $D$ has an occurrence of $\genlit{\psi}{\possign}$}
+
+% ~\\~\\
+
+% \begin{array}{lll}
+
+% \vspace{\spcr}
+
+% \text{if}~\psi = \neg \gamma & \Rightarrow & \genlit{\gamma}{\possign}
+
+% \\ \vspace{\spcr}
+
+% \text{if}~\psi = \gamma_1 \lor \gamma_2 & \Rightarrow & \genlit{\gamma_1}{\possign}, \genlit{\gamma_1}{\possign}
+
+% \\ \vspace{\spcr}
+
+% \text{if}~\psi= \gamma_1 \land \gamma_2 & \Rightarrow & \genlit{\gamma_1}{\possign} \text{~and~} \genlit{\gamma_1}{\possign}
+
+% \\ \vspace{\spcr}
+
+% \text{if}~\psi = \gamma_1 \liff \gamma_2 & \Rightarrow & \genlit{\gamma_1}{\possign}, \genlit{\gamma_1}{\negsign} \text{~and~} \genlit{\gamma_1}{\negsign}, \genlit{\gamma_1}{\possign}
+
+% \\ \vspace{\spcr}
+
+% \text{if}~\psi = \gamma_1 \lniff \gamma_2 & \Rightarrow & \genlit{\gamma_1}{\possign}, \genlit{\gamma_1}{\possign} \text{~and~} \genlit{\gamma_1}{\negsign}, \genlit{\gamma_1}{\negsign}
+
+% \\ \vspace{\spcr}
+
+% \text{if}~\psi = (\forall x:\tau) \gamma & \Rightarrow & \genlit{\gamma}{\possign}
+
+% \\ \vspace{\spcr}
+
+% \text{if}~\psi = (\exists x:\tau) \gamma & \Rightarrow & TODO
+
+% \end{array}
+
+% \end{array}
+% \]
+% \end{minipage}}
+% \end{center}
+% \caption{A summary of \newcnf\ rules.\label{fig:rules}}
+% \end{figure}
+
+Whenever a new sequent $\genclause{D}{\subst}$ is constructed, \newcnf{} eliminates immediate tautologies and redundant formulas. It means that
+\begin{enumerate}
+  \item if $D$ contains both $\genlit{\psi}{\possign}$ and $\genlit{\psi}{\negsign}$, $\genclause{D}{\subst}$ is not added to $\GC$;
+  \item if $D$ contains multiple occurrences of a signed formula, only one occurrence is kept in $D$;
+  \item if $D$ contains $\genlit{\top}{\possign}$ or $\genlit{\bot}{\negsign}$, $\genclause{D}{\subst}$ is not added to $\GC$;
+  \item if $D$ contains a signed formula $\genlit{\bot}{\possign}$ or
+    $\genlit{\top}{\negsign}$, this signed formula is removed from $D$.
+\end{enumerate}
+% \todo{Probably no need to mention tautology elimination anymore, since it's described in the VCNF paper}
+These rules are not required for replacing sequents, however they simplify formulas and make the resulting set of clauses smaller.
+
+\newcnf{} takes as an input a first-order formula in \emph{equivalence negation normal form} (ENNF). A formula is in ENNF if it does not contain $\implies$ and negations are only applied to atoms. ENNF is very convenient for
+standard FOL, as it reduces the number of cases to consider and makes checking polarities trivial. At the same time, it is not easy to define a useful extension of ENNF for FOOL because of \LETIN\ expressions and formulas inside terms. It is straightforward, however, to extend \newcnf{} in order to support formulas in full first-order logic. For that, we need to add an extra rewriting rule for implications. In what follows we will consider a modification of \newcnf{} with this extension.

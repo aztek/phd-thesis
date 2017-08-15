@@ -1,0 +1,169 @@
+% !TEX root = main.tex
+
+
+%FOOL extends ordinary first-order logic with first-class boolean sort,
+%\ITE\ and \LETIN\ expressions. 
+In this experiment we evaluated Vampire on FOOL problems that express partial correctness property of imperative programs. We obtained these problems manually from a collection of loop-free programs that we in turn generated from a small set of programs with loops by unrolling their loops. Both the benchmarks and the results are available at \url{www.cse.chalmers.se/~evgenyk/fool-tuple-experiments/}.
+
+
+%We now report on our experiments of using FOOL for the safety
+%verification of progams. 
+%
+%properties, in particular for proving partial correctness 
+%These extensions allow one to automatically express logical properties of imperative programs as FOOL formulas. In this section we
+%\begin{enumerate}
+ % \item illustrate how the partial correctness property can be encoded as a FOOL problem for a collection of realistic loop-free programs;
+%  \item present experimental results obtained by running Vampire on these FOOL problems.
+%\end{enumerate}
+%For this experiment 
+We used five small programs with loops annotated with a safety property using the {\tt assert} command. They are listed in Appendix A. Each program contains one loop with one or more
+\ITE\ expressions, assignments and tests over integers,
+integer arrays and booleans. Table~\ref{table:examples-results}
+summarises the programs used in our experiments: the programs
+\verb'count_two',  \verb'count_two_flag' and \verb'count_three'
+implement versions of counting elements in an input array using
+different criteria and ensure that the sum of counted elements equal
+to the array length; \verb'two_arrays' and \verb'three_arrays' sort
+and compare 
+two, and respectively three arrays element-wise. 
+We unrolled these program loops 2, 3, 4 and 5
+times, resulting in a set of 20 annotated loop-free programs.
+%We used a collection of 20 code fragments that we extracted from five programs with loops by unrolling each program's loop 2, 3, 4, or 5 times. Appendix~\ref{sec:newcnf/examples} lists the code of the five programs with loops, and we give their description below. Each program uses a loop with one or many \ITE\ expressions inside, assignments for integers, integer arrays and booleans. Each program has an empty pre-condition and one or many post-conditions. 
+%\begin{itemize}
+%  \item \verb'count_two' counts the number of negative and non-negative elements of an array. Its post-condition checks that the sum of the number of negative and non-negative elements of the array is equal to the length of the array.
+%  \item \verb'count_two_flag' does the same thing as \verb'count_two' but assigns a condition to a boolean flag.
+%  \item \verb'count_three' counts the number of elements of an array that are negative, non-negative and greater than 5, and non-negative and less or equal to 5. Its post-condition checks that the sum of values of the three counters is equal to the length of the array.
+%  \item \verb'two_arrays' sorts two arrays element-wise. Its post-conditions check that every element of one array is less or equal than the element of the other array at the same index.
+%  \item \verb'three_arrays' sorts three arrays element-wise.
+%\end{itemize}
+%
+%We unrolled each program's loop by fixing the length of the arrays
+%used in the program and repeating the body of the loop. 
+Figure~\ref{fig:examples/count_two_unrolled} shows the
+program obtained by unrolling three times the loop of \verb'count_two'.
+%given Fig.~\ref{fig:examples/count_two}. 
+%For example, by unrolling the loop of
+% \verb'count_two' (Figure~\ref{fig:examples/count_two}) three times, we obtained the code on Figure~\ref{fig:examples/count_two_unrolled}.
+
+\begin{figure}[tb]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  {\begin{lstlisting}[language=cpp]
+int a[];
+int x = 0, y = 0;
+for (int i = 0; i < n; i++) {
+  if (a[i] > 0) x++; else y++;
+}
+assert(x + y == n);
+      \end{lstlisting}}
+  \caption{The \texttt{count\_two} program.}
+  \label{fig:examples/count_two}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  {\begin{lstlisting}[language=cpp]
+int a[];
+int x = 0, y = 0;
+if (a[0] > 0) x++; else y++;
+if (a[1] > 0) x++; else y++;
+if (a[2] > 0) x++; else y++;
+assert(x + y == 3);
+      \end{lstlisting}}
+  \caption{The benchmark obtained by unrolling
+    Figure~\ref{fig:examples/count_two} three times.}
+  \label{fig:examples/count_two_unrolled}
+\end{minipage}
+\end{figure}
+
+%Each one of the 20 code fragments with unrolled loops is an imperative
+%program with assignements, \ITE, and sequential composition. 
+For each one of the 20 loop-free benchmarks, we expressed its partial
+correctness as a TPTP problem using FOOL in the combination of the  theory of
+linear integer arithmetic and the polymorphic theory of
+arrays~\cite{VampireAndFOOL}. To this end, (i) we formulated the
+safety assertion as a TPTP conjecture and (ii) expressed the
+transition relation of the program as a FOOL formula with tuple
+expressions and \LETIN\ expressions with tuple definitions.
+We refer to \cite{VampireAndFOOL} for the details of the translation of a program's transition relation to FOOL. In particular, the correctness of this translation is stated in Theorem 1 of that work. Each FOOL formula produces by the translation is linear in the size of the program. Figure~\ref{fig:examples/count_two_tptp} shows the TPTP translation of the safety property of the \verb'cout\_two\_tptp' program. It uses the {\tt thf} subset of the TPTP language, which is the standard subset that contains features of FOOL.
+
+%we (i) encode a conjunction of post-conditions as the safety condition and (ii) encode the next state values of program variables. The former is straightforward, and the latter employs the translation described in our previous work~\cite{VampireAndFOOL}. We briefly recap it here.
+%
+%The translation works with programs using assignments $\ass$, \ITE, and sequential composition. Given a program $P$ its translation $[P]$ has the form $\letin{(x_1,\ldots,x_n)}{E}{(x_1,\ldots,x_n)}$, where $x_1,\ldots,x_n$ are all variables updated by $P$, that is, all variables used in the left-hand-side of an assignment. $[P]$ is inductively defined as follows:
+%
+%\begin{itemize}
+%  \item $[\text{x}_i \text{\ASS} e]$ is $\letin{(\ldots,x_i,\ldots)}{(\ldots,e,\ldots)}{(x_1,\ldots,x_n)}$,
+%  \item $[$\IF\ e \THEN\ $P_1$ \ELSE\ $P_2]$ is $\letin{(x_1,\ldots,x_n)}{\ite{e}{[P_1]}{[P_2]}}{(x_1,\ldots,x_n)},$
+%  \item $[P_1$;$P_2]$ is $\mathtt{let}~D~\mathtt{in}~[P_2]$ where $[P_1]$ is $\mathtt{let}~D~\mathtt{in}~(x_1,\ldots,x_n)$.
+%\end{itemize}
+
+%The crucial aspect of this translation is that it relies on tuple expressions and tuple definitions in \LETIN\ expressions available in FOOL.
+
+%The translation takes a program statement $s$ and a FOOL formula $\psi$ as the input and produces a FOOL formula $[s]\psi$ that expresses the next state values of program variables. The translation is inductively defined as follows.
+%\begin{enumerate}
+%  \item $[x \ass\ e]\psi$ is $\letin{x}{e}{\psi}$;
+%  \item $[s_1 ; s_2]\psi$ is $\letin{a}{b}{c}$
+%  \item $[\IF~\phi~\THEN~s_1~\ELSE~s_2]\psi$ is $\letin{\tuple{x_1}{\ldots}{x_n}}{\ite{\phi}{[s_1,\tuple{x_1}{\ldots}{x_n}]}{[s_2,\tuple{x_1}{\ldots}{x_n}]}}{\psi}$, where $x_1,\ldots,x_n$ are all program variables of $s_1$ and $s_2$.
+%\end{enumerate}
+%Figure~\ref{fig:examples/count_two_tptp} shows the translation of code fragment from Figure~\ref{fig:examples/count_two_unrolled} written in the TPTP language. In this and other examples we translated assignments to an element of an array as an assignment of an updated version of an array to itself.
+
+\begin{figure}[tb]
+  \centering
+  \begin{minipage}[t]{\textwidth}
+    \begin{lstlisting}
+thf(a, type, a: $array($int, $int)).
+thf(x, type, x: $int).
+thf(y, type, y: $int).
+
+thf(count_two, conjecture,
+     $let(x := 0,
+     $let(y := 0,
+     $let([x, y] := $ite($greater($select(a, 0), 0),
+                           $let(x := $sum(x, 1), [x, y]),
+                           $let(y := $sum(y, 1), [x, y])),
+     $let([x, y] := $ite($greater($select(a, 1), 0),
+                           $let(x := $sum(x, 1), [x, y]),
+                           $let(y := $sum(y, 1), [x, y])),
+     $let([x, y] := $ite($greater($select(a, 2), 0),
+                           $let(x := $sum(x, 1), [x, y]),
+                           $let(y := $sum(y, 1), [x, y])),
+           $sum(x, y) = 3)))))).
+    \end{lstlisting}
+  \end{minipage}
+  \caption{A FOOL translation of Fig.~\ref{fig:examples/count_two_unrolled} written in the TPTP language.}
+  \label{fig:examples/count_two_tptp}
+\end{figure}
+
+The results of the experiments are summarised in Table~\ref{table:examples-results}. These results were obtained on a MacBook Pro with a 2,9 GHz Intel Core i5 and 8 Gb RAM, and using the time limit of 60 seconds per problem.  The first column of the table lists the
+names of the programs with loops, and columns~2--5 indicate how many
+time the program loop was unrolled and gives the time needed by
+Vampire to prove the correctness of the corresponding loop-free
+program. %Dashes mean Vampire failed to construct a
+%proof; when investigating the failing cases, we realised that more
+%efficient implementation of tuples in FOOL is needed. We leave this
+%task for future work. 
+
+Based on the results of this experiment we conclude that Vampire can be used for verification of bounded safety properties of imperative programs.
+
+%The experiment shows shows that Vampire can be used for proving bounded safety of imperative programs.
+%This is mainly thanks to the FOOL logic and, in particular, the support for the tuple construct,
+%which make first-order theorem proving better suited for applications of program analysis and verification. 
+%The results of the experiments are summarised in
+%Table~\ref{table:examples-results}. 
+%\EK{Are there any observation we can make about the results?} These results were obtained on a MacBook Pro with a 2,9 GHz Intel Core i5 and 8 Gb RAM, and using the time limit of 60 seconds per problem. Both the benchmarks and the results are available at \url{www.cse.chalmers.se/~evgenyk/fool-tuple-experiments/}.
+
+\begin{table}[tb]
+  \caption{Runtimes in seconds of Vampire on 20 problems encoding partial program correctness.}
+  \begin{center}
+  \begin{tabular}{|l|r|r|r|r|}
+    \hline Problem & 2 & 3 & 4 & 5 \\ \hline
+    \verb'count_two'        &  0.011  &  0.016  &  0.030  &  0.053 \\
+    \verb'count_two_flag'~  &  0.011  &  0.017  &  0.028  &  0.041 \\
+    \verb'count_three'      &  0.023  &  0.042  &  0.128  &  0.522 \\
+    \verb'two_arrays'       &  0.026  &  0.091  &  0.237  &  0.263 \\
+    \verb'three_arrays'     &  0.446  &  5.368  &  8.719  & 14.886 \\
+    \hline
+  \end{tabular}
+  \end{center}
+  \label{table:examples-results}
+\end{table}

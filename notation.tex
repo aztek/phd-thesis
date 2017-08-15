@@ -31,6 +31,16 @@
   captionpos=b
 }
 
+\lstdefinelanguage{appendixcpp}{
+  basicstyle={\ttfamily},
+  columns=flexible,
+  keywords={public, static, void, do, for, while, int, bool, if, else, break, assert},
+  sensitive=true,
+  captionpos=b,
+  frame=bottomline,
+  breaklines=true
+}
+
 \newcommand{\reserved}[1]{\textbf{\underline{#1}}} % reserved words in algorithms
 \newcommand{\ass}{\texttt{:=}}     % assignment operator
 \newcommand{\inc}{~~~~\= \+ \kill}    % used in algorithms
@@ -66,6 +76,7 @@
 \newcommand{\ITE}{\texttt{if}-\texttt{then}-\texttt{else}}
 \newcommand{\binding}[2]{{#1}\,=\,{#2}}
 \newcommand{\letin}[3]{\mathtt{let}\;\binding{#1}{#2}\;\allowbreak\mathtt{in}\;{#3}}
+\newcommand{\letindef}[2]{\mathtt{let}\;{#1}\;\allowbreak\mathtt{in}\;{#2}}
 \newcommand{\letinpar}[5]{\mathtt{let}\;\binding{#1}{#2};\;\binding{#3}{#4}\;\mathtt{in}\;{#5}}
 \newcommand{\LETIN}{\texttt{let}-\texttt{in}}
 \newcommand{\ofsort}[2]{{{#1}:{#2}}}
@@ -109,8 +120,6 @@
 \newcommand{\folb}{{FOOL}}% how should we call FOL with boolean?
 \newcommand{\toFOL}[1]{\mathit{fol}(#1)}  % translation of syntactially FO to FO
 
-\newcommand{\newcnf}{\textsc{new-cnf}}
-
 % end of definition, theorem, proof etc.
 \newcommand{\QEDsymbol}{\text{\ding{111}}}
 \newcommand{\QED}{\hfill\QEDsymbol}
@@ -120,16 +129,21 @@
 \renewcommand{\phi}{\varphi}
 
 % newcnf
-\newcommand{\possign}{+}
-\newcommand{\negsign}{-}
+\newcommand{\possign}{\mathtt{t}}
+\newcommand{\negsign}{\mathtt{f}}
 \newcommand{\genlit}[2]{{#1}^{#2}}
 \newcommand{\genclause}[2]{{#1}_{#2}}
 
-\newcommand{\sign}{\sigma}
+\newcommand{\sign}{\star}
 \newcommand{\subst}{\theta}
 \newcommand{\emptySubst}{\epsilon}
 
-\newcommand{\GC}{\mathit{D}}
+\newcommand{\formName}{\mathtt{form}}
+\newcommand{\form}[1]{\formName({#1})}
+
+\newcommand{\config}[2]{#1}
+
+\newcommand{\GC}{\mathit{C}}
 
 \newcommand{\sk}{\mathit{sk}}
 
@@ -179,6 +193,15 @@
 \newcommand{\dselecttwo}{\lstinline'$select2'} %$
 \newcommand{\dstoretwo}{\lstinline'$store2'} %$
 
+\newcommand{\skolem}{skolem}
+
 % the rest
 \newcommand{\Z}{\mathds{Z}}
 \newcommand{\R}{\mathds{R}}
+
+% tuples
+\newcommand{\tuple}[3]{({#1},{#2},{#3})}
+
+\newcommand{\newcnf}{\textsc{VCNF}}
+\newcommand{\nfcnf}{$\text{\textsc{VCNF}}_{\text{\textsc{FOOL}}}$}
+\newcommand{\oldcnf}{\textsc{FOOL2FOL}}
