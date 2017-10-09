@@ -47,7 +47,7 @@ program obtained by unrolling three times the loop of \verb'count_two'.
 
 \begin{figure}[tb]
 \centering
-\begin{minipage}{.5\textwidth}
+\begin{minipage}{.52\textwidth}
   \centering
   {\begin{lstlisting}[language=cpp]
 int a[];
@@ -57,10 +57,10 @@ for (int i = 0; i < n; i++) {
 }
 assert(x + y == n);
       \end{lstlisting}}
-  \caption{The \texttt{count\_two} program.}
+  \caption{The \texttt{count\_two} program.\\~}
   \label{fig:examples/count_two}
 \end{minipage}%
-\begin{minipage}{.5\textwidth}
+\begin{minipage}{.48\textwidth}
   \centering
   {\begin{lstlisting}[language=cpp]
 int a[];
@@ -70,7 +70,7 @@ if (a[1] > 0) x++; else y++;
 if (a[2] > 0) x++; else y++;
 assert(x + y == 3);
       \end{lstlisting}}
-  \caption{The benchmark obtained by unrolling
+  \caption{The program obtained by unrolling
     Figure~\ref{fig:examples/count_two} three times.}
   \label{fig:examples/count_two_unrolled}
 \end{minipage}
@@ -155,14 +155,13 @@ Based on the results of this experiment we conclude that Vampire can be used for
 \begin{table}[tb]
   \caption{Runtimes in seconds of Vampire on 20 problems encoding partial program correctness.}
   \begin{center}
-  \begin{tabular}{|l|r|r|r|r|}
+  \begin{tabular}{lrrrr}
     \hline Problem & 2 & 3 & 4 & 5 \\ \hline
     \verb'count_two'        &  0.011  &  0.016  &  0.030  &  0.053 \\
     \verb'count_two_flag'~  &  0.011  &  0.017  &  0.028  &  0.041 \\
     \verb'count_three'      &  0.023  &  0.042  &  0.128  &  0.522 \\
     \verb'two_arrays'       &  0.026  &  0.091  &  0.237  &  0.263 \\
-    \verb'three_arrays'     &  0.446  &  5.368  &  8.719  & 14.886 \\
-    \hline
+    \verb'three_arrays'     &  0.446  &  5.368  &  8.719  & 14.886
   \end{tabular}
   \end{center}
   \label{table:examples-results}

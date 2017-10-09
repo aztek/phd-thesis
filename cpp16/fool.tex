@@ -237,9 +237,8 @@ Consider now the following valid property of $\mathit{max}$:
 
 Its encoding in the extended TFF0 can use the same \dite\ expression:
 \begin{lstlisting}
-![X:$int, Y:$int]: $ite(max(X, Y) = X,
-                           $greatereq(X, Y),
-                           $greatereq(Y, X)).
+![X:$int, Y:$int]:
+  $ite(max(X, Y) = X, $greatereq(X, Y), $greatereq(Y, X)).
 \end{lstlisting}%$
 
 Note that TFF0 without \dite\ has to differentiate between terms and formulas, and so requires to use \ditet\ in~\eqref{eq:ite-t-example} and \ditef\ in~\eqref{eq:ite-f-example}.

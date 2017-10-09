@@ -46,7 +46,7 @@ array[2] + array[3];
 Formula~\eqref{eq:let-function-example} used an interpreted function to represent the array in this code. We can alternatively use arrays to represent it as follows
 \begin{equation}\label{eq:arrays-example}
 \begin{aligned}
-&\mathtt{let}\;\binding{\arrayt}{\store{array}{3}{5}}\;\mathtt{in}\\
+&\mathtt{let}\;\binding{\arrayt}{\store{\arrayt}{3}{5}}\;\mathtt{in}\\
 &\quad\select{\arrayt}{2} + \select{\arrayt}{3}
 \end{aligned}
 \end{equation}

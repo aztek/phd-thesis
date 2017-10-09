@@ -102,41 +102,38 @@ Likewise, for a variable $x$ and value $a$ we define $\variant{\intI}{x}{a}$ to 
 \begin{definition}\label{def:folb-term-evaluation}\rm
   Let $\intI$ be a $\context$-interpretation, and $\context \vdash t:\sigma$. The \emph{value of $t$ in $\intI$}, denoted as $\eval{t}{\intI}$, is a value in $\interpret{\sigma}{\intI}$ inductively defined as follows:
   \[
-    \begin{array}{rcl}
-      \eval{x}{\intI}&=&\interpret{x}{\intI}.
-      \\*[1ex]
-      \eval{f(t_1, \ldots, t_n)}{\intI}&=&\interpret{f}{\intI}(\eval{t_1}{\intI}, \ldots, \eval{t_n}{\intI}).
-      \\*[1ex]
-      \eval{s \eql t}{\intI} & = &
-        \left\{ \begin{array}{ll}
-                  1, & \text{if } \eval{s}{\intI} = \eval{t}{\intI}; \\*[1ex]
-                  0, & \text{otherwise.}
-                \end{array}\right.
-      \\*[1ex]
-      \eval{(\forall x : \sigma)\phi}{\intI} & = &
-        \left\{ \begin{array}{ll}
-                  1, & \text{if } \eval{\phi}{\replacement{\intI}{x}{a}} = 1\\*[1ex]
-                     & \text{~~~for all } a \in \interpret{\sigma}{\intI}; \\*[1ex]
-                  0, & \text{otherwise.}
-                \end{array}\right.
-      \\*[1ex]
-      \eval{(\exists x : \sigma)\phi}{\intI} & = &
-        \left\{ \begin{array}{ll}
-                  1, & \text{if } \eval{\phi}{\replacement{\intI}{x}{a}} = 1\\*[1ex]
-                     & \text{~~~for some } a \in \interpret{\sigma}{\intI}; \\*[1ex]
-                  0, & \text{otherwise.}
-                \end{array}\right.
-      \\*[1ex]
-      \eval{\ite{\phi}{s}{t}}{\intI}&=&\left\{ \begin{array}{ll}
-        \eval{s}{\intI},&\text{if $\eval{\phi}{\intI} = 1$;} \\*[1ex]
-        \eval{t}{\intI},&\text{otherwise.}
-      \end{array}\right.
-    \end{array}
+    \begin{aligned}
+      \eval{x}{\intI} &= \interpret{x}{\intI}.
+      \\
+      \eval{f(t_1, \ldots, t_n)}{\intI} &= \interpret{f}{\intI}(\eval{t_1}{\intI}, \ldots, \eval{t_n}{\intI}).
+      \\
+      \eval{s \eql t}{\intI} &=
+        \left\{ \begin{aligned}
+                  &\text{1, if $\eval{s}{\intI} = \eval{t}{\intI}$;} \\
+                  &\text{0, otherwise.}
+                \end{aligned}\right.
+      \\
+      \eval{(\forall x : \sigma)\phi}{\intI} &=
+        \left\{ \begin{aligned}
+                  &\text{1, if $\eval{\phi}{\replacement{\intI}{x}{a}} = 1$ for all $a \in \interpret{\sigma}{\intI}$;} \\
+                  &\text{0, otherwise.}
+                \end{aligned}\right.
+      \\
+      \eval{(\exists x : \sigma)\phi}{\intI} &=
+        \left\{ \begin{aligned}
+                  &\text{1, if $\eval{\phi}{\replacement{\intI}{x}{a}} = 1$ for some  $a \in \interpret{\sigma}{\intI}$;} \\
+                  &\text{0, otherwise.}
+                \end{aligned}\right.
+      \\
+      \eval{\ite{\phi}{s}{t}}{\intI} &=
+        \left\{ \begin{aligned}
+                  &\eval{s}{\intI},\text{ if $\eval{\phi}{\intI} = 1$;} \\
+                  &\eval{t}{\intI},\text{ otherwise.}
+                \end{aligned}\right.
+    \end{aligned}
   \]
   \[
-    \begin{array}{rcl}
-      \eval{\letin{f(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{s}{t}}{\intI}&=&\eval{t}{\replacement{\intI}{f}{g}},
-    \end{array}
+      \eval{\letin{f(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{s}{t}}{\intI} = \eval{t}{\replacement{\intI}{f}{g}},
   \]
   where $g$ is such that for all $i = 1, \ldots, n$ and $a_i \in \interpret{\sigma_i}{\intI}$, we have $g(a_1, \ldots, a_n) = \eval{s}{\replacement{\intI}{x_1 \ldots x_n}{a_1 \ldots a_n}}$. \QED
 \end{definition}
