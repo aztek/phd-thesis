@@ -1,0 +1,220 @@
+In this section we discuss an efficient translation of imperative programs to FOOL. To formalise the translation we define a restricted imperative programming language and its denotational semantics in Section~\ref{sec:boogie/next-state/programming-language}. This language is capable of expressing variable updates, \ITE, and sequential composition. Then, we define an encoding of the next state relation for programs of this language, and state the soundness property of this encoding in Section~\ref{sec:boogie/next-state/encoding}. Finally, in Section~\ref{sec:boogie/next-state/translation} we show a translation that converts a program, annotated with its pre-conditions and post-conditions, to a FOOL formula that expresses the partial correctness property of that program. %We formulate the soundness property of the translation as well.
+
+We give (rather standard) definitions of our programming language and its semantics and use them to define the main contributions of this section: the encoding of the next state relation (Definition~\ref{def:boogie/encoding}) and soundness of this encoding (Theorem~\ref{thm:boogie/encoding-soundness}).
+
+\subsection{An Imperative Programming Language}\label{sec:boogie/next-state/programming-language}
+
+% Our goal is to define a program language that on the one hand is simple enough to be illustrative, and on the other hand expressive enough to allow non-trivial meaningful programs.
+
+We define a programming language with assignments to typed variables, \ITE, and sequential composition. We omit variable declarations in our language and instead assume for each program a set of program variables $V$ and a type assignment $\context$. $\context$ is a function that maps each program variable into a type. Each type is either $\pint$, $\pbool$, or $\parray(\sigma,\tau)$, where $\sigma$ and $\tau$ are types of array indexes and array values, respectively. In the sequel we will assume that $V$ and $\context$ are arbitrary but fixed.
+
+Programs in our language select and update elements of arrays, including multidimentional arrays. We do not introduce a distinguished type for multidimentional arrays but instead use nested arrays. We write $\parray(\sigma_1,\ldots,\sigma_n,\tau)$, $n > 1$, to mean the nested array type $$\parray(\sigma_1,\parray(\ldots,\parray(\sigma_n,\tau)\ldots)).$$
+
+\begin{definition}\label{def:boogie/expression}
+An \emph{expression} of the type $\tau$ is defined inductively as follows.
+\begin{enumerate}
+  \item An integer $n$ is an expression of the type $\pint$.
+  \item Symbols $\ttrue$ and $\tfalse$ are expressions of the type $\pbool$.
+  \item If $\context(x)=\tau$, then $x$ is an expression of the type $\tau$.
+  \item If $\context(x)=\parray(\sigma_1,\ldots,\sigma_n,\tau)$, $n > 0$, $\expr_1,\ldots,\expr_n$ are expressions of types $\sigma_1,\allowbreak\ldots,\allowbreak\sigma_n$, respectively, then $x[\expr_1,\ldots,\expr_n]$ is an expression of the type $\tau$.
+  \item If $\expr_1$ and $\expr_2$ are expressions of the type $\tau$, then $\expr_1 \eql \expr_2$ is an expression of the type $\pbool$.
+  \item If $\expr_1$ and $\expr_2$ are expressions of the type $\pint$, then $-\expr_1$, $\expr_1+\expr_2$, $\expr_1-\expr_2$, $\expr_1\times\expr_2$ are expressions of the type $\pint$.
+  \item If $\expr_1$ and $\expr_2$ are expressions of the type $\pint$, then $\expr_1<\expr_2$ is an expression of the type $\pbool$.
+  \item If $\expr_1$ and $\expr_2$ are expression of the type $\pbool$, then $\neg\expr_1$, $\expr_1\vee\expr_2$, $\expr_1\wedge\expr_2$ are expressions of the type $\pbool$. \QED
+\end{enumerate}
+\end{definition}
+
+%\begin{definition}
+%An \emph{lvalue} $\ell$ of the type $\tau$ is defined inductively as follows.
+%\begin{enumerate}
+%  \item If $\context(x)=\tau$, then $x$ is an lvalue of the type $\tau$.
+%  \item If $\ell$ is an lvalue of the type $\arrayt(\sigma,\tau)$ and $i$ is an expression of the type $\sigma$, then $\ell[i]$ is an lvalue of the type $\tau$.
+%\end{enumerate}
+%\end{definition}
+
+\begin{definition}\label{def:boogie/statement}
+A \emph{statement} is defined inductively as follows.
+\begin{enumerate}
+  \item $\emptyStatement$ is an empty statement.
+  \item If $\context(x_1)=\tau_1,\ldots,\context(x_n)=\tau_n,n\ge1$ and $\expr_1,\ldots,\expr_n$ are expressions of the types $\tau_1,\ldots,\tau_n$, respectively, then $\assigns{x_1,\ldots,x_n}{\expr_1,\ldots,\expr_n}$ is a statement.
+  \item If $\context(x)=\parray(\sigma_1,\ldots,\sigma_n,\tau)$, $n\ge1$, and $\expr_1,\ldots,\allowbreak\expr_n,\allowbreak\expr$ are expressions of types $\sigma_1,\ldots,\sigma_n,\tau$, respectively, then $\assigns{x[\expr_1,\ldots,\expr_n]}{\expr}$ is a statement.
+  \item If $\expr$ is an expression of the type $\pbool$, $\stmt_1$ and $\stmt_2$ are statements, and at least one of $s_1$, $s_2$ is not $\emptyStatement$, then $\ite{\expr}{\stmt_1}{\stmt_2}$ is a statement.
+  \item If $\stmt_1$ and $\stmt_2$ are statements and neither of them is $\emptyStatement$, then $\seq{\stmt_1}{\stmt_2}$ is a statement. \QED
+\end{enumerate}
+\end{definition}
+
+We say that $x_1,\ldots,x_n$ in the statement $\assigns{x_1,\ldots,x_n}{\expr_1,\ldots,\expr_n}$ and $x$ in the statement $\assigns{x[\expr_1,\ldots,\expr_n]}{\expr}$ are \emph{assigned program variables}. For each statement $s$ we denote by $\updates{s}$ the set of all assigned program variables that occur in $s$.
+
+We define the semantics of the programming language by an interpretation function $\interp{-}$ for types, expressions and statements. The interpretation of a type is a set: $\interp{\pint}=\Z$, $\interp{\pbool}=\{0,1\}$, and $\interp{\parray(\tau,\sigma)} = \interp{\tau}\to\interp{\sigma}$. The interpretation of expressions and statements is defined using \emph{program states}, that is, mappings of program variables $x\in V$, $\context(x)=\tau$ to elements of $\interp{\tau}$.
+
+\begin{definition}\label{def:boogie/interpret-expression}
+Let $\expr$ be an expression of the type $\tau$. The \emph{interpretation} $\interp{\expr}$ is a mapping from program states to $\interp{\tau}$ defined inductively as follows.
+\begin{enumerate}
+  \item $\interp{n}$ maps each state to $n$, where $n$ is an integer.
+  \item $\interp{\ttrue}$ maps each state to 1.
+  \item $\interp{\tfalse}$ maps each state to 0.
+  \item $\interp{x}$ maps each $\State$ to $\State(x)$.
+  \item $\interp{x[\expr_1,\ldots,\expr_n]}$ maps each $\State$ to $\State(x)(\interp{\expr_1}(\State))\ldots(\interp{\expr_n}(\State))$.
+  \item $\interp{\expr_1 \oplus \expr_2}$ maps each $\State$ to $\interp{\expr_1}(\State) \oplus \interp{\expr_2}(\State), \text{where } \oplus \in \{ \eql, +, -, \times, <, \vee, \wedge \}.$
+  \item $\interp{\neg\expr}$ maps each $\State$ to $\neg\interp{\expr}(\State)$.\QED
+\end{enumerate}
+% \[
+% \begin{aligned}
+% \interp{n}(\State) &= n,\text{ where $n$ is an integer.} \\
+% \interp{\ttrue}(\State) &= 1. \\
+% \interp{\tfalse}(\State) &= 0. \\
+% \interp{x}(\State) &= \State(x). \\
+% \interp{x[\expr_1,\ldots,\expr_n]}(\State) &= \State(x)(\interp{\expr_1}(\State))\ldots(\interp{\expr_n}(\State)). \\
+% % \interp{\expr_1 \oplus \expr_2}(\State) &= \begin{aligned}[t]
+% %                                              &\interp{\expr_1}(\State) \oplus \interp{\expr_2}(\State),\\
+% %                                              &\text{where $\oplus \in \{ \eql, +, -, \times, <, \vee, \wedge \}$.}
+% %                                            \end{aligned}\\
+% \interp{\expr_1 \oplus \expr_2}(\State) &= \interp{\expr_1}(\State) \oplus \interp{\expr_2}(\State), \text{where } \oplus \in \{ \eql, +, -, \times, <, \vee, \wedge \}.\\
+% \interp{-\expr}(\State) &= -\interp{\expr}(\State). \\
+% \interp{\neg\expr}(\State) &= \neg\interp{\expr}(\State).\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\;\QED
+% \end{aligned}
+% \]
+\end{definition}
+
+\begin{definition}\label{def:boogie/interpret-statement}
+Let $\stmt$ be a statement. The \emph{interpretation} $\interp{\stmt}$ is a mapping between program states defined inductively as follows.
+\begin{enumerate}
+  \item $\interp{\emptyStatement}$ is the identity mapping.
+  \item $\interp{\assigns{x_1,\ldots,x_n}{\expr_1,\ldots,\expr_n}}$ maps each $\State$ to $\State'$ such that $\State'(x_i)=\interp{\expr_i}(\State)$ for each $1 \le i \le n$ and otherwise coincides with $\State$.
+  \item $\interp{\assigns{x[\expr_1,\ldots,\expr_n]}{\expr}}$ maps each $\State$ to $\State'$ such that $$\State'(x)(\interp{\expr_1}(\State))\ldots(\interp{\expr_n}(\State))=\interp{e}(\State)$$ and otherwise coincides with $\State$.
+  \item $\interp{\ite{\expr}{\stmt_1}{\stmt_2}}$ maps each $\State$ to $\interp{\stmt_1}(\State)$ if $\interp{\expr}(\State)=1$ and to $\interp{\stmt_2}(\State)$ otherwise.
+  \item $\interp{\seq{\stmt_1}{\stmt_2}}$ is $\interp{\stmt_2}\circ\interp{\stmt_1}$. \QED  
+\end{enumerate}
+% \[
+% \begin{aligned}
+% \interp{\emptyStatement}(\State) &= \State.\\
+% \interp{\assigns{x_1,\ldots,x_n}{\expr_1,\ldots,\expr_n}}(\State) &= \State',
+%   \begin{aligned}[t]
+%     &\text{such that $\State'(x_i)=\interp{\expr_i}(\State)$ for each $1 \le i \le n$}\\*[-0.5ex]
+%     &\text{and otherwise coincides with $\State$.}
+%   \end{aligned}\\
+% \interp{\assigns{x[\expr_1,\ldots,\expr_n]}{\expr}}(\State) &= \EK{TODO}. \\
+% \interp{\ite{\expr}{\stmt_1}{\stmt_2}}(\State) &= \left\{ \begin{array}{l}
+%                                                             \interp{\stmt_1}(\State),\text{ if }\interp{\expr}(\State)=1;\\
+%                                                             \interp{\stmt_2}(\State),\text{ otherwise.}
+%                                                           \end{array} \right.\\
+% \interp{\seq{\stmt_1}{\stmt_2}}(\State) &= \interp{\stmt_2}(\interp{\stmt_1}(\State)). \\
+% \end{aligned}
+% \]\QED
+\end{definition}
+
+
+\subsection{Encoding the Next State Relation}\label{sec:boogie/next-state/encoding}
+
+Our setting is FOOL extended with the theory of linear integer arithmetic, the polymorphic theory of arrays~\cite{VampireAndFOOL}, and the polymorphic theory of first class tuples (Section~\ref{sec:boogie/tuples}). The theory of linear integer arithmetic includes the sort $\Z$, the predicate symbol $<$, and the function symbols $+$, $-$, and $\times$. The theory of arrays includes the sort $\arrayt(\tau,\sigma)$ for all sorts $\tau$ and $\sigma$, and function symbols $\selectf$ and $\storef$. The function symbol $\selectf$ represents a binary operation of extracting an array element by its index. The function symbol $\storef$ represents a ternary operation of updating an array at a given index with a given value. We point out that sorts $\bool$, $\Z$, and $\arrayt(\sigma,\tau)$ mirror types $\pbool$, $\pint$ and $\parray(\sigma,\tau)$ of our programming language, and have the same interpretations.
+
+We represent multidimentional arrays in FOOL as nested arrays\footnote{Multidimentional arrays can be represented in FOOL also as arrays with tuple indexes. We do not discuss such representation in this work.}. To this end we
+\begin{enumerate*}[label=(\roman*)]
+%  \item write $\arrayt(\sigma_1,\ldots,\sigma_n,\tau)$, where $n > 1$, to mean $\arrayt(\sigma_1,\allowbreak\arrayt(\ldots,\allowbreak\arrayt(\sigma_n,\allowbreak\tau)\ldots));$
+  \item inductively define $\select{a}{i_1,\allowbreak\ldots,\allowbreak i_n}$, where $n > 1$, to be $\select{\select{a}{i_1}}{i_2,\ldots,i_n}$; and
+  % \select{a}{i_1,\ldots,i_n} = \select{\select{a}{i_1}}{i_2,\ldots,i_n}
+  \item inductively define $\store{a}{i_1,\allowbreak\ldots,\allowbreak i_n}{e}$, where $n > 1$, to be $\store{a}{i_1}{\store{\select{a}{i_1}}{i_2,\allowbreak\ldots,\allowbreak i_n}{e}}.$
+  % \store{a}{i_1,\ldots,i_n}{e} = \store{a}{i_1}{\store{\select{a}{i_1}}{i_2,\ldots,i_n}{e}}
+\end{enumerate*}
+
+Our encoding of the next state relation produces FOOL terms that use program variables as constants and do not use any other uninterpreted function or predicate symbols. In the sequel we will only consider such FOOL terms. For these FOOL terms, $\context$ is a type assignment and each program state can be extended to a $\context$-interpretation, the details of this extension are straightforward (we refer to~\cite{FOOL} for the semantics of FOOL). We will use program states as $\context$-interpretations for FOOL terms. For example we will write $\eval{t}{\State}$ for the value of $t$ in $\State$, where $t$ is a FOOL term and $\State$ is a program state. We will say that a program state $\State$ satisfies a FOOL formula $\phi$ if $\eval{\phi}{\State} = 1$.
+
+To define the encoding of the next state relation we first define a translation of expressions to FOOL terms. Our encoding applies this translation to each expression that occurs inside a statement.
+
+\begin{definition}
+Let $\expr$ be an expression of the type $\tau$. $\translate{\expr}$ is a FOOL term of the sort $\tau$, defined inductively as follows.
+\[
+\begin{aligned}
+\translate{n} &= n, \text{where $n$ is an integer}. \\
+\translate{\ttrue} &= \true. \\
+\translate{\tfalse} &= \false. \\
+\translate{x} &= x. \\
+\translate{x[\expr_1,\ldots,\expr_n]} &= \select{x}{\translate{\expr_1},\ldots,\translate{\expr_n}}. \\
+\translate{\expr_1\oplus\expr_2} &= \translate{\expr_1} \oplus \translate{\expr_2}, \text{where } \oplus \in \{ \eql, +, -, <, \times, \vee, \wedge \}. \\
+% \translate{\expr_1\oplus\expr_2} &= \begin{aligned}[t]
+%                                       &\translate{\expr_1} \oplus \translate{\expr_2},\\
+%                                       &\text{where $\oplus \in \{ \eql, +, -, <, \times, \vee, \wedge \}$.}
+%                                     \end{aligned} \\
+\translate{-\expr} &= -\translate{\expr}. \\
+\translate{\neg\expr} &= \neg\translate{\expr}.\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\,\,\QED
+\end{aligned}
+\]
+\end{definition}
+
+\begin{lemma}\label{lemma:boogie/transform-expressions}
+$\eval{\translate{\expr}}{\State} = \interp{\expr}(\State)$ for each expression $\expr$ and state $\State$. \QED
+\end{lemma}
+\begin{proof}
+By structural induction on $\expr$. %\QED
+\end{proof}
+
+%\begin{definition}\label{def:boogie/updates}
+%Let $\stmt$ be a statement. The set of variables updated in $\stmt$, denoted as $\updates{s}$, is defined inductively as follows.
+%\[
+%\begin{aligned}
+%\updates{\emptyStatement} &= \emptyset. \\
+%\updates{\assigns{x}{\expr}} &= \{ x \}. \\
+%\updates{\assigns{x[\expr_1,\ldots,\expr_n]}{\expr}} &= \{ x \}. \\
+%\updates{\ite{\expr}{\stmt_1}{\stmt_2}} &= \updates{\stmt_1} \cup \updates{\stmt_2}. \\
+%\updates{\seq{\stmt_1}{\stmt_2}} &= \updates{\stmt_1} \cup \updates{\stmt_2}.
+%\end{aligned}
+%\]\QED
+%\end{definition}
+
+\begin{definition}\label{def:boogie/encoding}
+Let $\stmt$ be a statement. $\tuplifyRel{\stmt}$ is a mapping between FOOL terms of the same sort, defined inductively as follows.
+\begin{enumerate}
+  \item $\tuplifyRel{\emptyStatement}$ is the identity mapping.
+  \item $\tuplifyRel{\assigns{x_1,\ldots,x_n}{\expr_1,\ldots,\expr_n}}$ maps $t$ to $$\letin{(x_1,\ldots,x_n)}{(\translate{\expr_1},\ldots,\translate{\expr_n})}{t}.$$
+  \item $\tuplifyRel{\assigns{x[\expr_1,\ldots,\expr_n]}{\expr}}$ maps $t$ to $$\letin{x}{\storef(x,\translate{\expr_1},\ldots,\translate{\expr_n},\translate{\expr})}{t}.$$
+%  \item $\tuplifyRel{\ite{\expr}{\stmt_1}{\stmt_2}}$ maps $t$ to $$\letin{(x_1,\ldots,x_n)}{t'}{t},$$ where $$t' = \ite{\translate{\expr}}{\tuplify{\stmt_1}{(x_1,\ldots,x_n)}}{\tuplify{\stmt_2}{(x_1,\ldots,x_n)}}$$ and $\updates{s_1}\cup\updates{s_2} = \{x_1,\ldots,x_n\}.$
+  \item $\tuplifyRel{\ite{\expr}{\stmt_1}{\stmt_2}}$ maps $t$ to \[
+    \letnl{(x_1,\ldots,x_n)}{\itenl{\translate{\expr}}
+                                   {\tuplify{\stmt_1}{(x_1,\ldots,x_n)}}
+                                   {\tuplify{\stmt_2}{(x_1,\ldots,x_n)}}}
+          {t,}
+  \] where $\updates{s_1}\cup\updates{s_2} = \{x_1,\ldots,x_n\}$.\\[-0.5em]
+  \item $\tuplifyRel{\seq{\stmt_1}{\stmt_2}}$ is $\tuplifyRel{\stmt_1}\circ\tuplifyRel{\stmt_2}$. \QED
+\end{enumerate}
+% \[
+% \begin{aligned}
+%   \tuplify{\emptyStatement}{t} &= t. \\
+%   \tuplify{\assigns{x_1,\ldots,x_n}{\expr_1,\ldots,\expr_n}}{t} &=
+%     \letin{(x_1,\ldots,x_n)}{(\translate{\expr_1},\ldots,\translate{\expr_n})}
+%           {t}. \\
+%   \tuplify{\assigns{x[\expr_1,\ldots,\expr_n]}{\expr}}{t} &=
+%     \letin{x}{\storef(x,\translate{\expr_1},\ldots,\translate{\expr_n},\translate{\expr})}
+%           {t}. \\
+%   \tuplify{\ite{\expr}{\stmt_1}{\stmt_2}}{t} &=
+%     \letnl{(x_1,\ldots,x_n)}{\itenl{\translate{\expr}}
+%                                    {\tuplify{\stmt_1}{(x_1,\ldots,x_n)}}
+%                                    {\tuplify{\stmt_2}{(x_1,\ldots,x_n)}}}
+%           {t\text{, where $\updates{s_1}\cup\updates{s_2} = \{x_1,\ldots,x_n\},n>0$.}} \\
+%   \tuplify{\seq{\stmt_1}{\stmt_2}}{t} &= \tuplify{\stmt_1}{\tuplify{\stmt_2}{t}}. \\
+% \end{aligned}
+% \]\QED
+\end{definition}
+
+The following theorem is the soundness property of translation $\tuplifyT$. Essentially, it states that $\tuplifyT$ encodes the semantics of a given statement as a FOOL formula.
+
+\begin{theorem}\label{thm:boogie/encoding-soundness}
+$\eval{\tuplify{\stmt}{t}}{\State} = \eval{t}{\interp{\stmt}(\State)}$ for each statement $\stmt$, state $\State$ and FOOL term $t$. \QED
+\end{theorem}
+\begin{proof}
+By structural induction on $\stmt$. %\QED
+\end{proof}
+
+\subsection{Encoding the Partial Correctness Property}\label{sec:boogie/next-state/translation}
+
+We use the encoding of the next state relation to generate partial correctness properties of programs annotated with their pre-conditions and post-conditions. %These properties can then be checked automatically by a theorem prover. 
+
+We define an \emph{annotated program} to be a Hoare triple $\hoare{\varphi}{\stmt}{\psi}$, where $\stmt$ is a statement, and $\varphi$ and $\psi$ are formulas in first-order logic. We say that $\hoare{\varphi}{\stmt}{\psi}$ is correct if for each program state $\State$ that satisfies $\varphi$, $\interp{\stmt}(\State)$ satisfies $\psi$. We translate each annotated program $\hoare{\varphi}{\stmt}{\psi}$ to the FOOL formula $\varphi \implies \tuplify{\stmt}{\psi}$.
+
+\begin{theorem}\label{thm:boogie/translation-soundness}
+Let $\hoare{\varphi}{\stmt}{\psi}$ be an annotated program. The FOOL formula $\varphi \implies \tuplify{\stmt}{\psi}$ is valid iff $\hoare{\varphi}{\stmt}{\psi}$ is correct. \QED
+\end{theorem}
+\begin{proof}
+Directly follows from Theorem~\ref{thm:boogie/encoding-soundness}. %\QED
+\end{proof}
+
+We point out the following two properties of the encoding $\tuplifyT$. First, the size of the encoded formula is $O(v\cdot n)$, where $v$ is the number of variables in the program and $n$ is the program size as each program statement is used once with one or two instances of $(x_1,\ldots,x_n)$. Second, the encoding does not introduce any new symbols. When we translate program correctness properties to FOL, both an excessive number of new symbols and an excessive size of the translation might make the encoded formula hard for a theorem prover. Instead of balancing between the two, encoding to FOOL leaves the decision to the theorem prover.

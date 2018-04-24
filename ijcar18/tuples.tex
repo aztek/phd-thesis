@@ -1,0 +1,56 @@
+The use of tuple expressions in FOOL is limited. They can only occur on the right hand side of a tuple definition in \LETIN. One cannot use a tuple expression elsewhere, for example, as an argument to a function or predicate symbol.
+
+In this section we describe the theory of first class tuples that enables a more generic use of tuples. This theory contains tuple sorts and tuple terms. Both of them are first class~--- one can define function and predicate symbols with tuple arguments, quantify over the tuple sort, and use tuple terms as arguments to function and predicate symbols. Tuple expressions in FOOL, combined with the polymorphic theory of tuples, are tuple terms.
+
+\paragraph*{\bf Definition.}
+The polymorphic theory of tuples is the union of theories of tuples parametrised by tuple arity $n > 0$ and sorts $\tau_1,\ldots,\tau_n$.
+
+A theory of first class tuples is a first-order theory that contains a sort $(\tau_1,\ldots,\tau_n)$, function symbols $t:\tau_1\times\ldots\times\tau_n\to(\tau_1,\ldots,\tau_n)$, $\pi_1:(\tau_1,\ldots,\tau_n)\to\tau_1,\ldots,\pi_n:(\tau_1,\ldots,\tau_n)\to\tau_n$, and two axioms. The function symbol $t$ constructs a tuple from given terms, and function symbols $\pi_1,\ldots,\pi_n$ project a tuple to its individual elements. For simplicity we will write $\tuple{t_1,\ldots,t_n}$ instead of $t(t_1,\ldots,t_n)$ to mean a tuple of terms $t_1,\ldots,t_n$. The tuple axioms are
+\begin{enumerate}
+  \item exhaustiveness
+    $$(\forall x_1:\tau_1)\ldots(\forall x_n:\tau_n)(\pi_1(\tuple{x_1,\ldots,x_n})\eql x_1 \wedge \ldots \wedge \pi_n(\tuple{x_1,\ldots,x_n})\eql x_n);$$
+        % \begin{align*}
+        %   &(\forall x_1:\tau_1)\ldots(\forall x_n:\tau_n)\\
+        %   &\quad(\pi_1(\tuple{x_1,\ldots,x_n})\eql x_1 \wedge \ldots \wedge \pi_n(\tuple{x_1,\ldots,x_n})\eql x_n);
+        % \end{align*}
+  \item injectivity
+        \begin{align*}
+          &(\forall x_1:\tau_1)\ldots(\forall x_n:\tau_n)(\forall y_1:\tau_1)\ldots(\forall y_n:\tau_n)\\
+          &\quad(\tuple{x_1,\ldots,x_n} \eql \tuple{y_1,\ldots,y_n} \implies x_1 \eql y_1 \wedge \ldots \wedge x_n \eql y_n).
+        \end{align*}
+\end{enumerate}
+
+Tuples are ubiquitous in mathematics and programming languages. For example, one can use the tuple sort $(\R,\R)$ as the sort of complex numbers. Thus, the term $\tuple{a,b}$, where $a:\R$ and $b:\R$ represents a complex number $a+bi$. One can define the addition function $\mathit{plus}: (\R,\R) \times (\R,\R) \to (\R,\R)$ for complex numbers with the formula
+\begin{equation}\label{eq:complex-tuples}
+  % (\forall x:(\R,\R))(\forall y:(\R,\R))(\mathit{plus}(x,y)\eql \tuple{\pi_1(x) + \pi_1(y), \pi_2(x) + \pi_2(y)}),
+  \begin{aligned}
+    &(\forall x:(\R,\R))(\forall y:(\R,\R)) \\
+    &\quad(\mathit{plus}(x,y)\eql \tuple{\pi_1(x) + \pi_1(y), \pi_2(x) + \pi_2(y)}),
+  \end{aligned}
+\end{equation} where $+$ denotes addition for real numbers.
+
+Tuple terms can be used as tuple expressions in FOOL. If $\binding{(c_1,\ldots,c_n)}{s}$ is a tuple definition inside a \LETIN, where $c_1,\ldots,c_n$ are constant symbols of sorts $\tau_1,\ldots,\tau_n$, respectively, then tuple expression $s$ is a term of the sort $(\tau_1,\ldots,\tau_n)$.
+
+It is not hard to extend tuple definitions to allow arbitrary tuple terms of the correct sort on the right hand side of $=$. For example, one can use a variable of the tuple sort. With such extension, Formula~\ref{eq:complex-tuples} can be equivalently expressed using a \LETIN\ with two simultaneous tuple definitions as follows
+\begin{equation}\label{eq:complex-tuples2}
+  % (\forall x:(\R,\R))(\forall y:(\R,\R))(\mathit{plus}(x,y)\eql \letinpar{(a,b)}{x}{(c,d)}{y}{\tuple{a+c,b+d}).}
+  \begin{aligned}
+    &(\forall x:(\R,\R))(\forall y:(\R,\R))\\
+    &\quad(\mathit{plus}(x,y)\eql \letinpar{(a,b)}{x}{(c,d)}{y}{\tuple{a+c,b+d}).}
+  \end{aligned}
+\end{equation}
+
+\paragraph*{\bf Implementation.}
+Vampire implements reasoning with the polymorphic theory of tuples by adding corresponding tuple axioms when the input uses tuple sorts and/or tuple functions. For each tuple sort $(\tau_1,\ldots,\tau_n)$ used in the input, Vampire defines a term algebra~\cite{DBLP:conf/popl/KovacsRV17} with the single constructor $t$ and $n$ destructors $\pi_1,\ldots,\pi_n$. Then Vampire adds the corresponding term algebra axioms, which coincide with the tuple theory axioms.
+
+Vampire reads formulas written in the TPTP language~\cite{tff0}. The TFX subset\footnote{\url{http://www.cs.miami.edu/~tptp/TPTP/Proposals/TFXTHX.html}} of TPTP contains a syntax for tuples and \LETIN\ expressions with tuple definitions. The sort $(\R,\R)$ is represented in TFX as \lstinline'[$real,$real]' and the term $\tuple{a+c,b+d}$ is represented as \lstinline'[$sum(a,c),$sum(b,d)]'. Formula~\ref{eq:complex-tuples2} can be expressed in TPTP as
+\begin{lstlisting}[language=tptp]
+tff(plus,type,plus:([$real,$real]*[$real,$real])>[$real,$real]).
+tff(plus_def,axiom,
+    ![X:[$real,$real],Y:[$real,$real]]:
+      (plus(X,Y)=$let([[a:$real,b:$real],[c:$real,d:$real]],
+                        [a,b]:=X;[c,d]:=Y,
+                        [$sum(a,c),$sum(b,d)]))).
+\end{lstlisting}
+
+Vampire translates \LETIN\ with tuple definitions to clausal normal form of first-order logic using the \newcnf\ clausification algorithm~\cite{FOOLCNF}.

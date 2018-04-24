@@ -1,0 +1,87 @@
+Automated program analysis and verification requires discovering and proving program properties ensuring program correctness. 
+ These program properties are usually expressed in combined theories of various data structures, such as integers and arrays. 
+SMT solvers and first-order theorem provers that are used to check these properties need efficient handling of both theories and quantifiers. Moreover, 
+formalisation of the program properties in the logic supported by the SMT solver or theorem prover plays a crucial role in making the prover succeed proving program correctness. 
+
+The translation of program properties into logical formulas accepted by a theorem prover is not straightforward. The reason for this is a mismatch between the semantics of the programming language constructs and that of the input language of the theorem prover. If program properties are not directly expressible in the input language, one needs to implement a translation of these properties to the language of the theorem prover. Such translations can be complex and error prone. Furthermore, one might need deep knowledge of how theorem provers work to obtain formulas in a form that theorem provers can handle efficiently.
+
+Program verification systems reduce the mismatch between program properties and their formalisation as logical formulas from two ends. On the one hand, intermediate verification languages, such as Boogie~\cite{leino2008boogie} and WhyML~\cite{DBLP:conf/esop/FilliatreP13}, are designed to represent programs and their properties in a way that is friendly for translations to logic. On the other hand, theorem provers extend their supported logics with syntactic constructs that mirror those of programming languages.
+
+Our previous work introduced FOOL~\cite{FOOL}, a modification of many-sorted first-order logic (FOL). FOOL extends FOL with syntactical constructs such as \ITE\ and \LETIN\ expressions. These constructs can be used to naturally express program properties about conditional statements and variable updates. Users of a theorem prover that supports FOOL do not need to invent translations for these features of programming languages and can use features of FOOL directly. It allows the theorem prover to apply its own translation to FOL that it can use efficiently. We extended the Vampire theorem prover~\cite{Vampire13} to support FOOL~\cite{VampireAndFOOL} and designed an efficient clausification algorithm VCNF~\cite{FOOLCNF} for FOOL.
+
+In summary, FOOL extends FOL with the following constructs. 
+\begin{itemize}
+  \item First-class boolean sort~--- one can define function and predicate symbols with boolean arguments and use quantifiers over the boolean sort.
+  \item Boolean variables used as formulas.
+  \item Formulas used as arguments to function and predicate symbols.
+  \item Expressions of the form $\ite{\varphi}{s}{t}$, where $\varphi$ is a formula, and $s$ and $t$ are either both terms or formulas.
+  \item Expressions of the form $\letindef{D_1;\ldots;D_k}{t}$, where $k > 0$, $t$ is either a term or a formula, and $D_1,\ldots,D_k$ are simultaneous definitions, each of the form
+    \begin{enumerate}
+      \item $\binding{f(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{s}$, where $n \geq 0$, $f$ can be a function or a predicate symbol, and $s$ is either a term or a formula;
+      \item $\binding{(c_1,\ldots,c_n)}{s}$, where $n > 1$, $c_1,\ldots,c_n$ are constant symbols of the sorts $\sigma_1,\ldots,\sigma_n$, respectively, and $s$ is a tuple expression. A tuple expression is inductively defined to be either
+      \begin{enumerate}
+        \item $(s_1,\ldots,s_n)$, where $s_1,\ldots,s_n$ are terms of the sorts $\sigma_1,\ldots,\sigma_n$, respectively;
+        \item $\ite{\phi}{s_1}{s_2}$, where $\phi$ is a formula, and $s_1$ and $s_2$ are tuple expressions; or
+        \item $\letindef{D_1;\ldots;D_k}{s'}$, where $D_1;\ldots;D_k$ are definitions, and $s'$ is a tuple expression.
+      \end{enumerate}
+    \end{enumerate}
+\end{itemize}
+
+To our knowledge, no other logic, efficiently implemented in automated theorem provers, contains these constructs. Some constructs of FOOL have been previously implemented in interactive and higher-order theorem provers. However, there was no special emphasis on the efficiency or friendliness of the translation for the following processing by automatic provers.
+
+In this paper, we extend our previous work on FOOL by demonstrating the efficient use of FOOL for program analysis. To this end, we give an efficient encoding of the next state relations of imperative programs in FOOL. Let us motivate our work with the simple program on Figure~\ref{fig:boogie/simple-if}. This program contains an \verb'if' statement and assignments to integer variables. The \verb'assert' statement ensures that \verb'x' is never greater than \verb'y' after execution of the \verb'if' statement.
+
+\begin{figure}
+  \parbox{4.6cm}{
+    \vspace{1.35em}
+    \begin{center}
+    \begin{tabular}{c}
+    \begin{lstlisting}[language=cpp]^^J
+if (x > y) \{^^J
+\ \ t := x;^^J
+\ \ x := y;^^J
+\ \ y := t;^^J
+\}^^J
+assert x <= y;^^J
+    \end{lstlisting}
+    \end{tabular}
+    \end{center}
+    \vspace{1em}
+    \caption{An imperative program with an \texttt{if} statement.}
+    \label{fig:boogie/simple-if}
+  }
+\qquad
+  \begin{minipage}{6cm}
+\[
+  \letnl{(x,y,t)}{\itenll{x > y}
+                 {\letinnl{t}{x}
+                          {\letinnl{x}{y}
+                                   {\letinnl{y}{t}
+                                            {(x,y,t)}}}}
+                 {(x,y,t)}}
+        {x \le y}
+\]
+    \caption{A FOOL encoding of the program assertion on Figure~\ref{fig:boogie/simple-if}.}
+    \label{fig:boogie/simple-if-fool}
+  \end{minipage}
+\end{figure}
+
+To check that the given program assertion holds using an automated theorem prover, one has to express this assertion as a logical formula. For that, one has to express the updated values of \verb'x' and \verb'y' after the sequence of assignments. For example, one can compute the updated value of each individual variable separately for each possible execution trace. However, this approach suffers from a bloated resulting formula that will contain duplicating parts of the program. A more common technique is to first convert a program to a static single assignment (SSA) form. This conversion introduces a new intermediate variable for each assignment and creates a smaller translated formula.
+
+Both excessive naming and excessive duplication of program expressions can make the resulting logical formula very hard for a first-order theorem prover. The encoding of the next state relations of imperative programs given in this paper avoids both by using a FOOL formula that closely matches the structure of the original program (Section~\ref{sec:boogie/technique}). This way the decision between introducing new symbols and duplicating program expressions is left to the theorem prover that is better equipped to make it. The assertion of the program in Figure~\ref{fig:boogie/simple-if} is concisely expressed with our encoding as the FOOL formula on Figure~\ref{fig:boogie/simple-if-fool}.
+
+While FOOL offers a concise representation of some programming constructs, the efficient implementation of FOOL poses a challenge for first-order theorem provers since their performance on various translations to CNF can be hampered by the (unintended) use of constructs interfering with their internal implementation, including the use of orderings, selection and the saturation algorithm. For example, to deal with the boolean sort, it is not uncommon to add an axiom like $(\forall x)(x = 0 \vee x = 1)$ for this sort. Even this simple axiom can cause a considerable growth of the search space, especially when used with certain term orderings. To address the challenge of dealing with full FOOL, one needs experimental comparison of various translations or various implementations of FOOL. Our paper is the first one to make such an experimental comparison.
+
+Our encoding uses tuple expressions and \LETIN\ expressions with tuple definitions, available in FOOL. We extend and generalise the use of tuples in first-order theorem provers by introducing a polymorphic theory of first class tuples (Section~\ref{sec:boogie/tuples}). In this theory one can define tuple sorts and use tuples as terms.
+
+Our encoding can be efficiently used in automated program analysis and verification. To demonstrate this, we report on our experimental results obtained by running Vampire on program verification problems (Section~\ref{sec:boogie/experiments}). These verification problems are partial correctness properties that we generated from a collection of imperative programs using an implementation of our encoding to FOOL as well as other tools.
+
+\paragraph*{Contributions.} We summarise the main contributions of this paper below.
+\begin{enumerate}
+  \item We define an encoding of the next state relation of imperative programs in FOOL and show that it is sound (Section~\ref{sec:boogie/technique}). Using this encoding, we define a translation of certain properties of imperative programs to FOOL formulas. 
+  \item We present a polymorphic theory of first class tuples and its implementation in Vampire (Section~\ref{sec:boogie/tuples}). To our knowledge, Vampire is the only superposition-based theorem prover to support this theory.
+  %\item We present a collection of simple imperative programs annotated with their quantified properties and our encoding of partial correctness properties of these programs (Section~\ref{sec:boogie/experiments}). This collection of programs can be used for benchmarking program verification and program analysis tools.
+  \item We present experimental results obtained by running Vampire on a collection of benchmarks expressing partial correctness properties of imperative programs (Section~\ref{sec:boogie/experiments}). We generated these benchmarks using an implementation of our encoding to FOOL and other tools. Our results show Vampire is more efficient on the FOOL encoding of partial correctness properties, compared with other translations.
+\end{enumerate}
+
+% This paper extends our previous work in~\cite{VampireAndFOOL} by (i) formalising the polymorphic theory of first class tuples in FOOL, (ii) implementing FOOL tuples in Vampire and using them to express partial program correctness, and (iii) experimental evaluation of using FOOL in program analysis and verification. 
