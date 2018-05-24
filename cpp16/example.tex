@@ -20,8 +20,7 @@
 
 \begin{figure*}[tb]
 {\small
-\vspace{-1em}
-\begin{lstlisting}
+\begin{lstlisting}[language=tptp]
 tff(x, type, x: $int).
 tff(y, type, y: $int).
 tff(max, type, max: $int).
@@ -30,14 +29,14 @@ tff(res1, type, res1: $int).
 
 tff(transition_relation, hypothesis,
     res1 = $let(res := x,
-             $let(max := $ite($greater(x, y),
-                                $let(max := x, max),
-                                $let(max := y, max)),
-               $let(res := $ite($greater(max, 0),
-                                  $let(res := $sum(res, max), res),
-                                  $let(res := $difference(res, max),
-                                        res)),
-                 res)))).
+           $let(max := $ite($greater(x, y),
+                            $let(max := x, max),
+                            $let(max := y, max)),
+           $let(res := $ite($greater(max, 0),
+                            $let(res := $sum(res, max), res),
+                            $let(res := $difference(res, max),
+                                 res)),
+                res)))).
 
 tff(safety_property, conjecture, $greatereq(res1, x)).
 \end{lstlisting}
@@ -179,7 +178,6 @@ interesting task for future work.
 
 \begin{figure*}[bt]
 {
-  \vspace{-1em}
   \begin{center}
     \parbox{0cm}{
   \begin{tabbing}
@@ -199,14 +197,13 @@ interesting task for future work.
   \end{tabbing}
     }
   \end{center}
-  \vspace{-2em}
   \caption{Array partition.\label{fig:partition}}
 }
 \end{figure*}
 
 \begin{figure*}[tb]
 {\small
-\begin{lstlisting}
+\begin{lstlisting}[language=tptp]
 tff(a, type, a: $int).
 tff(b, type, b: $int).
 tff(c, type, c: $int).
@@ -217,7 +214,7 @@ tff(arrayC, type, arrayC: $array($int, $int)).
 
 tff(invariant_property, hypothesis,
     inv <=> ((a = $sum(b, c)) & $greatereq(a, 0) & $greatereq(b, 0)
-                                 & $greatereq(c, 0) & $lesseq(a, k) &
+                              & $greatereq(c, 0) & $lesseq(a, k) &
              ![P:$int]: ($lesseq(0, P) & $less(P, b) =>
                (?[I:$int]: ($lesseq(0, I) & $less(I, a) &
                   $greater($select(arrayA, I), 0) &
@@ -226,7 +223,7 @@ tff(invariant_property, hypothesis,
 tff(safety_property, conjecture,
     (inv & ~$lesseq(a, k)) =>
       (![P:$int]: ($lesseq(0, P) & $less(P, b) =>
-                    $greater($select(arrayB, P), 0)))).
+                   $greater($select(arrayB, P), 0)))).
 \end{lstlisting}
 \caption{Representation of the partial correctness statement of the code on Figure~\ref{fig:partition} in Vampire\label{fig:loop_safety_Vampire}.}
 }

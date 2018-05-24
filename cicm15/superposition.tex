@@ -36,7 +36,7 @@ Suppose now that we use an off-the-shelf superposition theorem prover to reason 
 {\underline{x \eql \true} \vee x \eql \false & \underline{y \eql \true} \vee y \eql \false}
 \]
 
-The derived clause $x \eql y \vee x \eql false \vee y \eql \false$ is a recipe for disaster, since the literal $x \eql y$ must be selected and can be used for paramodulation into every non-variable term of a boolean sort. Very soon the search space will contain many clauses obtained as logical consequences of clause \eqref{clause:T|F} and results of paramodulation from variables applied to them. This will cause a rapid degradation of performance of superposition-based provers.
+The derived clause $x \eql y \vee x \eql false \vee y \eql \false$ is a recipe for disaster, since the literal $x \eql y$ must be selected and can be used for paramodulation into every non-variable term of a boolean sort. Very soon the search space will contain many clauses obtained as logical consequences of clause \eqref{clause:T|F} and results of paramodulation from variables applied to them. This will cause a rapid degradation of performance of superposition provers.
 
 To get around this problem, we propose the following solution. First, we will choose term
 orderings $\succ$ having the following properties: $\true\succ\false$ and $\true$ and

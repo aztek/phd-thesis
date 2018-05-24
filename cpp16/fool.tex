@@ -53,7 +53,7 @@ Vampire translates boolean variables to FOL in the following way. First, every f
 
 Note that it is possible to directly express quantified boolean formulas (QBF) in FOOL, and use Vampire to reason about them.
 
-TFF0 does not support quantification over booleans. Vampire supports an extended version of TFF0 where the sort symbol \tptpo\ is allowed to occur as the sort of a quantifier and boolean variables are allowed to occur as formulas. The formula $(\forall x:\bool)(x \lor \neg x)$ can be expressed in this syntax as \lstinline'![X:$o]: (X | ~X)'. %$
+TFF0 does not support quantification over booleans. Vampire supports an extended version of TFF0 where the sort symbol \tptpo\ is allowed to occur as the sort of a quantifier and boolean variables are allowed to occur as formulas. The formula $(\forall x:\bool)(x \lor \neg x)$ can be expressed in this syntax as \lstinline[language=tptp]{![X:$o]: (X | ~X)}. %$
 
 \subsection[Functions and Predicates with Boolean Arguments]{Functions and Predicates with\\Boolean Arguments}
 
@@ -65,7 +65,7 @@ Functions and predicates in FOOL are allowed to take booleans as arguments. For 
 Since Vampire supports many-sorted logic, this feature requires no additional implementation, apart from changes in the parser.
 
 In TFF0, functions and predicates cannot have arguments of the sort \tptpo. In the version of TFF0, supported by Vampire, this restriction is removed. Thus, the definition of $\mathit{impl}$ can be expressed in the following way.
-\begin{lstlisting}
+\begin{lstlisting}[language=tptp]
 tff(impl, type, impl: ($o * $o) > $o).
 tff(impl_definition, axiom,
     ![X:$o, Y:$o]: (impl(X, Y) <=> (~X | Y))).
@@ -95,7 +95,7 @@ For example, after this translation has been applied for both arguments of $\mat
 \end{enumerate}
 
 TFF0 does not allow formulas to occur as arguments. The extended version of TFF0, supported by Vampire, removes this restriction for arguments of the boolean sort. Formula~\eqref{eq:bool-arg-example} can be expressed in this syntax as follows:
-\begin{lstlisting}
+\begin{lstlisting}[language=tptp]
 ![X:s, Y:t, Z:t]: impl(p(X, Y) & p(X, Z), Y = Z)
 \end{lstlisting}
 
@@ -114,7 +114,7 @@ For a more interesting example, consider the following logical puzzle taken from
 To solve the puzzle, one can formalise it as a problem in FOOL and give a corresponding extended TFF0 representation to Vampire. Let $\zoye$ and $\mel$ be terms of a fixed sort $\person$ that represent Zoye and Mel, respectively. Let $\says$ be a predicate that takes a term of the sort $\person$ and a boolean term. We will write $\says(p, s)$ to denote that a person $p$ made a logical statement $s$. Let $\knight$ and $\knave$ be predicates that take a term of the sort $\person$. We will write $\knight(p)$ or $\knave(p)$ to denote that a person $p$ is a knight or a knave, respectively. We will express the fact that knights only tell the truth and knaves only lie by axioms $(\forall p:\person)(\forall s:\bool)(\knight(p) \land \says(p, s) \implies s)$ and $(\forall p:\person)(\forall s:\bool)(\knave(p) \land \says(p, s) \implies \neg s)$, respectively. We will express the fact that every person is either a knight or a knave by the axiom $(\forall p:\person)(\knight(p) \oplus \knave(p))$, where $\oplus$ is the ``exclusive or'' connective. Finally, we will express the statements that Zoye and Mel make in the puzzle by axioms $\says(\zoye, \knave(\mel))$ and $\says(\mel, \neg\knave(\zoye) \land \neg\knave(\mel))$, respectively.
 
 The axioms and definitions, given above, can be written in the extended TFF0 syntax in the following way.
-\begin{lstlisting}
+\begin{lstlisting}[language=tptp]
 tff(person, type, person: $tType).
 tff(says, type, says: (person * $o) > $o).
 
@@ -217,7 +217,7 @@ TPTP has two different expressions for \ITE: \ditet\ for constructing terms and 
 Since FOOL does not distinguish formulas and boolean terms, it does not require separate expressions for the formula-level and term-level \ITE. The extended version of TFF0, supported by Vampire, uses a new expression \dite, that unifies \ditet\ and \ditef. \dite\ takes a formula and two terms of the same sort as arguments. If the second and the third arguments are boolean, such \dite\  expression is equivalent to \ditef, otherwise it is equivalent to \ditet.
 
 Consider, for example, the above definition of $\mathit{max}$. It can be encoded in the extended TFF0 as follows.
-\begin{lstlisting}
+\begin{lstlisting}[language=tptp]
 tff(max, type, max: ($int * $int) > $int).
 tff(max_definition, axiom,
     ![X:$int, Y:$int]:
@@ -236,7 +236,7 @@ Consider now the following valid property of $\mathit{max}$:
 \end{equation}
 
 Its encoding in the extended TFF0 can use the same \dite\ expression:
-\begin{lstlisting}
+\begin{lstlisting}[language=tptp]
 ![X:$int, Y:$int]:
   $ite(max(X, Y) = X, $greatereq(X, Y), $greatereq(Y, X)).
 \end{lstlisting}%$
@@ -277,10 +277,10 @@ Note that an expression of the form \eqref{eq:let} is not in general equivalent 
 \end{aligned}
 \end{equation}
 The main application of \LETIN\ expressions is in problems coming from program analysis, namely modelling of assignments. Consider for example the following code snippet featuring operations over an integer \verb'array'.
-\begin{verbatim}
+\begin{lstlisting}[language=cpp]
 array[3] := 5;
 array[2] + array[3];
-\end{verbatim}
+\end{lstlisting}
 It can be translated to FOOL in the following way. We represent the integer array as an uninterpreted function $\arrayt$ of the type $\Z \to \Z$ that maps an index to the array element at that index. The assignment of an array element can be translated to a combination of \LETIN\ and \ITE.
 \begin{equation}\label{eq:let-function-example}
 \begin{aligned}
@@ -354,10 +354,10 @@ TPTP has four different expressions for \LETIN: \dlettt\ and \dletft\ for constr
 
 Similarly to \ITE, \LETIN\ expressions in FOOL do not need different notation for terms and formulas. The modification of TFF0 supported by Vampire introduces a new \dlet\ expression, that unifies \dlettt, \dletft, \dlettf\ and \dletff, and extends them to support multiple bindings. Depending on whether the binding is of a function or predicate symbol and whether the second argument of the expression is term or formula, a \dlet\ expression is equivalent to one of \dlettt, \dletft, \dlettf\ and \dletff.
 
-The new \dlet\ expressions use different syntax for bindings. Instead of a quantified equation, they use the following syntax: a function symbol possibly followed by a list of variable arguments in parenthesis, followed by the \lstinline':=' operator and the body of the binding. Similarly to quantified variables, variable arguments are separated with commas and each variable might include a sort declaration. A sort declaration can be omitted, in which case the variable is assumed to the be of the sort of individuals (\verb|$i|).
+The new \dlet\ expressions use different syntax for bindings. Instead of a quantified equation, they use the following syntax: a function symbol possibly followed by a list of variable arguments in parenthesis, followed by the \lstinline':=' operator and the body of the binding. Similarly to quantified variables, variable arguments are separated with commas and each variable might include a sort declaration. A sort declaration can be omitted, in which case the variable is assumed to the be of the sort of individuals.
 
 Formula \eqref{eq:let-function-example} can be written in the extended TFF0 with the TPTP interpreted function \dsum, representing integer addition, as follows:
-\begin{lstlisting}
+\begin{lstlisting}[language=tptp]
 $let(array(I:$int) := $ite(I = 3, 5, array(I)),
      $sum(array(2), array(3))).
 \end{lstlisting}
@@ -368,26 +368,26 @@ $let(array(I:$int) := $ite(I = 3, 5, array(I)),
 %\end{lstlisting}
 
 The same \dlet\ expression can be used for multiple bindings. For that, the bindings should be separated by a semicolon and passed as the first argument. The formula~\eqref{eq:parallel-let-example} can be written using \dlet\ as follows.
-\begin{lstlisting}
+\begin{lstlisting}[language=tptp]
 $let(a := b; b := a, f(a, b)))
 \end{lstlisting}
 
 Overall, \dite\ and \dlet\ expressions provide a more concise syntax for TPTP formulas than the TFF0 variations of \ITE\ and \LETIN\  expressions. To illustrate this point, consider the following snippet of TPTP code, taken from the TPTP problem \mbox{SYN000\_2}.
-\begin{lstlisting}
+\begin{lstlisting}[language=tptp]
 tff(let_binders, axiom, ![X:$i]:
     $let_ff(![Y1:$i, Y2:$i]: (q(Y1, Y2) <=> p(Y1)),
       q($let_tt(![Z1:$i]:
-          (f(Z1) = g(Z1, b)), f(a)), X) &
+         (f(Z1) = g(Z1, b)), f(a)), X) &
       p($let_ft(![Y3:$i, Y4:$i]: (q(Y3, Y4) <=>
-          $ite_f(Y3 = Y4, q(a, a), q(Y3, Y4))),
-          $ite_t(q(b, b), f(a), f(X)))))).
+         $ite_f(Y3 = Y4, q(a, a), q(Y3, Y4))),
+         $ite_t(q(b, b), f(a), f(X)))))).
 \end{lstlisting}
 
 It uses both of the TFF0 variations of \ITE\ and three different variations of \LETIN. The same snippet can be expressed more concisely using \dite\ and \dlet\ expressions.
-\begin{lstlisting}
+\begin{lstlisting}[language=tptp]
 tff(let_binders, axiom, ![X:$i]:
     $let(q(Y1, Y2) := p(Y1),
-      q($let(f(Z1) := g(Z1, b), f(a)), X) &
-      p($let(q(Y3, Y4) := $ite(Y3 = Y4, q(a, a), q(Y3,Y4))),
-          $ite(q(b, b), f(a), f(X)))))).
+         q($let(f(Z1) := g(Z1, b), f(a)), X) &
+         p($let(q(Y3, Y4) := $ite(Y3 = Y4, q(a, a), q(Y3,Y4))),
+           $ite(q(b, b), f(a), f(X)))))).
 \end{lstlisting}

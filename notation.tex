@@ -1,45 +1,38 @@
+\usepackage{color}
+\definecolor{lstgrey}{rgb}{0.96,0.96,0.96}
 \usepackage{listings}
-\lstdefinelanguage{tptp}{
-  basicstyle={\ttfamily},
+
+\lstset{
+  basicstyle=\ttfamily,
   columns=flexible,
-%  keywords={tff, type, axiom, hypothesis, conjecture},
+  keepspaces=true,
+  backgroundcolor=\color{lstgrey},
+  breaklines=false,
   sensitive=true,
   captionpos=b,
+  frame=single,
+  framesep=2pt,
+  xleftmargin=3pt,
+  xrightmargin=3pt,
+  resetmargins=true,
+  rulecolor=\color{lstgrey}
+  % frameround=tttt,
+%  literate={~}{{\textapprox}}1
 }
-\lstset{literate=
-  {~}{{\textapprox}}1
-}
-\lstset{language=tptp}
-\lstset{breaklines}
 
-\lstdefinelanguage{haskell}{
-  basicstyle={\ttfamily},
-  columns=flexible,
-  morekeywords={if, then, else, where, let, in},
-  sensitive=true,
-  captionpos=b
-}
-\lstset{literate=
-  {->}{{$\rightarrow\:\:$}}1
+\lstdefinelanguage{tptp}{
+  keywords={tff, thf, fof, cnf, type, axiom, hypothesis, conjecture}
 }
 
 \lstdefinelanguage{cpp}{
-  basicstyle={\ttfamily},
-  columns=flexible,
-%  keywords={public, static, void, do, for, while, int, bool, if, else, break},
-  sensitive=true,
-  captionpos=b
+  keywords={public, static, void, do, for, while, int, bool, if, then, else, break, assert, let, in}
 }
 
 \lstdefinelanguage{appendixcpp}{
-  basicstyle={\ttfamily},
-  columns=flexible,
-  keywords={public, static, void, do, for, while, int, bool, if, else, break, assert},
-  sensitive=true,
-  captionpos=b,
-  frame=bottomline,
-  breaklines=true
+  keywords={public, static, void, do, for, while, int, bool, if, else, break, assert}
 }
+
+\lstdefinelanguage{bnf}{}
 
 \newcommand{\reserved}[1]{\textbf{\underline{#1}}} % reserved words in algorithms
 \newcommand{\ass}{\texttt{:=}}     % assignment operator
@@ -200,7 +193,6 @@
 
 % tuples
 \newcommand{\tuple}[1]{({#1})}
-%\newcommand{\tuple3}[3]{({#1},{#2},{#3})}
 
 \newcommand{\newcnf}{\textsc{VCNF}}
 \newcommand{\nfcnf}{$\text{\textsc{VCNF}}_{\text{\textsc{FOOL}}}$}

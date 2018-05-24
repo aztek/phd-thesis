@@ -39,16 +39,11 @@ times, resulting in a set of 20 annotated loop-free programs.
 %
 %We unrolled each program's loop by fixing the length of the arrays
 %used in the program and repeating the body of the loop. 
-Figure~\ref{fig:examples/count_two_unrolled} shows the
-program obtained by unrolling three times the loop of \verb'count_two'.
-%given Fig.~\ref{fig:examples/count_two}. 
-%For example, by unrolling the loop of
-% \verb'count_two' (Figure~\ref{fig:examples/count_two}) three times, we obtained the code on Figure~\ref{fig:examples/count_two_unrolled}.
+Figure~\ref{fig:examples/count_two} shows the
+program \verb'count_two' and the program obtained by unrolling three times the loop of \verb'count_two'.
 
-\begin{figure}[tb]
-\centering
+\begin{figure}[h]
 \begin{minipage}{.52\textwidth}
-  \centering
   {\begin{lstlisting}[language=cpp]
 int a[];
 int x = 0, y = 0;
@@ -56,12 +51,10 @@ for (int i = 0; i < n; i++) {
   if (a[i] > 0) x++; else y++;
 }
 assert(x + y == n);
-      \end{lstlisting}}
-  \caption{The \texttt{count\_two} program.\\~}
-  \label{fig:examples/count_two}
+\end{lstlisting}}
 \end{minipage}%
+\hspace{1pt}
 \begin{minipage}{.48\textwidth}
-  \centering
   {\begin{lstlisting}[language=cpp]
 int a[];
 int x = 0, y = 0;
@@ -69,11 +62,10 @@ if (a[0] > 0) x++; else y++;
 if (a[1] > 0) x++; else y++;
 if (a[2] > 0) x++; else y++;
 assert(x + y == 3);
-      \end{lstlisting}}
-  \caption{The program obtained by unrolling
-    Figure~\ref{fig:examples/count_two} three times.}
-  \label{fig:examples/count_two_unrolled}
+\end{lstlisting}}
 \end{minipage}
+  \caption{The \texttt{count\_two} program and the program obtained by unrolling it three times.}
+  \label{fig:examples/count_two}
 \end{figure}
 
 %Each one of the 20 code fragments with unrolled loops is an imperative
@@ -107,30 +99,27 @@ We refer to \cite{VampireAndFOOL} for the details of the translation of a progra
 %\end{enumerate}
 %Figure~\ref{fig:examples/count_two_tptp} shows the translation of code fragment from Figure~\ref{fig:examples/count_two_unrolled} written in the TPTP language. In this and other examples we translated assignments to an element of an array as an assignment of an updated version of an array to itself.
 
-\begin{figure}[tb]
-  \centering
-  \begin{minipage}[t]{\textwidth}
-    \begin{lstlisting}
+\begin{figure}[h]
+\begin{lstlisting}[language=tptp]
 thf(a, type, a: $array($int, $int)).
 thf(x, type, x: $int).
 thf(y, type, y: $int).
 
 thf(count_two, conjecture,
-     $let(x := 0,
-     $let(y := 0,
-     $let([x, y] := $ite($greater($select(a, 0), 0),
-                           $let(x := $sum(x, 1), [x, y]),
-                           $let(y := $sum(y, 1), [x, y])),
-     $let([x, y] := $ite($greater($select(a, 1), 0),
-                           $let(x := $sum(x, 1), [x, y]),
-                           $let(y := $sum(y, 1), [x, y])),
-     $let([x, y] := $ite($greater($select(a, 2), 0),
-                           $let(x := $sum(x, 1), [x, y]),
-                           $let(y := $sum(y, 1), [x, y])),
-           $sum(x, y) = 3)))))).
-    \end{lstlisting}
-  \end{minipage}
-  \caption{A FOOL translation of Fig.~\ref{fig:examples/count_two_unrolled} written in the TPTP language.}
+    $let(x := 0,
+    $let(y := 0,
+    $let([x, y] := $ite($greater($select(a, 0), 0),
+                        $let(x := $sum(x, 1), [x, y]),
+                        $let(y := $sum(y, 1), [x, y])),
+    $let([x, y] := $ite($greater($select(a, 1), 0),
+                        $let(x := $sum(x, 1), [x, y]),
+                        $let(y := $sum(y, 1), [x, y])),
+    $let([x, y] := $ite($greater($select(a, 2), 0),
+                        $let(x := $sum(x, 1), [x, y]),
+                        $let(y := $sum(y, 1), [x, y])),
+         $sum(x, y) = 3)))))).
+\end{lstlisting}
+  \caption{A FOOL translation of the unrolled program in Figure~\ref{fig:examples/count_two} written in the TPTP language.}
   \label{fig:examples/count_two_tptp}
 \end{figure}
 
@@ -152,7 +141,7 @@ Based on the results of this experiment we conclude that Vampire can be used for
 %Table~\ref{table:examples-results}. 
 %\EK{Are there any observation we can make about the results?} These results were obtained on a MacBook Pro with a 2,9 GHz Intel Core i5 and 8 Gb RAM, and using the time limit of 60 seconds per problem. Both the benchmarks and the results are available at \url{www.cse.chalmers.se/~evgenyk/fool-tuple-experiments/}.
 
-\begin{table}[tb]
+\begin{table}[h]
   \caption{Runtimes in seconds of Vampire on 20 problems encoding partial program correctness.}
   \begin{center}
   \begin{tabular}{lrrrr}
@@ -165,4 +154,5 @@ Based on the results of this experiment we conclude that Vampire can be used for
   \end{tabular}
   \end{center}
   \label{table:examples-results}
+  \vspace{-1em}
 \end{table}

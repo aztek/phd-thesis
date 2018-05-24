@@ -17,14 +17,14 @@ arguments to function and predicate symbols. In addition to its first-class bool
   \item \LETIN\ expressions that can occur as terms and formulas and can define an arbitrary number of function and predicate symbols.
 \end{enumerate}
 Finally, \folb{} also includes tuple expressions and \LETIN\ expressions with tuple definitions. 
-A \LETIN\ expression with a tuple definition has the form $\letin{\tuple{c_1}{\ldots}{c_n}}{s}{t}$, where $n > 1$, $t$ is a term, $c_1,\ldots,c_n$ are constants, and $s$ is a tuple expression. A tuple expression is inductively defined as follows:
+A \LETIN\ expression with a tuple definition has the form $\letin{\tuple{c_1,\ldots,c_n}}{s}{t}$, where $n > 1$, $t$ is a term, $c_1,\ldots,c_n$ are constants, and $s$ is a tuple expression. A tuple expression is inductively defined as follows:
 \begin{enumerate}
-  \item $\tuple{s_1}{\ldots}{s_n}$, where $s_1,\ldots,s_n$ are terms;
+  \item $\tuple{s_1,\ldots,s_n}$, where $s_1,\ldots,s_n$ are terms;
   \item $\ite{\phi}{s_1}{s_2}$, where $s_1$ and $s_2$ are tuple expressions;
   \item a \LETIN\ expression of the form $\letindef{D}{t}$, where $D$ is tuple, function, or predicate definition, and $t$ is a tuple expression.
 \end{enumerate}
 
-Note that tuple expressions are not first class terms. They can only occur on the right-hand side of tuple definitions, but not as arguments to function or predicate symbols. Moreover, we do not assign sorts to tuple expressions and do not allow nested tuple expressions. It is however straightforward to extend \folb{} with a theory of first class tuples. For that, one needs to assign tuple sorts of the form $\tuple{\tau_1}{\ldots}{\tau_n}$ to tuple expressions of the form $\tuple{s_1}{\ldots}{s_n}$ if $s_1:\tau_1,\ldots,s_n:\tau_n$, and allow tuple expression to appear as terms. Such extension is not considered in this paper.
+Note that tuple expressions are not first class terms. They can only occur on the right-hand side of tuple definitions, but not as arguments to function or predicate symbols. Moreover, we do not assign sorts to tuple expressions and do not allow nested tuple expressions. It is however straightforward to extend \folb{} with a theory of first class tuples. For that, one needs to assign tuple sorts of the form $\tuple{\tau_1,\ldots,\tau_n}$ to tuple expressions of the form $\tuple{s_1,\ldots,s_n}$ if $s_1:\tau_1,\ldots,s_n:\tau_n$, and allow tuple expression to appear as terms. Such extension is not considered in this paper.
 
 There are several ways to support the interpreted boolean sort in first-order theorem proving. 
 The approach taken in~\cite{FOOL} proposes to axiomatise it by adding two constants $\true$ and $\false$ of this sorts and two axioms: $\true \neql \false$ and $(\forall x:\bool)(x \eql \true \lor x \eql \false)$. Furthermore, \cite{FOOL} proposes a modification in superposition calculus of first-order provers: it (i)
@@ -208,11 +208,15 @@ We first describe this step of \nfcnf{} for a single \ITE\ expression and then g
 
 To translate \eqref{eq:formula-ite-example}, \nfcnf{} first applies twice the rule for existential quantifier inherited from \newcnf, obtaining the sequent $$\genclause{ \{ \genlit{(\mathit{max}(x, y) \eql \ite{x \geq y}{x}{y})}{\possign} \} }{\emptySubst}.$$ Then, either expanding or naming processes the result.
 \begin{itemize}
-  \item Expanding results in $\genclause{ \{ \genlit{(x \geq y)}{\negsign}, \genlit{(\mathit{max}(x,y) \eql x)}{\possign} \} }{\emptySubst},
-  \genclause{ \{ \genlit{(x \geq y)}{\possign}, \genlit{(\mathit{max}(x,y) \eql y)}{\negsign} \} }{\emptySubst}.$
-  \item Naming results in $$\genclause{ \{ \genlit{(\mathit{max}(x,y)\eql z)}{\possign}, \genlit{P(z, x, y)}{\negsign} \} }{\emptySubst},
-  \genclause{ \{ \genlit{(x \geq y)}{\negsign}, \genlit{P(x,x,y)}{\possign} \} }{\emptySubst},
-  \genclause{ \{ \genlit{(x \geq y)}{\possign}, \genlit{P(y,x,y)}{\possign} \} }{\emptySubst},$$ where $z$ is a fresh variable of the sort $\Z$ and $P$ is a fresh predicate symbol of the sort $\Z \times \Z \times \Z$.
+  \item Expanding results in $$\genclause{ \{ \genlit{(x \geq y)}{\negsign}, \genlit{(\mathit{max}(x,y) \eql x)}{\possign} \} }{\emptySubst},
+  \genclause{ \{ \genlit{(x \geq y)}{\possign}, \genlit{(\mathit{max}(x,y) \eql y)}{\negsign} \} }{\emptySubst}.$$
+  \item Naming results in
+  \begin{align*}
+  &\genclause{ \{ \genlit{(\mathit{max}(x,y)\eql z)}{\possign}, \genlit{P(z, x, y)}{\negsign} \} }{\emptySubst},\\
+  &\genclause{ \{ \genlit{(x \geq y)}{\negsign}, \genlit{P(x,x,y)}{\possign} \} }{\emptySubst},
+  \genclause{ \{ \genlit{(x \geq y)}{\possign}, \genlit{P(y,x,y)}{\possign} \} }{\emptySubst},
+  \end{align*}
+  where $z$ is a fresh variable of the sort $\Z$ and $P$ is a fresh predicate symbol of the sort $\Z \times \Z \times \Z$.
 \end{itemize}
 
 Finally, \newcnf{} converts signed formulas to literals, and we obtain
@@ -228,8 +232,11 @@ Finally, \newcnf{} converts signed formulas to literals, and we obtain
   \item $(\forall x:\Z)(\forall y:\Z)(x \geq y \implies g(x, y) \eql x)$;
   \item $(\forall x:\Z)(\forall y:\Z)(x \not\geq y \implies g(x, y) \eql y).$
 \end{enumerate}
-This translation ultimately yields the set of three clauses with two new equalities $$\{\mathit{max}(x,y) \eql g(x,y)\}, \{x \not\geq y, g(x,y) \eql x\}, \{x \geq y, g(x,y) \eql y\}.$$
-\QED\end{example}
+This translation ultimately yields the set of three clauses with two new equalities
+\begin{equation*}
+\{\mathit{max}(x,y) \eql g(x,y)\}, \{x \not\geq y, g(x,y) \eql x\}, \{x \geq y, g(x,y) \eql y\}.\QED
+\end{equation*}
+\end{example}
 
 Both excessive expanding and excessive naming can result in a big CNF. Expanding \ITE\ expressions in \nfcnf{} doubles the number of sequents with occurrences of $L$, but does not introduce fresh symbols. Naming, on the other hand, adds exactly two new sequents, but introduces a fresh symbol. Both expanding and naming duplicate the condition of the \ITE\ expression. As discussed previously, \nfcnf{} keeps track of the number of occurrences of this condition and names it if this number exceeds the naming threshold. At the same time, expanding constructs two new literals that cannot be named because they might be syntactically distinct and \nfcnf{} does not count occurrences of literals. If the constructed literals contain more \ITE\ expressions inside, rewriting them might cause exponential increase of the number of sequents.
 
@@ -271,9 +278,9 @@ These three formulas ultimately yield the following set of clauses:
 \begin{align*}
 &\{P(x,y)\},\\
 &\{\mathit{max}(x, y) \not\eql x, \neg P(x,y), x \geq y\},\{\mathit{max}(x, y) \not\eql x, P(x,y), x \not\geq y\},\\
-&\{\mathit{max}(x, y) \eql y, \neg P(x,y), y \geq x\},\{\mathit{max}(x, y) \eql y, P(x,y), y \not\geq x\}.
+&\{\mathit{max}(x, y) \eql y, \neg P(x,y), y \geq x\},\{\mathit{max}(x, y) \eql y, P(x,y), y \not\geq x\}.\QED
 \end{align*}
-\QED\end{example}
+\end{example}
 
 % We point out that the translation of nested \ITE\ expressions may easily lead to an exponential increase in the number of sequents. % We handle this situation in \nfcnf{} by extending the formula naming mechanism of \nfcnf{}, as detailed below. 
 
@@ -296,11 +303,11 @@ Naming introduces a fresh function or predicate symbol and does not multiply the
 % Designing a syntactical criteria for choosing between naming and inlining is an interesting task for future work.
 
 \subsection*{\LETIN\ Expressions with Tuple Definitions}
-Suppose that $\psi$ is $\letin{\tuple{c_1}{\ldots}{c_n}}{s}{\gamma}$ where $n > 1$. Let $\tau_1,\ldots,\tau_n$ be the sorts of $c_1,\ldots,c_n$, respectively. Then, 
+Suppose that $\psi$ is $\letin{\tuple{c_1,\ldots,c_n}}{s}{\gamma}$ where $n > 1$. Let $\tau_1,\ldots,\tau_n$ be the sorts of $c_1,\ldots,c_n$, respectively. Then, 
 the \nfcnf{} algorithm 
 \begin{enumerate}
   \item introduces a fresh sort $\tau$, a fresh function symbol $t$ of the sort $\tau$, a fresh function symbol $g$ of the sort $\tau_1\times\ldots\times\tau_n\to\tau$, and $n$ fresh function symbols $\pi_1,\ldots,\pi_n$ (called projection functions), where for each $1 \le i \le n$, $\pi_i$ is of the sort $\tau \to \tau_i$;
-  \item adds a sequent to $\GC$ that is obtained from $D$ by replacing every occurrence of $\genlit{\psi}{\sign}$ with $\genlit{(\letin{t}{s'}{\gamma'})}{\sign}$. $\gamma'$ is obtained from $\gamma$ by replacing each free occurrence of $c_i$ with $\pi_i(t)$ for each $1 \le i \le n$. $s'$ is obtained from $s$ by replacing every tuple expression $\tuple{s_1}{\ldots}{s_n}$ with $g(s_1,\ldots,s_n)$;
+  \item adds a sequent to $\GC$ that is obtained from $D$ by replacing every occurrence of $\genlit{\psi}{\sign}$ with $\genlit{(\letin{t}{s'}{\gamma'})}{\sign}$. $\gamma'$ is obtained from $\gamma$ by replacing each free occurrence of $c_i$ with $\pi_i(t)$ for each $1 \le i \le n$. $s'$ is obtained from $s$ by replacing every tuple expression $\tuple{s_1,\ldots,s_n}$ with $g(s_1,\ldots,s_n)$;
   \item adds sequents to $\GC$ that axiomatise functions $g,\pi_1,\ldots,\pi_n$. In particular, these state
   that $\pi_i(g(s_1,\ldots,s_n)) \eql s_i$ for every $i=1,\ldots, n$ and that $t_1 \eql t_2 \liff \bigwedge_{i=1}^n \pi_i(t_1) \eql \pi_i(t_2)$.
 \end{enumerate} 
@@ -309,7 +316,6 @@ the \nfcnf{} algorithm
 \begin{equation*}\label{eq:tuple-let-example}
   \letin{(x,y)}{(y,x)}{P(x,y)}.
 \end{equation*}
-
 To clausify this formula, \nfcnf{} firstly converts it to the formula $$\letin{t}{g(y,x)}{P(\pi_1(t), \pi_2(t))},$$ where $t$ is a fresh term of the fresh sort $\tau$, and $g$ is a fresh function symbol of the sort $\Z \times \Z \to \tau$, and $\pi_1$ and $\pi_2$ are projection functions with appropriate axiomatisation. Then, depending on whether inlining or naming is enabled, \nfcnf{} result with clauses $$\{P(\pi_1(g(y,x)),\pi_2(g(y,x)))\} \text{~or~} \{P(\pi_1(t'),\pi_2(t'))\}, \{t' \eql g(y,x)\}$$ respectively, where $t'$ is a fresh constant symbol of the sort $\tau$.
 \QED\end{example}
 

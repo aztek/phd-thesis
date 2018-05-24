@@ -108,7 +108,7 @@ $\Leftrightarrow$, and $\oplus$ respectively.
 Equality and inequality are expressed as the infix operators {\tt =} and
 {\tt !=}.
 The following is an example of an annotated first-order formula, supplied from a file.
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 fof(union, axiom,
     ! [X,A,B] :
       (member(X,union(A,B))
@@ -116,7 +116,7 @@ fof(union, axiom,
         | member(X,B))),
     file('SET006+0.ax',union),
     [description('Definition of union'),relevance(0.9)]).
-\end{verbatim}
+\end{lstlisting}
 
 %------------------------------------------------------------------------------
 \subsection{The Typed First-order Form TFF}
@@ -164,7 +164,7 @@ Figure~\ref{fig:tfx/TF0Example} illustrates some TF0 formulae, whose conjecture 
 be proved from the axioms (it is the TPTP problem {\tt PUZ130\_1.p}).
 
 \begin{figure}[htbp]
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(animal_type, type, animal: $tType).
 tff(cat_type, type, cat: $tType).
 tff(dog_type, type, dog: $tType).
@@ -202,7 +202,7 @@ tff(dog_chase_cat, axiom,
 tff(odie_chased_garfield, axiom, chased(odie,garfield)).
 
 tff(jon_hates_jon, conjecture, hates(jon,jon)).
-\end{verbatim}
+\end{lstlisting}
 \caption{TF0 Formulae}
 \label{fig:tfx/TF0Example}
 \end{figure}
@@ -407,19 +407,19 @@ let expressions with definitions of tuples that capture the assignments.
 
 \begin{figure}[htbp]
 \begin{center}
-\begin{tabular}[t]{ll}\qquad
-\begin{minipage}{0.2\textwidth}
-\begin{verbatim}
+\begin{tabular}[t]{ll}\quad
+\begin{minipage}{0.235\textwidth}
+\begin{lstlisting}[language=tptp]
 if (x > y) {
    t := x;
    x := y;
    y := t;
 }
 assert x <= y;
-\end{verbatim}
+\end{lstlisting}
 \end{minipage}
 &
-\begin{minipage}{0.8\textwidth}
+\begin{minipage}{0.5\textwidth}
 \[
   \letnl{(x,y,t)}{\itenll{x > y}
                  {\letinnl{t}{x}
@@ -462,7 +462,7 @@ The following is the relevant BNF excerpt.
 Formulae are terms are conflated by including logic/atomic formulae as
 options for terms/unitary terms.
 The distinction between formulae and terms is maintained for plain TFF.
-\begin{verbatim}
+\begin{lstlisting}[language=bnf]
 <tff_logic_formula> ::=
     <tff_unitary_formula> | <tff_unary_formula>
   | <tff_binary_formula>  | <tff_defined_infix>
@@ -475,33 +475,33 @@ The distinction between formulae and terms is maintained for plain TFF.
 <tff_unitary_term> ::=
     <tff_atomic_formula> | <defined_term> | <tfx_tuple>
   | <variable> | (<tff_logic_formula>)
-\end{verbatim}
+\end{lstlisting}
 
 The FOOL tautology on Formula~\ref{eq:tfx/fool-bool-var} can be written in TFX as
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(tautology,conjecture, ! [X: $o]: (X | ~X)).
-\end{verbatim}
+\end{lstlisting}
 
 The $\mathit{imply}$ predicate in Formula~\ref{eq:tfx/fool-imply} can 
 be written in TFX as
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(imply_type, type, imply: ($o * $o) > $o).
 tff(imply_defn, axiom,
     ! [X: $o,Y: $o]: (imply(X,Y) <=> (~X | Y))).
-\end{verbatim}
+\end{lstlisting}
 
 % No longer necessary
 % Notice that the negation of a boolean variable used as a formula must be
 % placed inside parenthesis.
 
 The definition of a graph of a function on Formula~\ref{eq:tfx/bool-arg-example} can be written in TFX as
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(s, type, s: $tType).
 tff(t, type, t: $tType).
 tff(p, type, p: (s * t) > $o).
 tff(graph, axiom,
     ! [X: s,Y: t,Z: s] : imply(p(X,Y) & p(X,Z),Y = Z)).
-\end{verbatim}
+\end{lstlisting}
 
 A consequence of allowing formulae as terms is that the default typing of 
 functions and predicates supported in plain TFF (functions default to 
@@ -518,41 +518,41 @@ Tuples in TFX are written in {\tt []} brackets, and can contain any type of
 term, including formulae and variables of type {\tt \$o}. 
 Signatures can contain tuple types. 
 The following is the relevant BNF excerpt.
-\begin{verbatim}
+\begin{lstlisting}[language=bnf]
 <tfx_tuple_type> ::= [<tff_type_list>]
 <tff_type_list> ::=
     <tff_top_level_type>
   | <tff_top_level_type>,<tff_type_list>
 <tfx_tuple> ::= [] | [<tff_arguments>]
 <tff_arguments> ::= <tff_term> | <tff_term>,<tff_arguments>
-\end{verbatim}
+\end{lstlisting}
 
 The tuple type $\tuple{\mathds{R},\mathds{R}}$ can be written in the TFX 
 syntax as \verb|[$real,$real]| and the type of the addition function for 
 complex numbers $\tuple{\mathds{R},\mathds{R}} \times 
 \tuple{\mathds{R},\mathds{R}} \to \tuple{\mathds{R},\mathds{R}}$ can be 
-written as $$\text{\texttt{([\$real,\$real] * [\$real,\$real]) > [\$real,\$real]}}.$$
+written as \begin{center}\verb'([$real,$real] * [$real,$real]) > [$real,$real]'.\end{center}
 The tuple term $\tuple{2,3}$ can be written as \verb'[2,3]'.
 Tuples can occur only as terms, anywhere they are well-typed (i.e., they
 cannot appear as formulae). In the following example the predicate \verb|p|
 takes a tuple $(\mathds{Z},\iota,o)$ as the first argument.
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(p_type, type, p: ([$int,$i,$o] * $o * $int) > $o).
 tff(q_type, type, q: ($int * $i) > $o).
 tff(me_type, type, me: $i).
 tff(tuples_1, axiom,
     ! [X: $int] : p([33,me,$true],! [Y: $i] : q(X,Y),27)).
-\end{verbatim}
+\end{lstlisting}
 
 Note that while product types and tuple types are semantically equivalent,
 two separate syntaxes are used to make it easy to distinguish 
 between the following cases.
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(n_type, type, n: [$int,$int]).
 tff(f_type, type, f: [$int,$int] > $int).
 tff(g_type, type, g: ($int * $int) > $int).
 tff(h_type, type, h: ([$int,$int] * $int) > $int).
-\end{verbatim}
+\end{lstlisting}
 
 The first case defines \verb|n| to be a tuple of two integers.
 The second case defines \verb|f| to be a function from a tuple of two integers
@@ -562,14 +562,14 @@ The last case defines \verb|h| to be a function from a tuple of two integers and
 an integer, to an integer.
 
 The tuples syntax cannot be used to simultaneously declare types of multiple constants in an annotated formula with the \verb'type' role. For example, the following expression is not valid.
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(ab_type, type, [a,b]: [$int,$int]).
-\end{verbatim}
+\end{lstlisting}
 Instead, one must declare the type of each constant separately.
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(a_type, type, a: $int).
 tff(b_type, type, b: $int).
-\end{verbatim}
+\end{lstlisting}
 
 %------------------------------------------------------------------------------
 \subsection{Conditional Expressions}
@@ -580,10 +580,10 @@ third arguments.
 The type of the conditional expression is the type of its second and third 
 arguments. 
 The following is the relevant BNF excerpt.
-\begin{verbatim}
+\begin{lstlisting}[language=bnf]
 <tfx_conditional> ::= $ite(<tff_logic_formula>,
                            <tff_term>,<tff_term>)
-\end{verbatim}
+\end{lstlisting}
 
 The keyword \verb'$ite' is used for conditional expressions occurring both as
 terms and formulae, which is different from the old TFF syntax of if-then-else
@@ -591,7 +591,7 @@ that contained two separate keywords \verb'$ite_t' and \verb'$ite_f'.
 
 The definition and a property of the $\mathit{max}$ function on Formulae~\ref{eq:tfx/ite-t-example} and \ref{eq:tfx/ite-f-example} can be expressed in
 TFX as
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(max_type, type, max: ($int * $int) > $int).
 tff(max_defn, axiom,
     ! [X: $int,Y: $int]:
@@ -599,7 +599,7 @@ tff(max_defn, axiom,
 tff(max_property, conjecture,
     ! [X: $int,Y: $int]: 
       $ite(max(X,Y) = X,$greatereq(X,Y),$greatereq(Y,X))).
-\end{verbatim}
+\end{lstlisting}
 
 %------------------------------------------------------------------------------
 \subsection{Let Expressions}
@@ -613,7 +613,7 @@ The symbol definitions determine how locally defined symbols are expanded
 in the term or formulae where they are used.
 The type signature must include the types for all the local defined symbols.
 The following is the relevant BNF excerpt.
-\begin{verbatim}
+\begin{lstlisting}[language=bnf]
 <tfx_let> ::=
     $let(<tfx_let_types>,<tfx_let_defns>,<tff_term>)
 <tfx_let_types> ::=
@@ -627,7 +627,7 @@ The following is the relevant BNF excerpt.
 <tfx_let_defn_list> ::=
     <tfx_let_defn>
   | <tfx_let_defn>,<tfx_let_defn_list>
-\end{verbatim}
+\end{lstlisting}
 
 The keyword \verb'$let' is used for let expressions defining both function and 
 predicate symbols, regardless of whether the let expression occurs as a term 
@@ -637,10 +637,10 @@ four separate keywords \verb'$let_tt', \verb'$let_tf', \verb'$let_ft', and
 \verb'$let_ff'.
 
 In the following example an integer constant {\tt c} is defined in a let expression.
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(p_type, type, p: ($int * $int) > $o).
 tff(let_1, axiom, $let(c: $int,c:= $sum(2,3),p(c,c))).
-\end{verbatim}
+\end{lstlisting}
 
 The left hand side of a definition may contain pairwise distinct variables 
 as top-level arguments, which can also appear in the right hand side
@@ -650,26 +650,26 @@ defined by the symbol's type declaration.
 The variables' values are supplied by unification in the defined symbol's use.
 Figures~\ref{fig:tfx/let-tfx} and \ref{fig:tfx/let-tfx2} show examples of let expressions with definitions of function and predicate symbols.
 
-\begin{figure}[htbp]\centering
-\begin{BVerbatim}
+\begin{figure}[htbp]
+\begin{lstlisting}[language=tptp]
 tff(max_max, axiom,
     $let(max: ($real * $real) > $real,
          max(X,Y):= $ite($greatereq(X,Y),X,Y),
          max(max(a,b),c))).
-\end{BVerbatim}
+\end{lstlisting}
 \caption{TFX encoding of Formula~\ref{eq:tfx/fool-let-imply}}
 \label{fig:tfx/let-tfx}
 \end{figure}
 
-\begin{figure}[htbp]\centering
-\begin{BVerbatim}
+\begin{figure}[htbp]
+\begin{lstlisting}[language=tptp]
 tff(a, type, a: $o).
 tff(b, type, b: $o).
 tff(a_eq_b, axiom,
     $let(imply: ($o * $o) > $o,
          imply(X,Y):= ~X | Y,
          imply(a,b) & imply(b,a))).
-\end{BVerbatim}
+\end{lstlisting}
 \caption{TFX encoding of Formula~\ref{eq:tfx/fool-let-imply2}}
 \label{fig:tfx/let-tfx2}
 \end{figure}
@@ -679,7 +679,7 @@ Let expression can use definitions of tuples.
 Formula~\ref{eq:tfx/fool-tuple-let} can be written in TFX as follows. 
 Notice that the type declaration contains the elements of both tuples in 
 the simultaneous definition.
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(plus, type,
     plus: ([$real,$real] * [$real,$real]) > [$real,$real]).
 tff(plus_def, axiom,
@@ -688,11 +688,11 @@ tff(plus_def, axiom,
       = $let([a: $real,b: $real,c: $real,d: $real],
              [[a,b]:= X, [c,d]:= Y],
              [$sum(a,c),$sum(b,d)])).
-\end{verbatim}
+\end{lstlisting}
 
 Sequential let expressions (\verb'let*') can be implemented by nesting. 
 In the following example {\tt ff} and {\tt gg} are defined in sequence, and the let expression is equivalent to the formula \verb'p(f(i,i,i,i))'.
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(i_type, type, i: $int).
 tff(f_type, type, f: ($int * $int * $int * $int) > $int).
 tff(p_type, type, p: $int > $o).
@@ -700,7 +700,7 @@ tff(let_tuple_3, axiom,
     $let(ff: ($int * $int) > $int,
          ff(X,Y):= f(X,X,Y,Y),
          $let(gg: $int > $int,gg(Z):= ff(Z,Z),p(gg(i))))).
-\end{verbatim}
+\end{lstlisting}
 
 Let expressions can have simultaneous local definitions
 with the type declarations and the definitions given in {\tt []}es
@@ -713,8 +713,8 @@ The symbols must have distinct signatures.
 Figure~\ref{fig:tfx/pba-tfx} shows two equivalent let expressions, one with a tuple definition, the other with two simultaneous definitions of constants.
 \begin{figure}[htbp]
 \begin{tabular}[t]{ll}
-\begin{minipage}{0.46\textwidth}
-\begin{verbatim}
+\begin{minipage}{0.5\textwidth}
+\begin{lstlisting}[language=tptp]
 tff(a, type, a: $i).
 tff(b, type, b: $i).
 tff(p, type, p: ($i*$i) > $o).
@@ -722,11 +722,11 @@ tff(pba, axiom,
     $let([a: $i,b: $i],
          [a:= b, b:= a],
          p(a,b))).
-\end{verbatim}
+\end{lstlisting}
 \end{minipage}
     &
 \begin{minipage}{0.5\textwidth}
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(a, type, a: $i).
 tff(b, type, b: $i).
 tff(p, type, p: ($i*$i) > $o).
@@ -734,7 +734,7 @@ tff(pba, axiom,
     $let([a: $i,b: $i],
          [a,b]:= [b,a],
          p(a,b))).
-\end{verbatim}
+\end{lstlisting}
 \end{minipage}
 \\
 \end{tabular}
@@ -742,8 +742,8 @@ tff(pba, axiom,
 \label{fig:tfx/pba-tfx}
 \end{figure}
 
-In the following example two function symbols are defined simultaneously, and the let expression is equivalent to the formula $$\text{\texttt{p(f(i,i,f(i,i,i,i),f(i,i,i,i)))}}.$$
-\begin{verbatim}
+In the following example two function symbols are defined simultaneously, and the let expression is equivalent to the formula \begin{center}\lstinline[language=tptp]{p(f(i,i,f(i,i,i,i),f(i,i,i,i)))}.\end{center}
+\begin{lstlisting}[language=tptp]
 tff(i_type, type, i: $int).
 tff(f_type, type, f: ($int * $int * $int * $int) > $int).
 tff(p_type, type, p: $int > $o).
@@ -751,7 +751,7 @@ tff(let_tuple_2, axiom,
     $let([ff: ($int * $int) > $int, gg: $int > $int],
          [ff(X,Y):= f(X,X,Y,Y), gg(Z):= f(Z,Z,Z,Z)],
          p(ff(i,gg(i))))).
-\end{verbatim}
+\end{lstlisting}
 
 The defined symbols of a let expression have scope over the formula/term in 
 which the definitions are applied, shadowing any definition outside the let 
@@ -760,14 +760,14 @@ The right hand side of a definition can have symbols with the same name as
 the defined symbol, but refer to symbols defined outside the let expression. 
 In the following example the local definition of the {\tt array} function 
 symbols shadow the global declaration.
-\begin{verbatim}
+\begin{lstlisting}[language=tptp]
 tff(array_type, type, array: $int > $real).
 tff(p_type, type, p: $real > $o).
 tff(let_3, axiom,
     $let(array: $int > $real,
          array(I):= $ite(I = 3,5.2,array(I)),
          p($sum(array(2),array(3))))).
-\end{verbatim}
+\end{lstlisting}
 
 % In this formula,
 % \begin{itemize}
@@ -827,21 +827,8 @@ island~\cite{Smu78}.
 More TFX examples are available from the TPTP web site 
 \url{http://www.tptp.org/TPTP/Proposals/TFXExamples.tgz}.
 
-% \begin{figure}[htbp]
-% \begin{verbatim}
-% %-----------------------------------------------------------------------------
-% tff(p_type,type,p: [$int,$int] > $o).
-% tff(d_type,type,d: [$int,$int]).
-% tff(ite_3,axiom, ! [X:$int,Y:$int] : p($ite($greater(X,Y),[X,Y],[Y,X]))).
-% tff(ite_4,axiom, ! [X:$int,Y:$int] : d = $ite($greater(X,Y),[X,Y],[Y,X])).
-% %-----------------------------------------------------------------------------
-% \end{verbatim}
-% \caption{Tuples in conditional expressions}
-% \label{TupleConditional}
-% \end{figure}
-
-\begin{figure}[htbp]\centering
-\begin{BVerbatim}
+\begin{figure}[htbp]
+\begin{lstlisting}[language=tptp]
 tff(v1_type, type, v1: $int).
 tff(v2_type, type, v2: $int).
 tff(ordered_p, axiom,
@@ -849,13 +836,13 @@ tff(ordered_p, axiom,
          [large,small]:= $ite($greater(v1,v2),
                               [v1,v2],[v2,v1]),
          p(large,small))).
-\end{BVerbatim}
+\end{lstlisting}
 \caption{Mixing tuples, conditional and let expressions}
 \label{fig:tfx/TupleConditionalLet}
 \end{figure}
 
-\begin{figure}[htbp]\centering
-\begin{BVerbatim}
+\begin{figure}[htbp]
+\begin{lstlisting}[language=tptp]
 tff(x, type, x:$int).
 tff(y, type, y:$int).
 tff(t, type, t:$int).
@@ -868,14 +855,14 @@ tff(x_leq_y, conjecture,
                               [x,y,t]))),
                          [x,y,t]),
          $lesseq(x,y))).
-\end{BVerbatim}
+\end{lstlisting}
 \caption{A TFX encoding of the program analysis problem in
 Figure~\ref{fig:tfx/simple-if}}
 \label{fig:tfx/LetITE}
 \end{figure}
 
-\begin{figure}[htbp]\centering
-\begin{BVerbatim}
+\begin{figure}[htbp]
+\begin{lstlisting}[language=tptp]
 tff(a_type, type, a: $i).
 tff(b_type, type, b: $i).
 tff(c_type, type, c: $i).
@@ -900,7 +887,7 @@ tff(b_says, hypothesis,
 
 % C said that what B said is false
 tff(c_says, hypothesis, says(c,says(b,$false))).
-\end{BVerbatim}
+\end{lstlisting}
 \caption{Who is the truthteller?}
 \label{fig:tfx/Truthteller}
 \end{figure}

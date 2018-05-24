@@ -1,40 +1,19 @@
-{%\small
-
-\begin{tabular}[!h]{l@{\hskip 0.5cm}l}
+{\small
+\begin{tabular}[!h]{l@{\hskip 0pt}l}
   \begin{tabular}[!h]{l}
-    \begin{minipage}[t]{0.5\textwidth}
+    \begin{minipage}[t]{0.45\textwidth}
       {\begin{lstlisting}[language=appendixcpp,title=\texttt{count\_two}]
 int a[];
 int x = 0, y = 0;
 for (int i = 0; i < n; i++) {
-  if (a[i] > 0) {
-    x++;
-  } else {
-    y++;
-  }
+  if (a[i] > 0) x++;
+  else y++;
 }
 assert(x + y == n);
-      \end{lstlisting}}
+\end{lstlisting}}
     \end{minipage}
   \\
-    \begin{minipage}[t]{0.5\textwidth}
-      {\begin{lstlisting}[language=appendixcpp,title=\texttt{count\_two\_flag}]
-int a[];
-bool b;
-int x = 0, y = 0;
-for (int i = 0; i < n; i++) {
-  b = a[i] > 0;
-  if (b) {
-    x++;
-  } else {
-    y++;
-  }
-}
-assert(x + y == n);
-      \end{lstlisting}}
-    \end{minipage}
-  \\
-    \begin{minipage}[h]{0.5\textwidth}
+    \begin{minipage}[h]{0.45\textwidth}
       {\begin{lstlisting}[language=appendixcpp,title=\texttt{count\_three}]
 int a[];
 int x = 0, y = 0, z = 0;
@@ -42,20 +21,31 @@ for (int i = 0; i < n; i++) {
   if (a[i] < 0) {
     x++;
   } else {
-    if (a[i] > 5) {
-      y++;
-    } else {
-      z++;
-    }
+    if (a[i] > 5) y++;
+    else z++;
   }
 }
 assert(x + y + z == n);
-      \end{lstlisting}}
+\end{lstlisting}}
+    \end{minipage}
+  \\ \vspace{-10pt}
+    \begin{minipage}[t]{0.45\textwidth}
+      {\begin{lstlisting}[language=appendixcpp,title=\texttt{count\_two\_flag}]
+int a[];
+bool b;
+int x = 0, y = 0;
+for (int i = 0; i < n; i++) {
+  b = a[i] > 0;
+  if (b) x++;
+  else y++;
+}
+assert(x + y == n);
+\end{lstlisting}}
     \end{minipage}
   \end{tabular}
 &
   \begin{tabular}[!h]{l}
-    \begin{minipage}[t]{0.5\textwidth}
+    \begin{minipage}[t]{0.45\textwidth}
       {\begin{lstlisting}[language=appendixcpp,title=\texttt{two\_arrays}]
 int a[], b[];
 for (int i = 0; i < n; i++) {
@@ -68,10 +58,10 @@ for (int i = 0; i < n; i++) {
 for (int i = 0; i < n; i++) {
   assert(a[i] <= b[i]);
 }
-      \end{lstlisting}}
+\end{lstlisting}}
     \end{minipage}
   \\
-    \begin{minipage}[t]{0.5\textwidth}
+    \begin{minipage}[t]{0.45\textwidth}
       {\begin{lstlisting}[language=appendixcpp,title=\texttt{three\_arrays}]
 int a[], b[], c[];
 for (int i = 0; i < n; i++) {
@@ -96,9 +86,8 @@ for (int i = 0; i < n; i++) {
   assert(a[i] <= b[i]);
   assert(b[i] <= c[i]);
 }
-      \end{lstlisting}}
+\end{lstlisting}}
     \end{minipage}
   \end{tabular}
 \end{tabular}
-
 }

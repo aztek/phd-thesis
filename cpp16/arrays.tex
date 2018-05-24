@@ -39,10 +39,10 @@ concrete sorts $\tau$ and $\sigma$ the \emph{$(\tau,\sigma)$-instance}.
 %\end{equation}
 
 One can use the polymorphic theory of arrays to express program properties. Recall the code snippet involving arrays mentioned in Section~\ref{sect:fool}:
-\begin{verbatim}
+\begin{lstlisting}[language=cpp]
 array[3] := 5;
 array[2] + array[3];
-\end{verbatim}
+\end{lstlisting}
 Formula~\eqref{eq:let-function-example} used an interpreted function to represent the array in this code. We can alternatively use arrays to represent it as follows
 \begin{equation}\label{eq:arrays-example}
 \begin{aligned}
@@ -157,7 +157,7 @@ An important property of XOR encryption is its vulnerability to the known plaint
 \end{align*}
 
 The sort $\arrayt(\Z,\bool)$ is represented in the extended TFF0 syntax as \darray{\dint}{\dbool}. The presented property of XOR encryption can be expressed in the extended TFF0 in the following way.
-\begin{lstlisting}
+\begin{lstlisting}[language=tptp]
 tff(encrypt, type, encrypt: ($array($int,$o) *
     $array($int,$o)) > $array($int,$o)).
 

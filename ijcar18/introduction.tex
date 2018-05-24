@@ -20,7 +20,7 @@ In summary, FOOL extends FOL with the following constructs.
       \item $\binding{f(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{s}$, where $n \geq 0$, $f$ can be a function or a predicate symbol, and $s$ is either a term or a formula;
       \item $\binding{(c_1,\ldots,c_n)}{s}$, where $n > 1$, $c_1,\ldots,c_n$ are constant symbols of the sorts $\sigma_1,\ldots,\sigma_n$, respectively, and $s$ is a tuple expression. A tuple expression is inductively defined to be either
       \begin{enumerate}
-        \item $(s_1,\ldots,s_n)$, where $s_1,\ldots,s_n$ are terms of the sorts $\sigma_1,\ldots,\sigma_n$, respectively;
+        \item $(s_1,\ldots,s_n)$, where $s_1,\ldots,s_n$ are terms of the sorts $\sigma_1,\ldots,\allowbreak\sigma_n$, respectively;
         \item $\ite{\phi}{s_1}{s_2}$, where $\phi$ is a formula, and $s_1$ and $s_2$ are tuple expressions; or
         \item $\letindef{D_1;\ldots;D_k}{s'}$, where $D_1;\ldots;D_k$ are definitions, and $s'$ is a tuple expression.
       \end{enumerate}
@@ -33,9 +33,8 @@ In this paper, we extend our previous work on FOOL by demonstrating the efficien
 
 \begin{figure}
   \parbox{4.6cm}{
-    \vspace{1.35em}
-    \begin{center}
-    \begin{tabular}{c}
+    \vspace{2em}\hspace{0.6cm}
+    \begin{minipage}{3cm}
     \begin{lstlisting}[language=cpp]^^J
 if (x > y) \{^^J
 \ \ t := x;^^J
@@ -44,13 +43,12 @@ if (x > y) \{^^J
 \}^^J
 assert x <= y;^^J
     \end{lstlisting}
-    \end{tabular}
-    \end{center}
-    \vspace{1em}
+    \end{minipage}
+    \vspace{1.5em}
     \caption{An imperative program with an \texttt{if} statement.}
     \label{fig:boogie/simple-if}
   }
-\qquad
+\quad
   \begin{minipage}{6cm}
 \[
   \letnl{(x,y,t)}{\itenll{x > y}

@@ -4,7 +4,7 @@ The performance of a theorem prover on the result of a translation crucially dep
 
 If a theorem prover natively supports expressions that mirror the semantics of programming language constructs, we solve both above mentioned problems. First, the users do not have to design translations of such constructs. Second, the users do not have to possess a deep knowledge of how the theorem prover works~--- the efficiency becomes the responsibility of the prover itself.
 
-In this work we present new features recently developed and implemented in the theorem prover Vampire~\cite{Vampire13} to natively support mirroring programming language constructs in its input language. They include (i) FOOL~\cite{FOOL}, that is the extension of first-order logic by a first-class boolean sort, \ITE\ and \LETIN\ expressions, and (ii)  polymorphic arrays.
+In this work we present new features recently implemented in the theorem prover Vampire~\cite{Vampire13} to natively support mirroring programming language constructs in its input language. They include (i) FOOL~\cite{FOOL}, that is the extension of first-order logic by a first-class boolean sort, \ITE\ and \LETIN\ expressions, and (ii) polymorphic arrays.
 
 This paper is structured as follows. Section~\ref{sect:fool} presents how FOOL is implemented in Vampire and focuses on new extensions to the TPTP input language~\cite{TPTP} of first-order provers. Section~\ref{sect:fool}  extends the TPTP language of monomorphic many-sorted first-order formulas, called TFF0~\cite{tff0}, and allows users to treat the built-in boolean sort \tptpo\ as a first class sort. Moreover, it introduces expressions \dite\ and \dlet, which unify various TPTP \ITE\ and \LETIN\ expressions.
 
