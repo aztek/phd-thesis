@@ -2,7 +2,7 @@ Our recent work~\cite{FOOL} presented a modification of many-sorted first-order 
 
 The language of FOOL is, essentially, a superset of the core language of SMT-LIB~2~\cite{SMT-LIB}, the library of problems for SMT solvers. The difference between FOOL and the core language is that the former has richer \LETIN\ expressions, which support local definitions of functions symbols of arbitrary arity, while the latter only supports local binding of variables.
 
-FOOL can be regarded as the smallest superset of the SMT-LIB~2 Core language and TFF0. An implementation of a translation of FOOL to FOL thus also makes it possible to translate SMT-LIB problems to TPTP. Consider, for example, the following tautology, written in the SMT-LIB syntax: \verb'(exists ((x Bool)) x)'. It quantifies over boolean variables and uses a boolean variable as a formula. Neither is allowed in the standard TPTP language, but can be directly expressed in an extended TPTP that represents FOOL.
+FOOL can be regarded as the smallest superset of the SMT-LIB~2 Core language and TFF0. An implementation of a translation of FOOL to FOL thus also makes it possible to translate SMT-LIB problems to TPTP. Consider, for example, the following tautology, written in the SMT-LIB syntax: \lstinline'(exists ((x Bool)) x)'. It quantifies over boolean variables and uses a boolean variable as a formula. Neither is allowed in the standard TPTP language, but can be directly expressed in an extended TPTP that represents FOOL.
 
 The rest of this section presents features of FOOL not included in FOL, explains how they are implemented in Vampire and how they can be represented in an extended TPTP syntax understood by Vampire.
 
@@ -64,7 +64,7 @@ Functions and predicates in FOOL are allowed to take booleans as arguments. For 
 
 Since Vampire supports many-sorted logic, this feature requires no additional implementation, apart from changes in the parser.
 
-In TFF0, functions and predicates cannot have arguments of the sort \tptpo. In the version of TFF0, supported by Vampire, this restriction is removed. Thus, the definition of $\mathit{impl}$ can be expressed in the following way.
+In TFF0, functions and predicates cannot have arguments of the sort \tptpo. In the version of TFF0, supported by Vampire, this restriction is removed. Thus, the definition of $\mathit{impl}$ can be expressed as follows:
 \begin{lstlisting}[language=tptp]
 tff(impl, type, impl: ($o * $o) > $o).
 tff(impl_definition, axiom,
@@ -276,7 +276,7 @@ Note that an expression of the form \eqref{eq:let} is not in general equivalent 
 &\quad\quad\quad t.
 \end{aligned}
 \end{equation}
-The main application of \LETIN\ expressions is in problems coming from program analysis, namely modelling of assignments. Consider for example the following code snippet featuring operations over an integer \verb'array'.
+The main application of \LETIN\ expressions is in problems coming from program analysis, namely modelling of assignments. Consider for example the following code snippet featuring operations over an integer \lstinline'array'.
 \begin{lstlisting}[language=cpp]
 array[3] := 5;
 array[2] + array[3];

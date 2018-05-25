@@ -88,7 +88,7 @@ Vampire uses the extensionality resolution rule~\cite{ATVA14} to efficiently rea
 To express arrays, the TPTP syntax extension supported by Vampire
 allows, for every pair of sorts $\tau$ and $\sigma$, denoted by
 \lstinline't' and \lstinline's' in the TFF0 syntax, to denote the sort
-$\arrayt(\tau,\sigma)$ by \darray{\lstinline's'}{\lstinline't'}. Function symbols $\selectf$
+$\arrayt(\tau,\sigma)$ by \lstinline'$array(s, t)'. Function symbols $\selectf$
 and $\storef$ can be expressed as ad-hoc polymorphic \dselect\ and
 \texttt{\$store}, respectively for every pairs of sorts
 $\tau,\sigma$. Previously,
@@ -98,7 +98,7 @@ with the corresponding sort-specific function symbols \dselectone, \dselecttwo, 
 \dstoretwo. Our new implementation in Vampire, with
 support for the polymorphic theory of arrays, deprecates these
 two concrete array theories. Instead, one can now use the sorts
-\darray{\dint}{\dint} and \darray{\dint}{\darray{\dint}{\dint}}.
+\lstinline'$array($int, $int)' and \lstinline'$array($int, $array($int, $int))'.
 %The example~\eqref{eq:arrays-example} can be expressed in the extended TFF0 using the built-in theory of integers. Here \lstinline'$greatereq', \lstinline'$less' and \lstinline'$sum' represent operations of greater-or-equal comparison, less comparison and integer addition, respectively.
 %\begin{lstlisting}
 %![I : $int]: (($greatereq(i, 0) & $less(i, n)) =>

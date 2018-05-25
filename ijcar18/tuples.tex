@@ -43,15 +43,15 @@ It is not hard to extend tuple definitions to allow arbitrary tuple terms of the
 \paragraph*{\bf Implementation.}
 Vampire implements reasoning with the polymorphic theory of tuples by adding corresponding tuple axioms when the input uses tuple sorts and/or tuple functions. For each tuple sort $(\tau_1,\ldots,\tau_n)$ used in the input, Vampire defines a term algebra~\cite{DBLP:conf/popl/KovacsRV17} with the single constructor $t$ and $n$ destructors $\pi_1,\ldots,\pi_n$. Then Vampire adds the corresponding term algebra axioms, which coincide with the tuple theory axioms.
 
-Vampire reads formulas written in the TPTP language~\cite{tff0}. The TFX subset\footnote{\url{http://www.cs.miami.edu/~tptp/TPTP/Proposals/TFXTHX.html}} of TPTP contains a syntax for tuples and \LETIN\ expressions with tuple definitions. The sort $(\R,\R)$ is represented in TFX as \lstinline'[$real,$real]' and the term $\tuple{a+c,b+d}$ is represented as \begin{center}\lstinline'[$sum(a,c),$sum(b,d)]'.\end{center}Formula~\ref{eq:complex-tuples2} can be expressed in TPTP as
+Vampire reads formulas written in the TPTP language~\cite{tff0}. The TFX subset\footnote{\url{http://www.cs.miami.edu/~tptp/TPTP/Proposals/TFXTHX.html}} of TPTP contains a syntax for tuples and \LETIN\ expressions with tuple definitions. The sort $(\R,\R)$ is represented in TFX as \lstinline'[$real,$real]' and the term $\tuple{a+c,b+d}$ is represented in TFX as \lstinline'[$sum(a,c),$sum(b,d)]'. Formula~\ref{eq:complex-tuples2} can be expressed in TPTP as
 \begin{lstlisting}[language=tptp]
 tff(plus,type,
     plus:([$real,$real]*[$real,$real])>[$real,$real]).
 tff(plus_def,axiom,
     ![X:[$real,$real],Y:[$real,$real]]:
       (plus(X,Y)=$let([[a:$real,b:$real],[c:$real,d:$real]],
-                        [a,b]:=X;[c,d]:=Y,
-                        [$sum(a,c),$sum(b,d)]))).
+                      [a,b]:=X;[c,d]:=Y,
+                      [$sum(a,c),$sum(b,d)]))).
 \end{lstlisting}
 
 Vampire translates \LETIN\ with tuple definitions to clausal normal form of first-order logic using the \newcnf\ clausification algorithm~\cite{FOOLCNF}.

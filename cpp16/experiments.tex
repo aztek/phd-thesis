@@ -21,9 +21,9 @@ Our results are summarised in Tables~\ref{table:thf-results}--\ref{table:smt-lib
 
 \subsection{Experiments with TPTP Problems}
 The higher-order part of the TPTP library contains 3036 problems. Among these problems, 134 contain either boolean arguments in function applications or quantification over booleans, but contain no lambda abstraction, higher-order sorts or higher-order equality. We used these 134 problems, since they belong to FOOL but not to FOL. We translated these problems from THF0 to the modification of TFF0, supported by Vampire using the following syntactic transformation: \begin{enumerate*}[label=(\alph*)]
-\item every occurrence of the keyword \verb'thf' was replaced by \verb'tff';
-\item every occurrence of a sort definition of the form \verb's_1 >  ... > s_n > s' was replaced by \verb's_1 * ... * s_n > s';
-\item every occurrence of a function application of the form \verb'f @  t_1 @ ... @ t_n' was replaced by \verb'f(t_1, ..., t_n)'.
+\item every occurrence of the keyword \lstinline'thf' was replaced by \lstinline'tff';
+\item every occurrence of a sort definition of the form \lstinline's_1 >  ... > s_n > s' was replaced by \lstinline's_1 * ... * s_n > s';
+\item every occurrence of a function application of the form \lstinline'f @  t_1 @ ... @ t_n' was replaced by \lstinline'f(t_1, ..., t_n)'.
 \end{enumerate*}
 
 Out of 134 problems, 123 were marked as Theorem and 5 as

@@ -86,27 +86,27 @@ extensible language, suitable for writing both ATP problems and solutions.
 The top level building blocks of the TPTP language are {\em annotated 
 formulae}.
 An annotated formula has the form $$\mathit{language}\text{\tt(}\mathit{name}\text{\tt, }\mathit{role}\text{\tt, }\mathit{formula}\text{\tt, [}\mathit{source}\text{\tt, [}\mathit{useful\_info}\text{\tt]]).}$$
-The {\em language}s supported are clause normal form ({\tt cnf}),
-first-order form ({\tt fof}), typed first-order form ({\tt tff}), and
-typed higher-order form ({\tt thf}).
-The {\em role}, e.g., {\tt axiom}, {\tt lemma}, {\tt conjecture},
+The {\em language}s supported are clause normal form (\lstinline'cnf'),
+first-order form (\lstinline'fof'), typed first-order form (\lstinline'tff'), and
+typed higher-order form (\lstinline'thf').
+The {\em role}, e.g., \lstinline'axiom', \lstinline'lemma', \lstinline'conjecture',
 defines the use of the formula in an ATP system.
 In the {\em formula}, terms and atoms follow Prolog conventions, i.e.,
 functions and predicates start with a lowercase letter or are {\tt '}single
 quoted{\tt '}, variables start with an uppercase letter, and all
 contain only alphanumeric characters and underscore.
 The TPTP language also supports interpreted symbols, which either start with a
-{\tt \$}, or are composed of non-alphanumeric characters, e.g., the truth
-constants {\tt \$true} and {\tt \$false}, and integer/rational/real
-numbers such as $27$, $43/92$, $-99.66$.
+\lstinline'$', or are composed of non-alphanumeric characters, e.g., the truth
+constants \lstinline'$true' and \lstinline'$false', and integer/rational/real
+numbers such as \lstinline'27', \lstinline'43/92', \lstinline'-99.66'.
 The basic logical connectives are
-{\tt !}, {\tt ?}, {\tt \verb|~|}, {\tt |}, {\tt \&}, {\tt =>}, {\tt <=},
-{\tt <=>}, and {\tt <\verb|~|>},
+\lstinline'!', \lstinline'?', \lstinline'~', \lstinline'|', \lstinline'&', \lstinline'=>', \lstinline'<=',
+\lstinline'<=>', and \lstinline'<~>',
 for
 $\forall$, $\exists$, $\neg$, $\vee$, $\wedge$, $\Rightarrow$, $\Leftarrow$,
 $\Leftrightarrow$, and $\oplus$ respectively.
-Equality and inequality are expressed as the infix operators {\tt =} and
-{\tt !=}.
+Equality and inequality are expressed as the infix operators \lstinline'=' and
+\lstinline'!='.
 The following is an example of an annotated first-order formula, supplied from a file.
 \begin{lstlisting}[language=tptp]
 fof(union, axiom,
@@ -129,15 +129,15 @@ Every function and predicate symbol is declared before its use, with
 a {\em type signature} that specifies the types of the symbol's arguments
 and result. Each TF0 type is one of
 \begin{itemize}
-\item the predefined types {\tt \$i} for $\iota$ (individuals) and
-      {\tt \$o} for $o$ (booleans);
-\item the predefined arithmetic types {\tt \$int} (integers), {\tt \$rat}
-      (rationals), and {\tt \$real} (reals); or
+\item the predefined types \lstinline'$i' for $\iota$ (individuals) and
+      \lstinline'$o' for $o$ (booleans);
+\item the predefined arithmetic types \lstinline'$int' (integers), \lstinline'$rat'
+      (rationals), and \lstinline'$real' (reals); or
 \item user-defined types (constants).
 \end{itemize}
 
 User-defined types are declared before their use to be of the kind
-{\tt \$tType}, in annotated formulae with the {\tt type} role~--- see
+\lstinline'$tType', in annotated formulae with the \lstinline'type' role~--- see
 Figure~\ref{fig:tfx/TF0Example} for examples.
 % All symbols share the same namespace; in particular, a type cannot have the
 % same name as a function or predicate symbol.
@@ -153,11 +153,11 @@ Each TF0 type signature declares either
 \end{itemize}
 
 The type signatures of uninterpreted symbols are declared like types, in
-annotated formulae with the {\tt type} role~--- see Figure~\ref{fig:tfx/TF0Example}
+annotated formulae with the \lstinline'type' role~--- see Figure~\ref{fig:tfx/TF0Example}
 for examples.
-The type of {\tt =} and {\tt !=} is ad hoc polymorphic over all types 
-except {\tt \$o} (this restriction is lifted in TFX), with both arguments 
-having the same type and the result type being {\tt \$o}.
+The type of \lstinline'=' and \lstinline'!=' is ad hoc polymorphic over all types 
+except \lstinline'$o' (this restriction is lifted in TFX), with both arguments 
+having the same type and the result type being \lstinline'$o'.
 The types of arithmetic predicates and functions are ad hoc polymorphic
 over the arithmetic types; see \cite{tff0} for details.
 Figure~\ref{fig:tfx/TF0Example} illustrates some TF0 formulae, whose conjecture can
@@ -211,17 +211,17 @@ The polymorphic TF1 extends TF0 with (user-defined) {\em type constructors},
 {\em type variables}, polymorphic symbols, and one new binder.
 Each TF1 type is one of
 \begin{itemize}
-\item the predefined types {\tt \$i} and {\tt \$o};
-\item the predefined arithmetic types {\tt \$int}, {\tt \$rat}, and 
-      {\tt \$real};
+\item the predefined types \lstinline'$i' and \lstinline'$o';
+\item the predefined arithmetic types \lstinline'$int', \lstinline'$rat', and 
+      \lstinline'$real';
 \item user-defined $n$-ary type constructors applied to $n$ type arguments; or
-\item type variables, which must be quantified by {\tt !>} --- see the type
+\item type variables, which must be quantified by \lstinline'!>' --- see the type
       signature forms below.
 \end{itemize}
 
 Type constructors are declared before their use to be of the kind
 {\tt (\$tType$\;$*$\;{\cdots}\;$*$\;$\$tType)$\;$> \$tType}, in annotated 
-formulae with a {\tt type} role.
+formulae with a \lstinline'type' role.
 Each TF1 type signature declares either
 \begin{itemize}
 \item an individual type $\tau$;
@@ -233,10 +233,10 @@ Each TF1 type signature declares either
       type variables and $\varsigma$ is a TF0 type signature.
 \end{itemize}
 
-The {\tt !>} binder in the last form denotes universal quantification in the
+The \lstinline'!>' binder in the last form denotes universal quantification in the
 style of $\lambda\Pi$ calculi.
 It is used only at the top level in polymorphic type signatures.
-All type variables must be of type {\tt \$tType}; more complex type variables
+All type variables must be of kind \lstinline'$tType'; more complex type variables
 % e.g., {\tt \$tType$\;$>$\;$\$tType} 
 are beyond rank-1 polymorphism.
 An example of TF1 formulae can be found in \cite{KSR16}.
@@ -253,15 +253,14 @@ used as boolean terms, (ii)~contains conditional expressions, and
 (iii)~contains let expressions.
 FOOL can be straightforwardly extended with the polymorphic theory of tuples 
 that defines first class tuple types and terms \cite{KKV18}.
-In what follows we consider that extension, and tuples are part of TFX.
+In what follows we consider such extension, and tuples are part of TFX.
 There is a model-preserving transformation of FOOL formulae to FOL formulae
-\cite{FOOL}, so that an implementation of the transformation makes it 
-possible to reason in FOOL using a FOL ATP system.
+\cite{FOOL} that can be implemented in a FOL ATP system to support reasoning with FOOL.
 Formulae of FOOL can also be efficiently translated to a first-order clausal 
 normal form~\cite{FOOLCNF}. 
 The following describes these features of FOOL, illustrating them using 
 examples taken from \cite{VampireAndFOOL} and \cite{KKV18}.
-The complete formal semantics of FOOL is given in \cite{FOOL}.
+The complete formal semantics of FOOL is given in~\cite{FOOL}.
 
 %------------------------------------------------------------------------------
 \subsubsection{Boolean Terms and Formulae}
@@ -407,9 +406,10 @@ let expressions with definitions of tuples that capture the assignments.
 
 \begin{figure}[htbp]
 \begin{center}
-\begin{tabular}[t]{ll}\quad
-\begin{minipage}{0.235\textwidth}
-\begin{lstlisting}[language=tptp]
+\begin{tabular}[t]{ll}
+\begin{minipage}{0.245\textwidth}
+\vspace{0.8cm}
+\begin{lstlisting}[language=cpp]
 if (x > y) {
    t := x;
    x := y;
@@ -418,7 +418,7 @@ if (x > y) {
 assert x <= y;
 \end{lstlisting}
 \end{minipage}
-&
+&\hspace{0.4cm}
 \begin{minipage}{0.5\textwidth}
 \[
   \letnl{(x,y,t)}{\itenll{x > y}
@@ -456,7 +456,7 @@ with examples and commentary.
 %------------------------------------------------------------------------------
 \subsection{Boolean Terms and Formulae}
 
-Variables of type {\tt \$o} can be used as formulae, and formulae can be 
+Variables of type \lstinline'$o' can be used as formulae, and formulae can be 
 used as terms. 
 The following is the relevant BNF excerpt.
 Formulae are terms are conflated by including logic/atomic formulae as
@@ -515,7 +515,7 @@ Tuples, numbers, and ``distinct objects'' cannot be used as formulae.
 \subsection{Tuples}
 
 Tuples in TFX are written in {\tt []} brackets, and can contain any type of 
-term, including formulae and variables of type {\tt \$o}. 
+term, including formulae and variables of type \lstinline'$o'. 
 Signatures can contain tuple types. 
 The following is the relevant BNF excerpt.
 \begin{lstlisting}[language=bnf]
@@ -527,14 +527,14 @@ The following is the relevant BNF excerpt.
 <tff_arguments> ::= <tff_term> | <tff_term>,<tff_arguments>
 \end{lstlisting}
 
-The tuple type $\tuple{\mathds{R},\mathds{R}}$ can be written in the TFX 
-syntax as \verb|[$real,$real]| and the type of the addition function for 
+The tuple type $\tuple{\mathds{R},\mathds{R}}$ can be written in TFX 
+as \lstinline|[$real,$real]| and the type of the addition function for 
 complex numbers $\tuple{\mathds{R},\mathds{R}} \times 
 \tuple{\mathds{R},\mathds{R}} \to \tuple{\mathds{R},\mathds{R}}$ can be 
-written as \begin{center}\verb'([$real,$real] * [$real,$real]) > [$real,$real]'.\end{center}
-The tuple term $\tuple{2,3}$ can be written as \verb'[2,3]'.
+written as \begin{center}\lstinline'([$real,$real] * [$real,$real]) > [$real,$real]'.\end{center}
+The tuple term $\tuple{2,3}$ can be written as \lstinline'[2,3]'.
 Tuples can occur only as terms, anywhere they are well-typed (i.e., they
-cannot appear as formulae). In the following example the predicate \verb|p|
+cannot appear as formulae). In the following example the predicate \lstinline|p|
 takes a tuple $(\mathds{Z},\iota,o)$ as the first argument.
 \begin{lstlisting}[language=tptp]
 tff(p_type, type, p: ([$int,$i,$o] * $o * $int) > $o).
@@ -554,14 +554,14 @@ tff(g_type, type, g: ($int * $int) > $int).
 tff(h_type, type, h: ([$int,$int] * $int) > $int).
 \end{lstlisting}
 
-The first case defines \verb|n| to be a tuple of two integers.
-The second case defines \verb|f| to be a function from a tuple of two integers
+The first case defines \lstinline|n| to be a tuple of two integers.
+The second case defines \lstinline|f| to be a function from a tuple of two integers
 to an integer.
-The third case defines \verb|g| to be a function from two integers to an integer.
-The last case defines \verb|h| to be a function from a tuple of two integers and
+The third case defines \lstinline|g| to be a function from two integers to an integer.
+The last case defines \lstinline|h| to be a function from a tuple of two integers and
 an integer, to an integer.
 
-The tuples syntax cannot be used to simultaneously declare types of multiple constants in an annotated formula with the \verb'type' role. For example, the following expression is not valid.
+The tuples syntax cannot be used to simultaneously declare types of multiple constants in an annotated formula with the \lstinline'type' role. For example, the following expression is not valid.
 \begin{lstlisting}[language=tptp]
 tff(ab_type, type, [a,b]: [$int,$int]).
 \end{lstlisting}
@@ -585,9 +585,9 @@ The following is the relevant BNF excerpt.
                            <tff_term>,<tff_term>)
 \end{lstlisting}
 
-The keyword \verb'$ite' is used for conditional expressions occurring both as
+The keyword \lstinline'$ite' is used for conditional expressions occurring both as
 terms and formulae, which is different from the old TFF syntax of if-then-else
-that contained two separate keywords \verb'$ite_t' and \verb'$ite_f'.
+that contained two separate keywords \lstinline'$ite_t' and \lstinline'$ite_f'.
 
 The definition and a property of the $\mathit{max}$ function on Formulae~\ref{eq:tfx/ite-t-example} and \ref{eq:tfx/ite-f-example} can be expressed in
 TFX as
@@ -608,7 +608,7 @@ Let expressions in TFX contain (i) the type signatures of locally defined
 symbols; (ii) the definitions of the symbols; and (iii) the term or formula
 in which the definitions are used. 
 Type signatures in let expressions syntactically match those in annotated 
-formulae with the \verb'type' role. 
+formulae with the \lstinline'type' role. 
 The symbol definitions determine how locally defined symbols are expanded 
 in the term or formulae where they are used.
 The type signature must include the types for all the local defined symbols.
@@ -629,14 +629,14 @@ The following is the relevant BNF excerpt.
   | <tfx_let_defn>,<tfx_let_defn_list>
 \end{lstlisting}
 
-The keyword \verb'$let' is used for let expressions defining both function and 
+The keyword \lstinline'$let' is used for let expressions defining both function and 
 predicate symbols, regardless of whether the let expression occurs as a term 
 or a formula. 
 This is different from the old TFF syntax of let expressions that contained 
-four separate keywords \verb'$let_tt', \verb'$let_tf', \verb'$let_ft', and 
-\verb'$let_ff'.
+four separate keywords \lstinline'$let_tt', \lstinline'$let_tf', \lstinline'$let_ft', and 
+\lstinline'$let_ff'.
 
-In the following example an integer constant {\tt c} is defined in a let expression.
+In the following example an integer constant \lstinline'c' is defined in a let expression.
 \begin{lstlisting}[language=tptp]
 tff(p_type, type, p: ($int * $int) > $o).
 tff(let_1, axiom, $let(c: $int,c:= $sum(2,3),p(c,c))).
@@ -691,7 +691,7 @@ tff(plus_def, axiom,
 \end{lstlisting}
 
 Sequential let expressions (\verb'let*') can be implemented by nesting. 
-In the following example {\tt ff} and {\tt gg} are defined in sequence, and the let expression is equivalent to the formula \verb'p(f(i,i,i,i))'.
+In the following example \lstinline'ff' and \lstinline'gg' are defined in sequence, and the let expression is equivalent to the formula \lstinline'p(f(i,i,i,i))'.
 \begin{lstlisting}[language=tptp]
 tff(i_type, type, i: $int).
 tff(f_type, type, f: ($int * $int * $int * $int) > $int).
@@ -712,12 +712,13 @@ not \verb'let*' --- \verb'let*' can be implemented in TFX by nesting
 The symbols must have distinct signatures.
 Figure~\ref{fig:tfx/pba-tfx} shows two equivalent let expressions, one with a tuple definition, the other with two simultaneous definitions of constants.
 \begin{figure}[htbp]
+\hspace{-0.24cm}
 \begin{tabular}[t]{ll}
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}{0.48\textwidth}
 \begin{lstlisting}[language=tptp]
 tff(a, type, a: $i).
 tff(b, type, b: $i).
-tff(p, type, p: ($i*$i) > $o).
+tff(p, type, p: ($i*$i)>$o).
 tff(pba, axiom,
     $let([a: $i,b: $i],
          [a:= b, b:= a],
@@ -725,11 +726,11 @@ tff(pba, axiom,
 \end{lstlisting}
 \end{minipage}
     &
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}{0.48\textwidth}
 \begin{lstlisting}[language=tptp]
 tff(a, type, a: $i).
 tff(b, type, b: $i).
-tff(p, type, p: ($i*$i) > $o).
+tff(p, type, p: ($i*$i)>$o).
 tff(pba, axiom,
     $let([a: $i,b: $i],
          [a,b]:= [b,a],
@@ -742,7 +743,7 @@ tff(pba, axiom,
 \label{fig:tfx/pba-tfx}
 \end{figure}
 
-In the following example two function symbols are defined simultaneously, and the let expression is equivalent to the formula \begin{center}\lstinline[language=tptp]{p(f(i,i,f(i,i,i,i),f(i,i,i,i)))}.\end{center}
+In the following example two function symbols are defined simultaneously, and the let expression is equivalent to the formula \begin{center}\lstinline[language=tptp,backgroundcolor=\color{lstgrey}]{p(f(i,i,f(i,i,i,i),f(i,i,i,i)))}.\end{center}
 \begin{lstlisting}[language=tptp]
 tff(i_type, type, i: $int).
 tff(f_type, type, f: ($int * $int * $int * $int) > $int).
@@ -758,7 +759,7 @@ which the definitions are applied, shadowing any definition outside the let
 expression. 
 The right hand side of a definition can have symbols with the same name as 
 the defined symbol, but refer to symbols defined outside the let expression. 
-In the following example the local definition of the {\tt array} function 
+In the following example the local definition of the \lstinline'array' function 
 symbols shadow the global declaration.
 \begin{lstlisting}[language=tptp]
 tff(array_type, type, array: $int > $real).
@@ -820,14 +821,14 @@ Figure~\ref{fig:tfx/LetITE} shows the TFX encoding of the FOOL formula in
 Figure~\ref{fig:tfx/simple-if}, which expresses a partial correctness property 
 of an imperative program with an \texttt{if} statement. 
 Figure~\ref{fig:tfx/Truthteller} shows an example that uses formulae as terms, in 
-the second arguments of the {\tt says} predicate. 
+the second arguments of the \lstinline'says' predicate. 
 The problem is to find a model from which it is possible to determine which 
-of {\tt a}, {\tt b}, or {\tt c} is the only truthteller on this Smullyanesque 
+of \lstinline'a', \lstinline'b', or \lstinline'c' is the only truthteller on this Smullyanesque 
 island~\cite{Smu78}. 
 More TFX examples are available from the TPTP web site 
 \url{http://www.tptp.org/TPTP/Proposals/TFXExamples.tgz}.
 
-\begin{figure}[htbp]
+\begin{figure}
 \begin{lstlisting}[language=tptp]
 tff(v1_type, type, v1: $int).
 tff(v2_type, type, v2: $int).
@@ -841,7 +842,7 @@ tff(ordered_p, axiom,
 \label{fig:tfx/TupleConditionalLet}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}
 \begin{lstlisting}[language=tptp]
 tff(x, type, x:$int).
 tff(y, type, y:$int).
@@ -861,7 +862,7 @@ Figure~\ref{fig:tfx/simple-if}}
 \label{fig:tfx/LetITE}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}
 \begin{lstlisting}[language=tptp]
 tff(a_type, type, a: $i).
 tff(b_type, type, b: $i).

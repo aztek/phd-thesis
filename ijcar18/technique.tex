@@ -8,7 +8,7 @@ We give (rather standard) definitions of our programming language and its semant
 
 We define a programming language with assignments to typed variables, \ITE, and sequential composition. We omit variable declarations in our language and instead assume for each program a set of program variables $V$ and a type assignment $\context$. $\context$ is a function that maps each program variable into a type. Each type is either $\pint$, $\pbool$, or $\parray(\sigma,\tau)$, where $\sigma$ and $\tau$ are types of array indexes and array values, respectively. In the sequel we will assume that $V$ and $\context$ are arbitrary but fixed.
 
-Programs in our language select and update elements of arrays, including multidimentional arrays. We do not introduce a distinguished type for multidimentional arrays but instead use nested arrays. We write $\parray(\sigma_1,\ldots,\sigma_n,\tau)$, $n > 1$, to mean the nested array type $$\parray(\sigma_1,\parray(\ldots,\parray(\sigma_n,\tau)\ldots)).$$
+Programs in our language select and update elements of arrays, including multidimentional arrays. We do not introduce a distinguished type for multidimentional arrays but instead use nested arrays. We write $\parray(\sigma_1,\ldots,\sigma_n,\tau)$, $n > 1$, to mean the nested array type $\parray(\sigma_1,\allowbreak\parray(\ldots,\parray(\sigma_n,\tau)\ldots)).$
 
 \begin{definition}\label{def:boogie/expression}
 An \emph{expression} of the type $\tau$ is defined inductively as follows.
@@ -55,7 +55,7 @@ Let $\expr$ be an expression of the type $\tau$. The \emph{interpretation} $\int
   \item $\interp{\tfalse}$ maps each state to 0.
   \item $\interp{x}$ maps each $\State$ to $\State(x)$.
   \item $\interp{x[\expr_1,\ldots,\expr_n]}$ maps each $\State$ to $\State(x)(\interp{\expr_1}(\State))\ldots(\interp{\expr_n}(\State))$.
-  \item $\interp{\expr_1 \oplus \expr_2}$ maps each $\State$ to $\interp{\expr_1}(\State) \oplus \interp{\expr_2}(\State), \text{where } \oplus \in \{ \eql, +, -, \times, <, \vee, \wedge \}.$
+  \item $\interp{\expr_1 \oplus \expr_2}$ maps each $\State$ to $\interp{\expr_1}(\State)\oplus\interp{\expr_2}(\State)$,\\where $\oplus \in \{ \eql, +, -, \times, <, \vee, \wedge \}.$
   \item $\interp{\neg\expr}$ maps each $\State$ to $\neg\interp{\expr}(\State)$.\QED
 \end{enumerate}
 % \[
@@ -111,9 +111,9 @@ Our setting is FOOL extended with the theory of linear integer arithmetic, the p
 We represent multidimentional arrays in FOOL as nested arrays\footnote{Multidimentional arrays can be represented in FOOL also as arrays with tuple indexes. We do not discuss such representation in this work.}. To this end we
 \begin{enumerate*}[label=(\roman*)]
 %  \item write $\arrayt(\sigma_1,\ldots,\sigma_n,\tau)$, where $n > 1$, to mean $\arrayt(\sigma_1,\allowbreak\arrayt(\ldots,\allowbreak\arrayt(\sigma_n,\allowbreak\tau)\ldots));$
-  \item inductively define $\select{a}{i_1,\allowbreak\ldots,\allowbreak i_n}$, where $n > 1$, to be $\select{\select{a}{i_1}}{i_2,\ldots,i_n}$; and
+  \item inductively define $\select{a}{i_1,\allowbreak\ldots,\allowbreak i_n}$, $n > 1$, to be $\select{\select{a}{i_1}}{i_2,\ldots,i_n}$; and
   % \select{a}{i_1,\ldots,i_n} = \select{\select{a}{i_1}}{i_2,\ldots,i_n}
-  \item inductively define $\store{a}{i_1,\allowbreak\ldots,\allowbreak i_n}{e}$, where $n > 1$, to be $\store{a}{i_1}{\store{\select{a}{i_1}}{i_2,\allowbreak\ldots,\allowbreak i_n}{e}}.$
+  \item inductively define $\store{a}{i_1,\allowbreak\ldots,\allowbreak i_n}{e}$, $n > 1$, to be $\store{a}{i_1}{\store{\select{a}{i_1}}{i_2,\allowbreak\ldots,\allowbreak i_n}{e}}.$
   % \store{a}{i_1,\ldots,i_n}{e} = \store{a}{i_1}{\store{\select{a}{i_1}}{i_2,\ldots,i_n}{e}}
 \end{enumerate*}
 

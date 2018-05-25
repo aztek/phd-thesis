@@ -202,7 +202,6 @@ interesting task for future work.
 \end{figure*}
 
 \begin{figure*}[tb]
-{\small
 \begin{lstlisting}[language=tptp]
 tff(a, type, a: $int).
 tff(b, type, b: $int).
@@ -213,12 +212,13 @@ tff(arrayB, type, arrayB: $array($int, $int)).
 tff(arrayC, type, arrayC: $array($int, $int)).
 
 tff(invariant_property, hypothesis,
-    inv <=> ((a = $sum(b, c)) & $greatereq(a, 0) & $greatereq(b, 0)
-                              & $greatereq(c, 0) & $lesseq(a, k) &
+    inv <=> ((a = $sum(b, c)) &
+             $greatereq(a, 0) & $greatereq(b, 0) &
+             $greatereq(c, 0) & $lesseq(a, k) &
              ![P:$int]: ($lesseq(0, P) & $less(P, b) =>
-               (?[I:$int]: ($lesseq(0, I) & $less(I, a) &
-                  $greater($select(arrayA, I), 0) &
-                  $select(arrayB, P) = $select(arrayA, I)))))).
+              (?[I:$int]: ($lesseq(0, I) & $less(I, a) &
+                $greater($select(arrayA, I), 0) &
+                $select(arrayB,P) = $select(arrayA,I)))))).
 
 tff(safety_property, conjecture,
     (inv & ~$lesseq(a, k)) =>
@@ -226,7 +226,6 @@ tff(safety_property, conjecture,
                    $greater($select(arrayB, P), 0)))).
 \end{lstlisting}
 \caption{Representation of the partial correctness statement of the code on Figure~\ref{fig:partition} in Vampire\label{fig:loop_safety_Vampire}.}
-}
 \end{figure*}
 
 Let us now show the use of FOOL in Vampire for reasoning about
