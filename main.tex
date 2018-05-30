@@ -45,18 +45,18 @@
 \label{chap:intro}
 \input{introduction}
 
-\def\paperSevenContentsTitle{Checking Network Reachability Properties\\with Complementary Constraint Solvers}
-\def\paperSevenChapterTitle{Checking Network Reachability Properties with Complementary Constraint Solvers}
+\def\paperSevenContentsTitle{Checking Network Reachability Properties\\with Constraint Solvers}
+\def\paperSevenChapterTitle{Checking Network Reachability\\Properties with Constraint Solvers}
 \def\paperSevenAuthors{Evgenii~Kotelnikov and Pavle Suboti\'{c}}
-\def\paperSevenAbstract{\EK{Verification of network configurations is an important and challenging task, often tackled with constraint solving and automated reasoning. In this work we compare several constraint solvers that we use to check reachability properties of Amazon Virtual Private Cloud (VPC) networks. We model Amazon networks with Horn clauses and check first-order properties of these models using Datalog engines and automated theorem provers. We demonstrate that by using multiple types of constraint solvers we are able to pick the most efficient solver for each given network property. This allows us to increase the efficiency of network verification for Amazon VPC networks.}}
-\def\paperSevenPublication{\EK{Under submission?}}
+\def\paperSevenAbstract{Verification of network configurations is an important and challenging task, often tackled with constraint solving and automated reasoning. In this work we compare several constraint solvers that we use to check reachability properties of Amazon Virtual Private Cloud (VPC) networks. We model Amazon networks with Horn clauses and check first-order properties of these models using Datalog engines and automated theorem provers. We demonstrate that by using multiple types of constraint solvers we are able to pick the most efficient solver for each given network property. This allows us to increase the efficiency of network verification for Amazon VPC networks.}
+\def\paperSevenPublication{A technical report based on a joint work with Byron~Cook, Temesghen Kahsai and Sean~McLaughlin.}
 \paperchapter{\paperSevenContentsTitle}
              {\paperSevenChapterTitle}
              {\paperSevenAuthors}
              {\paperSevenAbstract}
              {\paperSevenPublication}
 \label{chap:aws}
-% \include{aws/main}
+\include{aws/main}
 
 \def\paperOneContentsTitle{A First Class Boolean Sort in\\First-Order Theorem Proving and TPTP}
 \def\paperOneChapterTitle{A First Class Boolean Sort in\\First-Order Theorem Proving\\and TPTP}
