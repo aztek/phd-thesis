@@ -68,7 +68,7 @@ In TFF0, functions and predicates cannot have arguments of the sort \tptpo. In t
 \begin{lstlisting}[language=tptp]
 tff(impl, type, impl: ($o * $o) > $o).
 tff(impl_definition, axiom,
-    ![X:$o, Y:$o]: (impl(X, Y) <=> (~X | Y))).
+    ![X: $o, Y: $o]: (impl(X, Y) <=> (~X | Y))).
 \end{lstlisting}%$
 
 \subsection{Formulas as Arguments}
@@ -96,7 +96,7 @@ For example, after this translation has been applied for both arguments of $\mat
 
 TFF0 does not allow formulas to occur as arguments. The extended version of TFF0, supported by Vampire, removes this restriction for arguments of the boolean sort. Formula~\eqref{eq:bool-arg-example} can be expressed in this syntax as follows:
 \begin{lstlisting}[language=tptp]
-![X:s, Y:t, Z:t]: impl(p(X, Y) & p(X, Z), Y = Z)
+![X: s, Y: t, Z: t]: impl(p(X, Y) & p(X, Z), Y = Z)
 \end{lstlisting}
 
 For a more interesting example, consider the following logical puzzle taken from the TPTP problem \mbox{PUZ081}:
@@ -120,16 +120,16 @@ tff(says, type, says: (person * $o) > $o).
 
 tff(knight, type, knight: person > $o).
 tff(knights_always_tell_truth, axiom,
-    ![P:person, S:$o]:
+    ![P: person, S: $o]:
       (knight(P) & says(P, S) => S)).
 
 tff(knave, type, knave: person > $o).
 tff(knaves_always_lie, axiom,
-    ![P:person, S:$o]:
+    ![P: person, S: $o]:
       (knave(P) & says(P, S) => ~S)).
 
 tff(very_special_island, axiom,
-    ![P:person]: (knight(P) <~> knave(P))).
+    ![P: person]: (knight(P) <~> knave(P))).
 
 tff(zoey, type, zoey: person).
 tff(mel,  type, mel:  person).
@@ -220,7 +220,7 @@ Consider, for example, the above definition of $\mathit{max}$. It can be encoded
 \begin{lstlisting}[language=tptp]
 tff(max, type, max: ($int * $int) > $int).
 tff(max_definition, axiom,
-    ![X:$int, Y:$int]:
+    ![X: $int, Y: $int]:
       (max(X, Y) = $ite($greatereq(X, Y), X, Y))).
 \end{lstlisting}%$
 It uses the TPTP notation \dint\ for the sort of integers and \dgreatereq\ for the greater-than-or-equal-to comparison of two numbers.
@@ -237,7 +237,7 @@ Consider now the following valid property of $\mathit{max}$:
 
 Its encoding in the extended TFF0 can use the same \dite\ expression:
 \begin{lstlisting}[language=tptp]
-![X:$int, Y:$int]:
+![X: $int, Y: $int]:
   $ite(max(X, Y) = X, $greatereq(X, Y), $greatereq(Y, X)).
 \end{lstlisting}%$
 
@@ -374,20 +374,21 @@ $let(a := b; b := a, f(a, b)))
 
 Overall, \dite\ and \dlet\ expressions provide a more concise syntax for TPTP formulas than the TFF0 variations of \ITE\ and \LETIN\  expressions. To illustrate this point, consider the following snippet of TPTP code, taken from the TPTP problem \mbox{SYN000\_2}.
 \begin{lstlisting}[language=tptp]
-tff(let_binders, axiom, ![X:$i]:
-    $let_ff(![Y1:$i, Y2:$i]: (q(Y1, Y2) <=> p(Y1)),
-      q($let_tt(![Z1:$i]:
+tff(let_binders, axiom, ![X: $i]:
+    $let_ff(![Y1: $i, Y2: $i]: (q(Y1, Y2) <=> p(Y1)),
+      q($let_tt(![Z1: $i]:
          (f(Z1) = g(Z1, b)), f(a)), X) &
-      p($let_ft(![Y3:$i, Y4:$i]: (q(Y3, Y4) <=>
+      p($let_ft(![Y3: $i, Y4: $i]: (q(Y3, Y4) <=>
          $ite_f(Y3 = Y4, q(a, a), q(Y3, Y4))),
          $ite_t(q(b, b), f(a), f(X)))))).
 \end{lstlisting}
 
 It uses both of the TFF0 variations of \ITE\ and three different variations of \LETIN. The same snippet can be expressed more concisely using \dite\ and \dlet\ expressions.
 \begin{lstlisting}[language=tptp]
-tff(let_binders, axiom, ![X:$i]:
+tff(let_binders, axiom, ![X: $i]:
     $let(q(Y1, Y2) := p(Y1),
          q($let(f(Z1) := g(Z1, b), f(a)), X) &
-         p($let(q(Y3, Y4) := $ite(Y3 = Y4, q(a, a), q(Y3,Y4))),
+         p($let(q(Y3, Y4) := $ite(Y3 = Y4,
+                                  q(a, a), q(Y3, Y4))),
            $ite(q(b, b), f(a), f(X)))))).
 \end{lstlisting}

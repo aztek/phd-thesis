@@ -29,7 +29,7 @@ To define the semantics of \folb, we will have to extend the signature and also 
 
 Our next aim is to define the set of terms and their sorts with respect to a type assignment $\context$. This will be done using a relation $\context \vdash t:\sigma$, where $\sigma \in S$, terms can then be defined as all such expressions $t$.
 
-\begin{definition}\label{def:folb-terms}\rm
+\begin{definition}\label{def:folb-terms}
   The relation $\context \vdash t:\sigma$, where $t$ is an expression and $\sigma \in S$ is defined inductively as follows. If $\context \vdash t:\sigma$, then we will say that $t$ is a \emph{term of the sort $\sigma$} w.r.t.\ $\context$.
 %We will also write $\context \vdash t_1:\sigma_1,\ldots,$
   \begin{enumerate}
@@ -59,7 +59,7 @@ According to our definition, not every term-like expression has a sort. For exam
 \end{enumerate}
 All other occurrences are called \emph{free}. We say that a variable or a function symbol is \emph{free} in a term $t$ if it has at least one free occurrence in $t$. A term is called \emph{closed} if it has no occurrences of free variables.
 
-\begin{theorem}\rm
+\begin{theorem}
   Suppose $\context \vdash t : \sigma$. Then
   \begin{enumerate}
     \item for every free variable $x$ of $t$, $\context$ is defined on $x$;
@@ -70,7 +70,7 @@ All other occurrences are called \emph{free}. We say that a variable or a functi
   \end{enumerate}
 \end{theorem}
 
-\begin{definition}\rm
+\begin{definition}
   A \emph{predicate symbol} is any function symbol of the type $\sigma_1 \times \ldots \times \sigma_n \to \bool$.
   A \emph{$\Sigma$-formula} is a $\Sigma$-term of the sort $\bool$. All $\Sigma$-terms that are not $\Sigma$-formulas are called \emph{non-boolean terms}. \QED
 \end{definition}
@@ -81,7 +81,7 @@ Note that, in addition to the use of \LETIN\ and \ITE, \folb\ is a proper extens
 
 As usual, the semantics of \folb\ is defined by introducing a notion of \emph{interpretation} and defining how a term is evaluated in an interpretation.
 
-\begin{definition}\label{def:folb-interpretation}\rm
+\begin{definition}\label{def:folb-interpretation}
   Let $\context$ be a type assignment.
   A \emph{$\context$-interpretation} $\intI$ is a map, defined as follows. Instead of $\intI(e)$ we will write $\interpret{e}{\intI}$, for every element $e$ in the domain of $\intI$.
   \begin{enumerate}
@@ -99,7 +99,7 @@ As usual, the semantics of \folb\ is defined by introducing a notion of \emph{in
 Given a $\context$-interpretation $\intI$ and a function symbol $f$, we define $\variant{\intI}{f}{g}$ to be the mapping that maps $f$ to $g$ and coincides otherwise with $\intI$.
 Likewise, for a variable $x$ and value $a$ we define $\variant{\intI}{x}{a}$ to be the mapping that maps $x$ to $a$ and coincides otherwise with $\intI$.
 
-\begin{definition}\label{def:folb-term-evaluation}\rm
+\begin{definition}\label{def:folb-term-evaluation}
   Let $\intI$ be a $\context$-interpretation, and $\context \vdash t:\sigma$. The \emph{value of $t$ in $\intI$}, denoted as $\eval{t}{\intI}$, is a value in $\interpret{\sigma}{\intI}$ inductively defined as follows:
   \[
     \begin{aligned}
@@ -138,7 +138,7 @@ Likewise, for a variable $x$ and value $a$ we define $\variant{\intI}{x}{a}$ to 
   where $g$ is such that for all $i = 1, \ldots, n$ and $a_i \in \interpret{\sigma_i}{\intI}$, we have $g(a_1, \ldots, a_n) = \eval{s}{\replacement{\intI}{x_1 \ldots x_n}{a_1 \ldots a_n}}$. \QED
 \end{definition}
 
-\begin{theorem}\label{thm:semantics}\rm
+\begin{theorem}\label{thm:semantics}
   Let $\context \vdash \phi : \bool$ and $\intI$ be a $\context$-interpretation. Then
   \begin{enumerate}
     \item for every free variable $x$ of $\phi$, $\intI$ is defined on $x$;

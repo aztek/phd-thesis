@@ -34,8 +34,8 @@ tff(1, type, p: $int > $o).
 tff(2, type, q: $int > $int).
 tff(3, type, r: $int > $o).
 tff(4, type, a: $int).
-tff(5, hypothesis, ![X:$int]: (p(X) => $greatereq(X, 0))).
-tff(6, hypothesis, ![X:$int]: ($greatereq(q(X), 0))).
+tff(5, hypothesis, ![X: $int]: (p(X) => $greatereq(X, 0))).
+tff(6, hypothesis, ![X: $int]: ($greatereq(q(X), 0))).
 tff(7, hypothesis, p(a)).
 tff(8, hypothesis,
     a1 = $ite_t(r(a), $let_tt(a, $sum(a, 1), a),
@@ -56,8 +56,8 @@ following examples, chosen among 490 properties about (co)algebraic datatypes, f
 \begin{gather}\label{formula:contains}
   \begin{aligned}
 &(\forall\ofsort{p}{\bool})(\forall\ofsort{l}{list_A})(\forall\ofsort{x}{A})(\forall\ofsort{y}{A}) \\
-&\hspace{0.4em}\mathtt{contains}(l,\mathrm{ite}(p,x,y)) \doteq \\
-&\hspace{2em} (p \Rightarrow \mathtt{contains}(l,x)) \wedge (\neg p \Rightarrow \mathtt{contains}(l,y))
+&\quad\mathtt{contains}(l,\mathrm{ite}(p,x,y)) \doteq \\
+&\quad\quad(p \Rightarrow \mathtt{contains}(l,x)) \wedge (\neg p \Rightarrow \mathtt{contains}(l,y))
  \end{aligned}
 \end{gather}
 

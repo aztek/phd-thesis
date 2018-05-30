@@ -110,12 +110,10 @@ Equality and inequality are expressed as the infix operators \lstinline'=' and
 The following is an example of an annotated first-order formula, supplied from a file.
 \begin{lstlisting}[language=tptp]
 fof(union, axiom,
-    ! [X,A,B] :
-      (member(X,union(A,B))
-    <=> (member(X,A)
-        | member(X,B))),
-    file('SET006+0.ax',union),
-    [description('Definition of union'),relevance(0.9)]).
+    ![X, A, B]: (member(X, union(A, B)) <=>
+      (member(X, A) | member(X, B))),
+    file('SET006+0.ax', union),
+    [description('Definition of union'), relevance(0.9)]).
 \end{lstlisting}
 
 %------------------------------------------------------------------------------
@@ -179,7 +177,7 @@ tff(chased_type, type, chased: (dog * cat) > $o).
 tff(hates_type, type, hates: (human * human) > $o).
 
 tff(human_owner, axiom,
-    ! [A: animal] : ? [H: human] : H = owner_of(A)).
+    ![A: animal]: ?[H: human]: H = owner_of(A)).
 
 tff(jon_owns_garfield, axiom,
     jon = owner_of(cat_to_animal(garfield))).
@@ -188,22 +186,22 @@ tff(jon_owns_odie, axiom,
     jon = owner_of(dog_to_animal(odie))).
 
 tff(jon_owns_only, axiom,
-    ! [A: animal] :
+    ![A: animal]:
       (jon = owner_of(A)
      => (A = cat_to_animal(garfield)
        | A = dog_to_animal(odie)))).
 
 tff(dog_chase_cat, axiom,
-    ! [C: cat,D: dog] :
-      (chased(D,C)
+    ![C: cat, D: dog]:
+      (chased(D, C)
      => hates(owner_of(cat_to_animal(C)),
               owner_of(dog_to_animal(D))))).
 
-tff(odie_chased_garfield, axiom, chased(odie,garfield)).
+tff(odie_chased_garfield, axiom, chased(odie, garfield)).
 
-tff(jon_hates_jon, conjecture, hates(jon,jon)).
+tff(jon_hates_jon, conjecture, hates(jon, jon)).
 \end{lstlisting}
-\caption{TF0 Formulae}
+\caption{TF0 Formulae.}
 \label{fig:tfx/TF0Example}
 \end{figure}
 
@@ -284,9 +282,9 @@ Then it is possible to express that $P$ is a graph of a (partial) function of
 the type $\sigma \to \tau$ as
 \begin{equation}\label{eq:tfx/bool-arg-example}
 (\forall x:\sigma)(\forall y:\tau)(\forall z:\tau)
-\mathit{imply}(P(x,y) \land P(x,z), y = z)
+\mathit{imply}(P(x,y) \land P(x,z), y \eql z)
 \end{equation}
-Formula \ref{eq:tfx/fool-imply} can be equivalently expressed with $=$ instead of
+Formula \ref{eq:tfx/fool-imply} can be equivalently expressed with $\eql$ instead of
 $\liff$.
 
 \subsubsection{Tuples}
@@ -321,14 +319,14 @@ arguments.
 Its definition can be expressed in FOOL as
 \begin{equation}\label{eq:tfx/ite-t-example}
 (\forall x:\mathds{Z})(\forall y:\mathds{Z})
-(\mathit{max}(x, y) = \ite{x \geq y}{x}{y}).
+(\mathit{max}(x, y) \eql \ite{x \geq y}{x}{y}).
 \end{equation}
 
 FOOL allows conditional expressions to occur as formulae, as in the
 following valid property of $\mathit{max}$.
 \begin{equation}\label{eq:tfx/ite-f-example}
 (\forall x:\mathds{Z})(\forall y:\mathds{Z})
-(\ite{\mathit{max}(x, y) = x}{x \geq y}{y \geq x})
+(\ite{\mathit{max}(x, y) \eql x}{x \geq y}{y \geq x})
 \end{equation}
 
 \subsubsection{Let Expressions}
@@ -374,7 +372,7 @@ two simultaneous local definition of tuples.
 \begin{equation}\label{eq:tfx/fool-tuple-let}
   \begin{aligned}
   &(\forall x:(\mathds{R},\mathds{R}))(\forall y:(\mathds{R},\mathds{R}))\\
-  &\quad(\mathit{plus}(x,y) = \letinpar{(a,b)}{x}{(c,d)}{y}{\tuple{a+c,b+d})}
+  &\quad(\mathit{plus}(x,y)\eql\letinpar{(a,b)}{x}{(c,d)}{y}{\tuple{a+c,b+d})}
   \end{aligned}
 \end{equation}
 
@@ -433,7 +431,7 @@ assert x <= y;
 \\
 \end{tabular}
 \end{center}
-\caption{FOOL encoding of an {\tt if} statement}
+\caption{FOOL encoding of an {\tt if} statement.}
 \label{fig:tfx/simple-if}
 \end{figure}
 
@@ -479,7 +477,7 @@ The distinction between formulae and terms is maintained for plain TFF.
 
 The FOOL tautology on Formula~\ref{eq:tfx/fool-bool-var} can be written in TFX as
 \begin{lstlisting}[language=tptp]
-tff(tautology,conjecture, ! [X: $o]: (X | ~X)).
+tff(tautology, conjecture, ![X: $o]: (X | ~X)).
 \end{lstlisting}
 
 The $\mathit{imply}$ predicate in Formula~\ref{eq:tfx/fool-imply} can 
@@ -487,7 +485,7 @@ be written in TFX as
 \begin{lstlisting}[language=tptp]
 tff(imply_type, type, imply: ($o * $o) > $o).
 tff(imply_defn, axiom,
-    ! [X: $o,Y: $o]: (imply(X,Y) <=> (~X | Y))).
+    ![X: $o, Y: $o]: (imply(X, Y) <=> (~X | Y))).
 \end{lstlisting}
 
 % No longer necessary
@@ -500,7 +498,7 @@ tff(s, type, s: $tType).
 tff(t, type, t: $tType).
 tff(p, type, p: (s * t) > $o).
 tff(graph, axiom,
-    ! [X: s,Y: t,Z: s] : imply(p(X,Y) & p(X,Z),Y = Z)).
+    ![X: s, Y: t, Z: s]: imply(p(X, Y) & p(X, Z), Y = Z)).
 \end{lstlisting}
 
 A consequence of allowing formulae as terms is that the default typing of 
@@ -528,30 +526,30 @@ The following is the relevant BNF excerpt.
 \end{lstlisting}
 
 The tuple type $\tuple{\mathds{R},\mathds{R}}$ can be written in TFX 
-as \lstinline|[$real,$real]| and the type of the addition function for 
+as \lstinline|[$real, $real]| and the type of the addition function for 
 complex numbers $\tuple{\mathds{R},\mathds{R}} \times 
 \tuple{\mathds{R},\mathds{R}} \to \tuple{\mathds{R},\mathds{R}}$ can be 
-written as \begin{center}\lstinline'([$real,$real] * [$real,$real]) > [$real,$real]'.\end{center}
+written as \begin{center}\lstinline'([$real, $real] * [$real, $real]) > [$real, $real]'.\end{center}
 The tuple term $\tuple{2,3}$ can be written as \lstinline'[2,3]'.
 Tuples can occur only as terms, anywhere they are well-typed (i.e., they
 cannot appear as formulae). In the following example the predicate \lstinline|p|
 takes a tuple $(\mathds{Z},\iota,o)$ as the first argument.
 \begin{lstlisting}[language=tptp]
-tff(p_type, type, p: ([$int,$i,$o] * $o * $int) > $o).
+tff(p_type, type, p: ([$int, $i, $o] * $o * $int) > $o).
 tff(q_type, type, q: ($int * $i) > $o).
 tff(me_type, type, me: $i).
 tff(tuples_1, axiom,
-    ! [X: $int] : p([33,me,$true],! [Y: $i] : q(X,Y),27)).
+    ![X: $int]: p([33, me, $true], ![Y: $i]: q(X, Y), 27)).
 \end{lstlisting}
 
 Note that while product types and tuple types are semantically equivalent,
 two separate syntaxes are used to make it easy to distinguish 
 between the following cases.
 \begin{lstlisting}[language=tptp]
-tff(n_type, type, n: [$int,$int]).
-tff(f_type, type, f: [$int,$int] > $int).
+tff(n_type, type, n: [$int, $int]).
+tff(f_type, type, f: [$int, $int] > $int).
 tff(g_type, type, g: ($int * $int) > $int).
-tff(h_type, type, h: ([$int,$int] * $int) > $int).
+tff(h_type, type, h: ([$int, $int] * $int) > $int).
 \end{lstlisting}
 
 The first case defines \lstinline|n| to be a tuple of two integers.
@@ -563,7 +561,7 @@ an integer, to an integer.
 
 The tuples syntax cannot be used to simultaneously declare types of multiple constants in an annotated formula with the \lstinline'type' role. For example, the following expression is not valid.
 \begin{lstlisting}[language=tptp]
-tff(ab_type, type, [a,b]: [$int,$int]).
+tff(ab_type, type, [a, b]: [$int, $int]).
 \end{lstlisting}
 Instead, one must declare the type of each constant separately.
 \begin{lstlisting}[language=tptp]
@@ -594,11 +592,12 @@ TFX as
 \begin{lstlisting}[language=tptp]
 tff(max_type, type, max: ($int * $int) > $int).
 tff(max_defn, axiom,
-    ! [X: $int,Y: $int]:
-      max(X,Y) = $ite($greatereq(X,Y),X,Y)).
+    ![X: $int, Y: $int]:
+      max(X, Y) = $ite($greatereq(X, Y), X, Y)).
 tff(max_property, conjecture,
-    ! [X: $int,Y: $int]: 
-      $ite(max(X,Y) = X,$greatereq(X,Y),$greatereq(Y,X))).
+    ![X: $int, Y: $int]: 
+      $ite(max(X, Y) = X, $greatereq(X, Y),
+                          $greatereq(Y, X))).
 \end{lstlisting}
 
 %------------------------------------------------------------------------------
@@ -639,7 +638,7 @@ four separate keywords \lstinline'$let_tt', \lstinline'$let_tf', \lstinline'$let
 In the following example an integer constant \lstinline'c' is defined in a let expression.
 \begin{lstlisting}[language=tptp]
 tff(p_type, type, p: ($int * $int) > $o).
-tff(let_1, axiom, $let(c: $int,c:= $sum(2,3),p(c,c))).
+tff(let_1, axiom, $let(c: $int, c:= $sum(2, 3), p(c, c))).
 \end{lstlisting}
 
 The left hand side of a definition may contain pairwise distinct variables 
@@ -654,10 +653,10 @@ Figures~\ref{fig:tfx/let-tfx} and \ref{fig:tfx/let-tfx2} show examples of let ex
 \begin{lstlisting}[language=tptp]
 tff(max_max, axiom,
     $let(max: ($real * $real) > $real,
-         max(X,Y):= $ite($greatereq(X,Y),X,Y),
-         max(max(a,b),c))).
+         max(X, Y) := $ite($greatereq(X, Y), X, Y),
+         max(max(a, b), c))).
 \end{lstlisting}
-\caption{TFX encoding of Formula~\ref{eq:tfx/fool-let-imply}}
+\caption{TFX encoding of Formula~\ref{eq:tfx/fool-let-imply}.}
 \label{fig:tfx/let-tfx}
 \end{figure}
 
@@ -667,10 +666,10 @@ tff(a, type, a: $o).
 tff(b, type, b: $o).
 tff(a_eq_b, axiom,
     $let(imply: ($o * $o) > $o,
-         imply(X,Y):= ~X | Y,
-         imply(a,b) & imply(b,a))).
+         imply(X, Y) := ~X | Y,
+         imply(a, b) & imply(b, a))).
 \end{lstlisting}
-\caption{TFX encoding of Formula~\ref{eq:tfx/fool-let-imply2}}
+\caption{TFX encoding of Formula~\ref{eq:tfx/fool-let-imply2}.}
 \label{fig:tfx/let-tfx2}
 \end{figure}
 
@@ -681,13 +680,13 @@ Notice that the type declaration contains the elements of both tuples in
 the simultaneous definition.
 \begin{lstlisting}[language=tptp]
 tff(plus, type,
-    plus: ([$real,$real] * [$real,$real]) > [$real,$real]).
+    plus: ([$real, $real] * [$real, $real]) > [$real, $real]).
 tff(plus_def, axiom,
-    ! [X: [$real,$real],Y: [$real$,$real]] :
-      (plus(X,Y) 
-      = $let([a: $real,b: $real,c: $real,d: $real],
-             [[a,b]:= X, [c,d]:= Y],
-             [$sum(a,c),$sum(b,d)])).
+    ![X: [$real, $real], Y: [$real$, $real]]:
+      (plus(X, Y) 
+      = $let([a: $real, b: $real, c: $real, d: $real],
+             [[a, b] := X, [c, d] := Y],
+             [$sum(a, c), $sum(b, d)])).
 \end{lstlisting}
 
 Sequential let expressions (\verb'let*') can be implemented by nesting. 
@@ -698,8 +697,10 @@ tff(f_type, type, f: ($int * $int * $int * $int) > $int).
 tff(p_type, type, p: $int > $o).
 tff(let_tuple_3, axiom,
     $let(ff: ($int * $int) > $int,
-         ff(X,Y):= f(X,X,Y,Y),
-         $let(gg: $int > $int,gg(Z):= ff(Z,Z),p(gg(i))))).
+         ff(X, Y):= f(X, X, Y, Y),
+         $let(gg: $int > $int,
+              gg(Z) := ff(Z, Z),
+              p(gg(i))))).
 \end{lstlisting}
 
 Let expressions can have simultaneous local definitions
@@ -720,9 +721,9 @@ tff(a, type, a: $i).
 tff(b, type, b: $i).
 tff(p, type, p: ($i*$i)>$o).
 tff(pba, axiom,
-    $let([a: $i,b: $i],
-         [a:= b, b:= a],
-         p(a,b))).
+    $let([a: $i, b: $i],
+         [a := b, b := a],
+         p(a, b))).
 \end{lstlisting}
 \end{minipage}
     &
@@ -732,14 +733,13 @@ tff(a, type, a: $i).
 tff(b, type, b: $i).
 tff(p, type, p: ($i*$i)>$o).
 tff(pba, axiom,
-    $let([a: $i,b: $i],
-         [a,b]:= [b,a],
-         p(a,b))).
+    $let([a: $i, b: $i],
+         [a, b] := [b, a],
+         p(a, b))).
 \end{lstlisting}
 \end{minipage}
-\\
 \end{tabular}
-\caption{TFX encodings of Formulas~\ref{eq:tfx/parallel-let-example} (left) and \ref{eq:tfx/parallel-let-tuple-example} (right)}
+\caption{TFX encodings of Formulas~\ref{eq:tfx/parallel-let-example} (left) and \ref{eq:tfx/parallel-let-tuple-example} (right).}
 \label{fig:tfx/pba-tfx}
 \end{figure}
 
@@ -750,8 +750,8 @@ tff(f_type, type, f: ($int * $int * $int * $int) > $int).
 tff(p_type, type, p: $int > $o).
 tff(let_tuple_2, axiom,
     $let([ff: ($int * $int) > $int, gg: $int > $int],
-         [ff(X,Y):= f(X,X,Y,Y), gg(Z):= f(Z,Z,Z,Z)],
-         p(ff(i,gg(i))))).
+         [ff(X, Y) := f(X,X,Y,Y), gg(Z) := f(Z,Z,Z,Z)],
+         p(ff(i, gg(i))))).
 \end{lstlisting}
 
 The defined symbols of a let expression have scope over the formula/term in 
@@ -766,8 +766,8 @@ tff(array_type, type, array: $int > $real).
 tff(p_type, type, p: $real > $o).
 tff(let_3, axiom,
     $let(array: $int > $real,
-         array(I):= $ite(I = 3,5.2,array(I)),
-         p($sum(array(2),array(3))))).
+         array(I) := $ite(I = 3, 5.2, array(I)),
+         p($sum(array(2), array(3))))).
 \end{lstlisting}
 
 % In this formula,
@@ -828,41 +828,41 @@ island~\cite{Smu78}.
 More TFX examples are available from the TPTP web site 
 \url{http://www.tptp.org/TPTP/Proposals/TFXExamples.tgz}.
 
-\begin{figure}
+\begin{figure}[h]
 \begin{lstlisting}[language=tptp]
 tff(v1_type, type, v1: $int).
 tff(v2_type, type, v2: $int).
 tff(ordered_p, axiom,
     $let([large: $int,small: $int],
-         [large,small]:= $ite($greater(v1,v2),
-                              [v1,v2],[v2,v1]),
-         p(large,small))).
+         [large, small] := $ite($greater(v1,v2),
+                                [v1, v2], [v2, v1]),
+         p(large, small))).
 \end{lstlisting}
-\caption{Mixing tuples, conditional and let expressions}
+\caption{Mixing tuples, conditional and let expressions.}
 \label{fig:tfx/TupleConditionalLet}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
 \begin{lstlisting}[language=tptp]
-tff(x, type, x:$int).
-tff(y, type, y:$int).
-tff(t, type, t:$int).
+tff(x, type, x: $int).
+tff(y, type, y: $int).
+tff(t, type, t: $int).
 tff(x_leq_y, conjecture,
-    $let([x:$int,y:$int,t:$int],
-         [x,y,t] := $ite($greater(x,y),
-                         $let(t:$int, t := x,
-                         $let(x:$int, x := y,
-                         $let(y:$int, y := t,
-                              [x,y,t]))),
-                         [x,y,t]),
-         $lesseq(x,y))).
+    $let([x: $int, y: $int, t: $int],
+         [x, y, t] := $ite($greater(x,y),
+                           $let(t: $int, t := x,
+                           $let(x: $int, x := y,
+                           $let(y: $int, y := t,
+                                [x, y, t]))),
+                           [x, y, t]),
+         $lesseq(x, y))).
 \end{lstlisting}
 \caption{A TFX encoding of the program analysis problem in
-Figure~\ref{fig:tfx/simple-if}}
+Figure~\ref{fig:tfx/simple-if}.}
 \label{fig:tfx/LetITE}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
 \begin{lstlisting}[language=tptp]
 tff(a_type, type, a: $i).
 tff(b_type, type, b: $i).
@@ -873,21 +873,21 @@ tff(says, type, says: ($i * $o) > $o).
 
 % Each person is either a truthteller or a liar
 tff(island, axiom,
-    ! [P: $i] : (says(P,$true) <~> says(P,$false))).
+    ![P: $i]: (says(P, $true) <~> says(P, $false))).
 tff(exactly_one_truthteller, axiom,
     (exactly_one_truthteller
-  <=> (? [P: $i] : says(P,$true)
-      & ! [P1: $i,P2: $i] :
-          ((says(P1,$true) & says(P2,$true))
+  <=> (?[P: $i]: says(P,$true)
+      & ![P1: $i, P2: $i]:
+          ((says(P1, $true) & says(P2, $true))
          => P1 = P2)))).
 
 % B said that A said that there is
 % exactly one truthteller on the island
 tff(b_says, hypothesis,
-    says(b,says(a,exactly_one_truthteller))).
+    says(b, says(a, exactly_one_truthteller))).
 
 % C said that what B said is false
-tff(c_says, hypothesis, says(c,says(b,$false))).
+tff(c_says, hypothesis, says(c, says(b, $false))).
 \end{lstlisting}
 \caption{Who is the truthteller?}
 \label{fig:tfx/Truthteller}
@@ -911,7 +911,7 @@ and systems that can already parse and reason using the SMT version 2 language
 need only new parsers to implement the features of TFX.
 In parallel, version v8.0.0 of the TPTP will include problems that use TFX,
 and the automated reasoning community is invited to submit problems for
-inclusion in the TPTP.
+inclusion in TPTP.
 
 \paragraph{Acknowledgements.}
 Thanks to our friends in the TPTP World who have provided feedback on TFX
