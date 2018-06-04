@@ -1,3 +1,5 @@
+% !TEX root = ../main.tex
+
 %Section~\ref{sec:boogie/next-state/translation} described a translation from imperative programs to FOOL formulas that encode the partial correctness properties of these programs. These partial correctness properties can be automatically checked by a theorem prover that supports reasoning with FOOL. 
 In this section we describe our experiments on comparing the performance of the Vampire theorem prover~\cite{Vampire13} on FOOL and on translations of program properties to FOL. We used a collection of 50 programs written in the Boogie verification language~\cite{leino2008boogie}. Each of these programs uses only variable assignments, \ITE\ statements, and sequential composition and is annotated with its pre-conditions and post-conditions, expressed in first-order logic. From this collection of programs we generated the following three sets of benchmarks.
 

@@ -1,3 +1,5 @@
+% !TEX root = ../main.tex
+
 In this section we discuss an efficient translation of imperative programs to FOOL. To formalise the translation we define a restricted imperative programming language and its denotational semantics in Section~\ref{sec:boogie/next-state/programming-language}. This language is capable of expressing variable updates, \ITE, and sequential composition. Then, we define an encoding of the next state relation for programs of this language, and state the soundness property of this encoding in Section~\ref{sec:boogie/next-state/encoding}. Finally, in Section~\ref{sec:boogie/next-state/translation} we show a translation that converts a program, annotated with its pre-conditions and post-conditions, to a FOOL formula that expresses the partial correctness property of that program. %We formulate the soundness property of the translation as well.
 
 We give (rather standard) definitions of our programming language and its semantics and use them to define the main contributions of this section: the encoding of the next state relation (Definition~\ref{def:boogie/encoding}) and soundness of this encoding (Theorem~\ref{thm:boogie/encoding-soundness}).

@@ -1,3 +1,4 @@
+% !TEX root = ../main.tex
 Handling boolean terms as formulas is common in the SMT community. The SMT-LIB project~\cite{SMT-LIB} defines its core logic as first-order logic extended with the distinguished first-class boolean sort and the \verb'let'-\verb'in' expression used for local bindings of variables. The core theory of SMT-LIB defines logical connectives as boolean functions and the ad-hoc polymorphic \verb'if'-\verb'then'-\verb'else' ($ite$) function, used for conditional expressions. 
 % SMT-solvers do not reason in the core logic, but use quantifier-free fragments of it with theories. 
 The language \folb\ defined here extends the SMT-LIB core language with local function definitions,
