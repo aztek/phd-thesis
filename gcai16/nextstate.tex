@@ -42,7 +42,7 @@ times, resulting in a set of 20 annotated loop-free programs.
 Figure~\ref{fig:examples/count_two} shows the
 program \verb'count_two' and the program obtained by unrolling three times the loop of \verb'count_two'.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \begin{minipage}{.515\textwidth}
   {\begin{lstlisting}[language=cpp]
 int a[];
@@ -99,7 +99,7 @@ We refer to \cite{VampireAndFOOL} for the details of the translation of a progra
 %\end{enumerate}
 %Figure~\ref{fig:examples/count_two_tptp} shows the translation of code fragment from Figure~\ref{fig:examples/count_two_unrolled} written in the TPTP language. In this and other examples we translated assignments to an element of an array as an assignment of an updated version of an array to itself.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \begin{lstlisting}[language=tptp]
 thf(a, type, a: $array($int, $int)).
 thf(x, type, x: $int).
@@ -141,7 +141,7 @@ Based on the results of this experiment we conclude that Vampire can be used for
 %Table~\ref{table:examples-results}. 
 %\EK{Are there any observation we can make about the results?} These results were obtained on a MacBook Pro with a 2,9 GHz Intel Core i5 and 8 Gb RAM, and using the time limit of 60 seconds per problem. Both the benchmarks and the results are available at \url{www.cse.chalmers.se/~evgenyk/fool-tuple-experiments/}.
 
-\begin{table}[h]
+\begin{table}[ht]
   \caption{Runtimes in seconds of Vampire on 20 problems encoding partial program correctness.}
   \begin{center}
   \begin{tabular}{lrrrr}
