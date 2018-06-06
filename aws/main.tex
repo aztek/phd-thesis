@@ -65,24 +65,24 @@
 \label{sect:aws/introduction}
 Computer networks are typically built from a variety of specialized heterogeneous devices running complex distributed 
 protocols. Network administrators, responsible for operability of a network, must configure and deploy every protocol 
-separately on each individual device. In an effort to simplify this task, software-defined networking (SDN)~\cite{SDN} 
+separately on each individual device. In an effort to simplify this task, \emph{software-defined networking} (SDN)~\cite{SDN} 
 has been proposed as a modern alternative. SDN provides an layer of software that is installed on each of the network 
 devices and a logically-centralized controller that manages connectivity settings of each device. Administrators can 
 therefore manage networks at a higher level of abstraction by programming them from the controller, typically in a domain 
 specific language~\cite{DBLP:journals/cm/FosterGRSFKMRRSWH13}. The SDN architecture is often credited with flexibility and ease 
-of maintenance compared to traditional networks.
+of maintenance compared to traditional networks~\cite{benzekki2016software}.
 
-Modern platforms for cloud computing offer their users means of configuring private networks in the style of SDN. This includes, for example, Amazon Virtual Private Cloud~\cite{AmazonVPC} and Microsoft Azure Virtual Network~\cite{AzureVirtualNetwork}, networking layers for Amazon Elastic Compute Cloud and Microsoft Azure infrastructures, respectively. Administrators of virtual private networks use a centralized control panel or a specialized API to launch network instances, set up subnets and route tables, and configure connectivity and security settings of the network.
-
-Despite the increase of usability provided by platforms such as Amazon VPC, the VPC networks remain prone to misconfigurations. These 
+Modern platforms for cloud computing such as Amazon Elastic Compute Cloud, Google Compute Engine and Azure Virtual Machines offer their users means of configuring \emph{virtual private networks} in the style of SDN. Administrators of such networks use a centralized control panel or a specialized API to launch network instances, set up subnets and route tables, and tune connectivity and security settings of the network. Despite the increase of usability provided by the cloud platforms, virtual private networks remain prone to misconfigurations. These 
 misconfigurations are caused by the complexity of large-scale enterprise networks and might lead to downtimes and breaches of 
-security. Discovering such misconfiguration in industrial-size networks can be both extremely labor and computationally intensive. Therefore, 
+security. Discovering such misconfiguration in industrial-sized networks can be both extremely labor and computationally intensive. Therefore, 
 verifying the correctness of network configurations is an important and challenging task.
 
-Several tools have been 
+%Modern platforms for cloud computing offer their users means of configuring private networks in the style of SDN. This includes, for example, Amazon Virtual Private Cloud~\cite{AmazonVPC} and Microsoft Azure Virtual Network~\cite{AzureVirtualNetwork}, networking layers for Amazon Elastic Compute Cloud and Microsoft Azure infrastructures, respectively. Administrators of virtual private networks use a centralized control panel or a specialized API to launch network instances, set up subnets and route tables, and configure connectivity and security settings of the network.
+
+The presense of a centralized network configuration facilitates automated analysis of SDN networks. Indeed, several tools have been 
 developed~\cite{batfish,jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15,DBLP:conf/pldi/BallBGIKSSV14,Veriflow,ConfigChecker,Anteater,DBLP:conf/cav/El-HassanyTVV17} in an effort to verify various SDN components. These tools employ specialized algorithms~\cite{Veriflow} as well as general purpose 
 reasoning engines such as 
-\Datalog~\cite{muZ, DBLP:conf/cav/El-HassanyTVV17}, BDD~\cite{ConfigChecker}, SMT~\cite{jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15}, 
+\Datalog~\cite{muZ, DBLP:conf/cav/El-HassanyTVV17}, BDD~\cite{ConfigChecker}, SMT~\cite{jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15} 
 and SAT~\cite{Anteater,DBLP:conf/pldi/BallBGIKSSV14}.
 
 %
@@ -133,11 +133,11 @@ The rest of the paper is organized as follows. Section~\ref{sect:aws/specificati
 % \caption{Tool Architecture\label{ex:tool}}
 % \end{figure}
 
-Figure~\ref{ex:vpc} shows an example of a VPC network that consists of two subnets ``Web'' and ``Database'' with three network instances in each of them. Each of the subnets is assigned with a route table that configures the ``Web'' subnet to be accessible from the internet and the ``Database'' to not be accessible from the internet. In addition, each of the subnets is assigned with an access control list (ACL) that contains their security access rules. In particular, one of the rules forbids SSH access to the database servers directly or indirectly (via the web servers). \EK{We need to rephrase this paragraph, I think the difference between route tables and ACLs is unclear.}
+Figure~\ref{ex:vpc} shows an example of a network that consists of two subnets ``Web'' and ``Database'' with three network instances in each of them. Each of the subnets is assigned with a route table that configures the ``Web'' subnet to be accessible from the internet and the ``Database'' to not be accessible from the internet. In addition, each of the subnets is assigned with an access control list (ACL) that contains their security access rules. In particular, one of the rules forbids SSH access to the database servers directly or indirectly (via the web servers). \EK{We need to rephrase this paragraph, I think the difference between route tables and ACLs is unclear.}
 
 \begin{figure*}[th]
-\centering\includegraphics[width=0.85\textwidth]{./aws/fig/vpc.pdf}
-\caption{An example VPC network\label{ex:vpc}}
+\centering\includegraphics[width=1.0\textwidth]{./aws/fig/vpc.pdf}
+\caption{An example network\label{ex:vpc}.}
 \end{figure*}
 
 In a realistic setting this VPN network might grow over time, accumulating new network instances and new security and access rules. A network administrator may want to make sure that this VPC network retain certain properties after each change in its configuration. For example, the network administrator may want to check the following property.
