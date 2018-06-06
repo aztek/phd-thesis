@@ -14,6 +14,7 @@
 \usepackage{wrapfig}
 \usepackage{xspace}
 \usepackage{fancyvrb}
+\usepackage{nameref}
 
 \usepackage{anyfontsize}
 
@@ -41,9 +42,12 @@
 
 \mainmatter
  
-\chapter{Introduction}
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
 \label{chap:intro}
 \input{introduction}
+
+% \setcounter{secnumdepth}{0}
 
 \def\paperSevenContentsTitle{Checking Network Reachability Properties\\Using Theorem Provers for First-Order Logic}
 \def\paperSevenChapterTitle{Checking Network Reachability\\Properties Using Theorem Provers for First-Order Logic}

@@ -13,7 +13,9 @@ Theorem provers are used for software and hardware verification, information man
 This thesis contributes to the area of automated theorem proving by presenting an extension of first-order logic that is useful for applications and can be supported by first-order theorem provers. This chapter describes the background of the thesis and is structured as follows. Section~\ref{sect:intro:fol} gives an introduction to automated theorem proving in first-order logic. Sections \ref{sect:intro:analysis} and \ref{sect:intro:itp} describe two important applications of first-order provers, automation for program verification and interactive proof assistants. Section~\ref{sect:intro:problem} states the problem addressed in the thesis, and finally Section~\ref{sect:intro:contributions} summarises the contributions of the thesis.
 
 
-\section[Automated Theorem Proving in First-Order Logic]{Automated Theorem Proving in\\First-Order Logic}\label{sect:intro:fol}
+\section*{Automated Theorem Proving in\\First-Order Logic}
+\label{sect:intro:fol}
+\addcontentsline{toc}{section}{Automated Theorem Proving in First-Order Logic}
 The problem of establishing validity of a first-order problem automatically can be traced back to Hilbert. In 1928 he posed a question, traditionally referred to as \emph{Entscheidungsproblem}\iffalse(German for ``decision problem'')\fi, stated as follows. Is there an algorithm that takes as input a statement in first-order logic and terminates with ``Yes'' or ``No'' according to whether or not the statement is valid?
 
 This question has been answered negatively in 1936 independently by Church~\cite{church1936unsolvable} and Turing~\cite{turing1936computable}. Their proofs rely on the famous G\"{o}del's incompleteness theorem\iffalse~\cite{godel1931formal} (for an English translation see e.g. \cite[pp. 4--38]{davis1965undecidable})\fi. G\"{o}del's result entails that the problem of provability in first-order logic is not decidable, but \emph{semi-decidable}. Informally, it means that if a logical sentence of the form ``$\varphi$ implies $\psi$'' is valid, that can be established by enumerating all finite derivations in the logical system. A derivation between $\varphi$ and $\psi$ will necessarily be found in that enumeration. On the other hand, if the sentence is invalid, there is no algorithm that could in general demonstrate that.
@@ -43,22 +45,27 @@ First-order provers are currently evaluated on empirical grounds. Comparison bet
 %Automated methods of theorem proving are appealing for mechanically checking problems that are too dull and time-consuming to be checked by humans.
 
 
-\section[Automation for Program Verification]{Automation for Program Verification}\label{sect:intro:analysis}
+\section*{Automation for Program Verification}
+\label{sect:intro:analysis}
+\addcontentsline{toc}{section}{Automation for Program Verification}
 Methods of program verification check that a program satisfies its specification. A program specification can be expressed with logical formulas that annotate program statements, capturing their properties. Typical examples of such properties are pre- and post-conditions, loop invariants and Craig interpolants. These program properties are checked using various tools, including theorem provers (see e.g. \cite{Bonacina10} for a detailed overview).
 
 Automated program verification sees compliance with specification as a theorem that can be automatically checked by theorem provers. For that, program statements are first translated to logical formulas that capture the semantics of the statements. Then, a theorem is built with the translated formulas as axioms and program properties as the conjecture. Validity of the theorem is interpreted as that the program statements have their annotated properties.
 
 Theorem provers can be used not just for checking program properties, but also for generating them. Recent approaches in interpolation and loop invariant generation~\cite{McMillan08,fase2009,hoder2012popl} present initial results of using first-order theorem provers for generating quantified program properties. First-order theorem provers can also be used to generate program properties with quantifier alternations~\cite{fase2009}; such properties could not be generated fully automatically by any previously known method.
 
-\section[Automation for Proof Assistants]{Automation for Proof Assistants}\label{sect:intro:itp}
+\section*{Automation for Proof Assistants}
+\label{sect:intro:itp}
+\addcontentsline{toc}{section}{Automation for Proof Assistants}
 A proof assistant (also called an interactive theorem prover) is a software tool that assists the user in constructing proofs of mathematical problems. Proof assistants use formalisations of mathematics based on higher-order logic (Isabelle/HOL~\cite{Isabelle}), type theory (Coq~\cite{Coq}), set theory (Mizar~\cite{Mizar}) and others.
 
 Many proof assistants enhance the workflow of their users by automatically filling in parts of the user's proof with the help of tactics. Tactics are specialised scripts that run a predefined collection of proof searching strategies. These strategies can be implemented inside the proof assistant itself or rely on third-party automated theorem provers~\cite{Sledgehammer,DBLP:conf/icms/UrbanHV10}.
 
 To automate proof search for a problem using a theorem prover, a proof assistant first translates the problem into the logic supported by the theorem prover. Since the logics of proof assistants are usually more expressive than the logics of automated provers, the translation can be incomplete. If the theorem prover reports back a proof, the proof assistant uses it to reconstruct a proof in its own logic.
 
-
-\section{Problem Statement}\label{sect:intro:problem}
+\section*{Problem Statement}
+\label{sect:intro:problem}
+\addcontentsline{toc}{section}{Problem Statement}
 Both systems of automated program verification and proof assistants use first-order theorem provers but usually do not natively work with first-order logic. Instead, they translate problems in their respective domains (program properties or formulas in the logic of the proof assistant) to problems in first-order logic. Such translations are not straightforward because of a mismatch between the semantics of first-order logic and that of the domain. They can be very complex and thus error prone.
 
 The performance of a theorem prover on the result of a translation crucially depends on whether the translation introduces formulas potentially making the prover inefficient. Theorem provers, especially first-order ones, are known to be very fragile with respect to the input. Expressing program properties in the ``right'' format therefore requires solid knowledge about how theorem provers work and are implemented~--- something that a user of a prover might not have. 
@@ -69,7 +76,9 @@ This thesis identifies the following syntactical constructs that are generally n
 
 Boolean values in programming languages are used both as conditions in conditional or loop statements, and as boolean flags, passed as arguments to functions. A natural way of translating program statements with booleans into formulas is by translating conditions as formulas, and function arguments as terms. Yet we cannot mix boolean terms and formulas in the same way in first-order logic, unless the boolean sort is first class. Properties expressed in higher-order logic routinely use quantification over the interpreted boolean sort; this is not allowed in first-order logic either. Program statements with conditionals can be directly translated to \ITE\ expressions. Assignments in imperative programs can be translated to a series of nested \LETIN\ expressions. Both of these constructs are actively used by the users of proof assistants to structure their problems. %While SMT solvers integrate \ITE\ and \LETIN\ expressions, first-order provers in general do not support them.
 
-\section{Contributions of the Thesis}\label{sect:intro:contributions}
+\section*{Contributions of the Thesis}
+\label{sect:intro:contributions}
+\addcontentsline{toc}{section}{Contributions of the Thesis}
 This thesis presents an extension of first-order logic that contains the aforementioned missing features of first-order theorem provers and explores how reasoning with this extension can be implemented in existing first-order theorem provers. The extension is called \folb{}, standing for first-order logic (FOL) with boolean sort. \folb{} differs from the ordinary many-sorted FOL in that it \begin{enumerate*}[label=(\roman*)]\item contains an interpreted boolean sort and treats boolean terms as formulas; \item supports \ITE\ expressions; and \item supports \LETIN\ expressions.\end{enumerate*}
 
 The main contributions of the thesis are the following:
@@ -96,7 +105,7 @@ The thesis describes a modification of the TPTP language needed to represent \fo
 
 The work described in this thesis has been carried out in three papers, each presented in a separate chapter. Two papers (Chapters~\ref{chap:fool} and~\ref{chap:implementation}) were published in peer-reviewed conferences, and one (Chapter~\ref{chap:cnf}) is currently being prepared for submission to a peer-reviewed conference. The references of the papers have been combined into a single bibliography at the end of the thesis. Other than that, the papers have only been edited for formatting purposes, and in general appear in their original form. The contributions of the thesis are the cumulative contributions of all the papers. The rest of this chapter details the main contributions of each individual paper.
 
-\subsection*{Chapter \ref{chap:aws}. Checking Network Reachability Properties with Constraint Solvers}
+\subsection*{Chapter \ref{chap:aws}. Checking Network Reachability Properties Using Theorem Provers for First-Order Logic}
 \EK{TODO}
 
 \paragraph{Statement of contribution.} \EK{TODO}
