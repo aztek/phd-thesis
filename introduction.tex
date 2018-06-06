@@ -108,34 +108,39 @@ The work described in this thesis has been carried out in three papers, each pre
 \subsection*{Chapter \ref{chap:aws}. Checking Network Reachability Properties Using Theorem Provers for First-Order Logic}
 \EK{TODO}
 
-\paragraph{Statement of contribution.} \EK{TODO}
-
+\paragraph{Statement of contribution.} The chapter is co-authored with Pavle Suboti\'{c} and based on a joint work with Byron~Cook, Temesghen Kahsai and Sean~McLaughlin. Evgenii Kotelnikov contributed with the encoding of network rechability properties in first-order logic and the implementation of a checker for these problems based on Vampire.
 
 \subsection*{Chapter \ref{chap:fool}. A First Class Boolean Sort in\\First-Order Theorem Proving and TPTP}
 The paper presents the syntax and semantics of \folb. We show that \folb\ is a modification of FOL and reasoning in it reduces to reasoning in FOL. We give a model-preserving \iffalse(modulo introduced definitions)\fi translation of \folb\ to FOL that can be used for proving theorems in \folb\ in a first-order prover. We discuss a modification of superposition calculus that can reason efficiently in the presence of boolean sort. This modification includes replacement of one of the boolean sort axioms with a specialised inference rule that we called \folb\ paramodulation. We note that the TPTP language can be changed to support \folb, which will also simplify some parts of the TPTP syntax. 
 
 \paragraph{Statement of contribution.} The paper is co-authored with Laura Kov\'{a}cs and Andrei Voronkov. Evgenii Kotelnikov contributed to the formalisation of \folb{} and its translation to FOL.
 
-This paper has been published in the proceedings of the 8th Conference on Intelligent Computer Mathematics (CICM) in 2015.
+\paragraph{Bibliographic information.} The paper has been published in the proceedings of the 8th Conference on Intelligent Computer Mathematics (CICM) in 2015~\cite{FOOL}.
 
 \subsection*{Chapter \ref{chap:implementation}. The Vampire and the \folb{}}
 The paper describes the implementation of \folb\ in Vampire. We extend and simplify the TPTP language by providing more powerful and uniform representations of \ITE\ and \LETIN\ expressions. We demonstrate usability and high performance of our implementation on two collections of benchmarks, coming from the higher-order part of the TPTP library and from the Isabelle interactive theorem prover. We compare the results of running Vampire on the benchmarks with those of SMT solvers and higher-order provers. Moreover, we compare the performance of Vampire with and without \folb{} paramodulation. We give a simple extension of \folb, allowing to express the next state relation of a program as a boolean formula which is linear in the size of the program.
 
 \paragraph{Statement of contribution.} The paper is co-authored with Laura Kov\'{a}cs, Giles Reger and Andrei Voronkov. Evgenii Kotelnikov contributed with the implementation of \folb{} in Vampire and the experiments.
 
-This paper has been published in the proceedings of the 5th ACM SIGPLAN Conference on Certified Programs and Proofs (CPP) in 2016.
+\paragraph{Bibliographic information.} The paper has been published in the proceedings of the 5th ACM SIGPLAN Conference on Certified Programs and Proofs (CPP) in 2016~\cite{VampireAndFOOL}.
 
 \subsection*{Chapter \ref{chap:cnf}. A Clausal Normal Form Translation\\for \folb{}}
 The paper presents a clausification algorithm that translates a FOOL formula to an equisatisfiable set of first-order clauses. This algorithm aims to minimise the number of clauses and the size of the resulting signature, especially on formulas with \ITE, \LETIN\ expressions and complex boolean structure. We demonstrate by experiments that the implementation of this algorithm in Vampire increases performance of the prover on \folb{} problems compared to the earlier translation of \folb{} formulas to full first-order logic.
 
 \paragraph{Statement of contribution.} The paper is co-authored with Laura Kov\'{a}cs, Martin Suda and Andrei Voronkov. Evgenii Kotelnikov contributed with the extension of \newcnf{} that supports \folb{}, the implementation of this extension in Vampire and the experiments.
 
+\paragraph{Bibliographic information.} The paper has been published in the proceedings of the 2nd Global Conference on Artificial Intelligence (GCAI) in 2016~\cite{FOOLCNF}.
+
 \subsection*{Chapter \ref{chap:boogie}. A FOOLish Encoding of the Next State Relations of Imperative Programs}
-\EK{TODO}
+The paper describes an encoding of the next state relations of imperative programs with variable updates and \ITE\ statements in FOOL. Based on this encoding the paper presents a translation of imperative programs annotated with their pre- and post-conditions to partial correctness properties of these programs. We demonstrate by experiments that this translation results in formulas that are easier for Vampire than the formulas produced by program verification tool such Boogie and BLT.
 
-\paragraph{Statement of contribution.} The paper is co-authored with Laura Kov\'{a}cs and Andrei Voronkov. Evgenii Kotelnikov contributed with \EK{TODO}
+\paragraph{Statement of contribution.} The paper is co-authored with Laura Kov\'{a}cs and Andrei Voronkov. Evgenii Kotelnikov contributed with the formalised translation of imperative programs to FOOL and the experiments.
 
-\subsection*{Chapter \ref{chap:tfx}. TFX: The TPTP Extended Typed First-order Form}
-\EK{TODO}
+\paragraph{Bibliographic information.} The paper has been published in the proceedings of the 9th International Joint Conference on Automated Reasoning (IJCAR) in 2018~\cite{KKV18}.
 
-\paragraph{Statement of contribution.} The paper is co-authored with Geoff Sutcliffe. Evgenii Kotelnikov contributed with \EK{TODO}
+\subsection*{Chapter \ref{chap:tfx}. TFX: The TPTP Extended Typed First-Order Form}
+The paper presents the new language TFX that extends and simplifies the language of typed first-order formulas TFF. TFX includes the first class boolean sort, \ITE\ expressions, \LETIN\ expressions and tuples. The inclusion of these syntactic constructs was motivated by the work on FOOL and FOOL formulas can be directly expressed in TFX. TFX has been included in the latest release of the TPTP library.
+
+\paragraph{Statement of contribution.} The paper is co-authored with Geoff Sutcliffe. Evgenii Kotelnikov contributed with the discussion of the TFX syntax, the description of FOOL and examples of FOOL problems.
+
+\paragraph{Bibliographic information.} The paper has been published in the proceedings of the 6th Workshop on Practical Aspects of Automated Reasoning (PAAR) in 2018~\cite{SutcliffeK18}.
