@@ -91,7 +91,7 @@ If $\subst$ does not map $x$, \nfcnf{} adds the sequent $\genclause{D'}{\subst'}
 This corresponds to the case in which $x$ was a universally quantified variable.
 Treating the boolean universal quantifier as a conjunction, we are implicitly replacing the sequent $D$ with two extensions, one for $x \mapsto \false$ and the other for $x \mapsto \true$. However, one of them is always true due to the occurrence of $\genlit{\psi}{\sign}$ in $D$ and so is not considered anymore. Thus only $\genclause{D'}{\subst'}$ is further processed by \nfcnf{}.
 
-\begin{example} Let $\psi_1 = (\forall x:\bool)(x \lor P(x))$, $\psi_2 = (\exists y:\bool)(P(y) \land y)$,
+\begin{example*} Let $\psi_1 = (\forall x:\bool)(x \lor P(x))$, $\psi_2 = (\exists y:\bool)(P(y) \land y)$,
 where $P$ is a predicate symbol of the sort $\bool \to \bool$ and let us consider the formula $\varphi = \psi_1 \lor \psi_2$.
 
 To process $\varphi$, \nfcnf{} first applies the rule for disjunction inherited from $\newcnf$,
@@ -136,7 +136,7 @@ However, \nfcnf{} is not designed to do that.}
 \oldcnf{} converts $\varphi$ to the following set of clauses:
 $$\{ x \eql \true, P(x), P(\mathit{sk}) \}, \{ x \eql \true, P(x), \mathit{sk}\eql \true \},$$
 where $\mathit{sk}$ is a skolem constant of the sort $\bool$.
-\QED\end{example}
+\QED\end{example*}
 
 %The translation of \folb{} formulas to full first-order logic in~\cite{FOOL} 
 The \oldcnf{} algorithm of~\cite{FOOL} 
@@ -201,7 +201,7 @@ We first describe this step of \nfcnf{} for a single \ITE\ expression and then g
   \item adds sequents $\genclause{\{\genlit{\gamma}{\negsign},\genlit{P(s,x_1,\ldots,x_n)}{\possign}\}}{\emptySubst}$ and $\genclause{\{\genlit{\gamma}{\possign},\allowbreak\genlit{P(t,\allowbreak x_1,\allowbreak \ldots,x_n)}{\possign}\}}{\emptySubst}$ to $\GC$.
 \end{enumerate}
 
-\begin{example} Consider a definition of the $\mathit{max}$ function using \ITE\ taken from \cite{VampireAndFOOL}:
+\begin{example*} Consider a definition of the $\mathit{max}$ function using \ITE\ taken from \cite{VampireAndFOOL}:
 \begin{equation}\label{eq:formula-ite-example}
   (\forall x:\Z)(\forall y:\Z)(\mathit{max}(x, y) \eql \ite{x \geq y}{x}{y}).
 \end{equation}
@@ -236,7 +236,7 @@ This translation ultimately yields the set of three clauses with two new equalit
 \begin{equation*}
 \{\mathit{max}(x,y) \eql g(x,y)\}, \{x \not\geq y, g(x,y) \eql x\}, \{x \geq y, g(x,y) \eql y\}.\QED
 \end{equation*}
-\end{example}
+\end{example*}
 
 Both excessive expanding and excessive naming can result in a big CNF. Expanding \ITE\ expressions in \nfcnf{} doubles the number of sequents with occurrences of $L$, but does not introduce fresh symbols. Naming, on the other hand, adds exactly two new sequents, but introduces a fresh symbol. Both expanding and naming duplicate the condition of the \ITE\ expression. As discussed previously, \nfcnf{} keeps track of the number of occurrences of this condition and names it if this number exceeds the naming threshold. At the same time, expanding constructs two new literals that cannot be named because they might be syntactically distinct and \nfcnf{} does not count occurrences of literals. If the constructed literals contain more \ITE\ expressions inside, rewriting them might cause exponential increase of the number of sequents.
 
@@ -261,7 +261,7 @@ If done unconditionally, the translation of nested \ITE\ expressions could lead 
 as the condition formula $\chi$ is being copied. However, \nfcnf{} inherits from \newcnf{} the mechanism 
 for naming subformulas with many occurrences (as explained in the previous section) which prevents such blowup.
 
-\begin{example} Consider the following property of the $\mathit{max}$ function
+\begin{example*} Consider the following property of the $\mathit{max}$ function
 \begin{equation}\label{eq:term-ite-example}
   (\forall x:\Z)(\forall y:\Z)(\ite{\mathit{max}(x, y) \eql x}{x \geq y}{y \geq x}).
 \end{equation}
@@ -280,7 +280,7 @@ These three formulas ultimately yield the following set of clauses:
 &\{\mathit{max}(x, y) \not\eql x, \neg P(x,y), x \geq y\},\{\mathit{max}(x, y) \not\eql x, P(x,y), x \not\geq y\},\\
 &\{\mathit{max}(x, y) \eql y, \neg P(x,y), y \geq x\},\{\mathit{max}(x, y) \eql y, P(x,y), y \not\geq x\}.\QED
 \end{align*}
-\end{example}
+\end{example*}
 
 % We point out that the translation of nested \ITE\ expressions may easily lead to an exponential increase in the number of sequents. % We handle this situation in \nfcnf{} by extending the formula naming mechanism of \nfcnf{}, as detailed below. 
 
@@ -312,11 +312,11 @@ the \nfcnf{} algorithm
   that $\pi_i(g(s_1,\ldots,s_n)) \eql s_i$ for every $i=1,\ldots, n$ and that $t_1 \eql t_2 \liff \bigwedge_{i=1}^n \pi_i(t_1) \eql \pi_i(t_2)$.
 \end{enumerate} 
 
-\begin{example} Consider a formula that uses a tuple \LETIN\ expression to swap two constants $x$ and $y$ of the sort $\Z$ before applying a predicate $P$ of the sort $\Z \times \Z$ to them:
+\begin{example*} Consider a formula that uses a tuple \LETIN\ expression to swap two constants $x$ and $y$ of the sort $\Z$ before applying a predicate $P$ of the sort $\Z \times \Z$ to them:
 \begin{equation*}\label{eq:tuple-let-example}
   \letin{(x,y)}{(y,x)}{P(x,y)}.
 \end{equation*}
 To clausify this formula, \nfcnf{} firstly converts it to the formula $$\letin{t}{g(y,x)}{P(\pi_1(t), \pi_2(t))},$$ where $t$ is a fresh term of the fresh sort $\tau$, and $g$ is a fresh function symbol of the sort $\Z \times \Z \to \tau$, and $\pi_1$ and $\pi_2$ are projection functions with appropriate axiomatisation. Then, depending on whether inlining or naming is enabled, \nfcnf{} result with clauses $$\{P(\pi_1(g(y,x)),\pi_2(g(y,x)))\} \text{~or~} \{P(\pi_1(t'),\pi_2(t'))\}, \{t' \eql g(y,x)\}$$ respectively, where $t'$ is a fresh constant symbol of the sort $\tau$.
-\QED\end{example}
+\QED\end{example*}
 
 \oldcnf{}, as described in~\cite{FOOL}, cannot handle \LETIN\ expression with tuple definitions.

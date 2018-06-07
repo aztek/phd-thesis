@@ -41,25 +41,6 @@
 
 \newcommand{\PS}[1]{\textcolor{blue}{PS: {{#1}}}}
 
-% \begin{document}
-% \title{Checking Network Reachability Properties\\with Complementary Constraint Solvers}
-% \author{\IEEEauthorblockN{
-% Byron Cook\IEEEauthorrefmark{1}\IEEEauthorrefmark{2},
-% Temesghen Kahsai\IEEEauthorrefmark{1},
-% Evgenii Kotelnikov\IEEEauthorrefmark{1}\IEEEauthorrefmark{3}, 
-% Sean McLaughlin\IEEEauthorrefmark{1}, 
-% Pavle Suboti\'{c}\IEEEauthorrefmark{1}\IEEEauthorrefmark{2}
-% }
-% \IEEEauthorblockA{\IEEEauthorrefmark{1}Amazon Web Services}
-% \IEEEauthorblockA{\IEEEauthorrefmark{2}University College London}
-% \IEEEauthorblockA{\IEEEauthorrefmark{3}Chalmers University of Technology}
-% }
-% \maketitle
-
-% \begin{abstract}
-% Verification of network configurations is an important and challenging task, often tackled with constraint solving and automated reasoning. In this work we compare several constraint solvers that we use to check reachability properties of Amazon Virtual Private Cloud (VPC) networks. We model Amazon networks with Horn clauses and check first-order properties of these models using Datalog engines and automated theorem provers. We demonstrate that by using multiple types of constraint solvers we are able to pick the most efficient solver for each given network property. This allows us to increase the efficiency of network verification for Amazon VPC networks.
-% \end{abstract}
-
 %-------------------------------------------------------------------------------
 \section{Introduction}
 \label{sect:aws/introduction}
@@ -76,8 +57,6 @@ Modern platforms for cloud computing such as Amazon Elastic Compute Cloud, Googl
 misconfigurations are caused by the complexity of large-scale enterprise networks and might lead to downtimes and breaches of 
 security. Discovering such misconfiguration in industrial-sized networks can be both extremely labor and computationally intensive. Therefore, 
 verifying the correctness of network configurations is an important and challenging task.
-
-%Modern platforms for cloud computing offer their users means of configuring private networks in the style of SDN. This includes, for example, Amazon Virtual Private Cloud~\cite{AmazonVPC} and Microsoft Azure Virtual Network~\cite{AzureVirtualNetwork}, networking layers for Amazon Elastic Compute Cloud and Microsoft Azure infrastructures, respectively. Administrators of virtual private networks use a centralized control panel or a specialized API to launch network instances, set up subnets and route tables, and configure connectivity and security settings of the network.
 
 The presense of a centralized network configuration facilitates automated analysis of SDN networks. Indeed, several tools have been 
 developed~\cite{batfish,jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15,DBLP:conf/pldi/BallBGIKSSV14,Veriflow,ConfigChecker,Anteater,DBLP:conf/cav/El-HassanyTVV17} in an effort to verify various SDN components. These tools employ specialized algorithms~\cite{Veriflow} as well as general purpose 
@@ -133,14 +112,14 @@ The rest of the paper is organized as follows. Section~\ref{sect:aws/specificati
 % \caption{Tool Architecture\label{ex:tool}}
 % \end{figure}
 
-Figure~\ref{ex:vpc} shows an example of a network that consists of two subnets ``Web'' and ``Database'' with three network instances in each of them. Each of the subnets is assigned with a route table that configures the ``Web'' subnet to be accessible from the internet and the ``Database'' to not be accessible from the internet. In addition, each of the subnets is assigned with an access control list (ACL) that contains their security access rules. In particular, one of the rules forbids SSH access to the database servers directly or indirectly (via the web servers). \EK{We need to rephrase this paragraph, I think the difference between route tables and ACLs is unclear.}
-
+Let us motivate the problem of verifying virtual private networks using the following example of a network.
 \begin{figure*}[th]
 \centering\includegraphics[width=1.0\textwidth]{./aws/fig/vpc.pdf}
-\caption{An example network\label{ex:vpc}.}
 \end{figure*}
 
-In a realistic setting this VPN network might grow over time, accumulating new network instances and new security and access rules. A network administrator may want to make sure that this VPC network retain certain properties after each change in its configuration. For example, the network administrator may want to check the following property.
+This network consists of two subnets ``Web'' and ``Database'' and three network instances in each of them. Each of the subnets is assigned with a route table (on the right) and an access control list (ACL, on the left). The route tables allow the network traffic to flow between the subnets and between the ``Web'' subnet and the internet gateway. In other words, the network instances in the ``Web'' subnet are accessible from the internet. An ACL consists of rules that filter the network traffic to and from its subnet. In our example, one of the ACL rules of the ``Database'' subnet forbids SSH access to its instances, both directly and through an intermediate instance.
+
+In a realistic setting this network might grow over time, obtaining more network instances and new security and access rules. A network administrator may want to make sure that the network retain certain properties after each change in its configuration. For example, the network administrator may want to check the following property.
 \begin{example}\label{prop:bool-property}
 All network instances in the subnet ``Web'' can access all network instances in the subnet ``Database''.
 \end{example}
@@ -212,7 +191,7 @@ partial evaluation that is present in high performance \Datalog engines such as
 
 \section{Network Reachability Properties}
 \label{sect:aws/specification}
-We answer network questions \emph{statically}, that is, instead of sending packets in a network, we build a model of the network and reason about this model. Our \emph{network model} consists of two parts, the \emph{formal specification} and the \emph{snapshot} of the network. The specification formalizes the semantics of each of the components available in the network. For example, the formal specification describes how a route table directs network traffic in a subnet or in which order a firewall applies rules in the access control list. The snapshot describes the topology of the given network. For example, the snapshot contains the list of network instances, subnets, and their route tables. Naturally, the formal specification in the model of each particular Amazon~VPC network is the same, whereas the snapshot differs. We express network questions in the language of many-sorted first-order logic. In the remainder of this section we describe syntax and semantics of network models and network questions.
+We answer network questions \emph{statically}, that is, instead of sending packets in a network, we build a model of the network and reason about this model. Our \emph{network model} consists of two parts, the \emph{formal specification} and the \emph{snapshot} of the network. The specification formalizes the semantics of each of the components available in the network. For example, the formal specification describes how a route table directs network traffic in a subnet or in which order a firewall applies rules in the access control list. The snapshot describes the topology of the given network. For example, the snapshot contains the list of network instances, subnets, and their route tables. Naturally, the formal specification in the model of each particular virtual private network is the same, whereas the snapshot differs. We express network questions in the language of many-sorted first-order logic. In the remainder of this section we describe syntax and semantics of network models and network questions.
 
 \EK{We might want to make it clear that the models and the queries are given to us. Otherwise we'd have to justify why we use Datalog for the spec and FOL for the queries.}
 
@@ -260,7 +239,7 @@ The network snapshot part of the model contains constants and facts that describ
 
 We express network questions as formulas of many-sorted first-order logic with the standard logical connectives $\vee$, $\wedge$, $\Rightarrow$, $\Leftrightarrow$, $\oplus$, and equality. These formulas only use types, constants, and predicates from the signature of the network model. The formulas do not use any function symbols. We allow interpretation of these formulas to use empty domains and otherwise assume the standard semantics of many-sorted first-order logic.
 
-We express boolean questions as closed formulas, that is, formulas in which all occurrences of variables are bound by a quantifier. Conversely, we express list questions as formulas with free variables. The answer to a boolean question is true iff its correspondent formula is valid. The answer to a list question is the set of variable substitutions that satisfies its correspondent formula.
+We express boolean questions as closed formulas, that is, formulas in which all variables are bound by a quantifier. Conversely, we express list questions as formulas with free variables. The answer to a boolean question is true iff its correspondent formula is valid. The answer to a list question is the set of substitutions of variable with constants that satisfy its correspondent formula.
 
 The boolean question in Example~\ref{prop:bool-property} is expressed as the following formula.
 \begin{equation}\label{eq:bool-property}
