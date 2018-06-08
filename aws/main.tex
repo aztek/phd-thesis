@@ -58,7 +58,7 @@ misconfigurations are caused by the complexity of large-scale enterprise network
 security. Discovering such misconfiguration in industrial-sized networks can be both extremely labor and computationally intensive. Therefore, 
 verifying the correctness of network configurations is an important and challenging task.
 
-The presense of a centralized network configuration facilitates automated analysis of SDN networks. Indeed, several tools have been 
+The presense of a centralized network configuration facilitates automated analysis and synthesis of SDN networks. Indeed, several tools have been 
 developed~\cite{batfish,jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15,DBLP:conf/pldi/BallBGIKSSV14,Veriflow,ConfigChecker,Anteater,DBLP:conf/cav/El-HassanyTVV17} in an effort to verify various SDN components. These tools employ specialized algorithms~\cite{Veriflow} as well as general purpose 
 reasoning engines such as 
 \Datalog~\cite{muZ, DBLP:conf/cav/El-HassanyTVV17}, BDD~\cite{ConfigChecker}, SMT~\cite{jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15} 
@@ -73,22 +73,22 @@ satisfaction problems. While most network verification
 tools depend on a single constraint solving paradigm, we find that no single solver achieves best performance on all 
 verification problems. Secondly, general purpose solvers are very 
 performance-sensitive to problem encodings. Effective encodings are often a ``black art'' for users, resulting in tedious trial 
-and error by the user without a good understanding of the implementation of the underlying solver.
+and error for a user without a good understanding of the implementation of the underlying solver.
 
 %
 % Explain our approach and tie back to in a nutshell how we solve problems 1 and 2
 %
-In this work we verify configurations of Amazon~VPC networks. The traffic flow in Amazon VPC networks is controlled by the rules assigned to various networking components available in Amazon~VPCs~\cite{WhatIsAmazonVPC}. These components include elastic network interfaces (ENI), subnets, and internet gateways. We are interested in checking \emph{network reachability properties}, that is, properties that express whether the network traffic is able to flow between given instances in an Amazon~VPC network.
+In this work we verify configurations of virtual private cloud networks. The traffic flow in these networks is typically controlled by the rules assigned to various networking components provided by the cloud platform. These components include subnets, route tables, access control lists, internet gateways, and others. We are interested in checking \emph{network reachability properties}, that is, properties that express whether the network traffic is able to flow between given nodes of a network.
 
-We check reachability properties of Amazon~VPC networks using a portfolio of constraint solvers. To this end, we build static models of Amazon networks, translate the properties of these models to constraint satisfaction problems, and solve them using \Datalog engines and automated theorem provers for first-order logic.
+We check reachability properties of virtual private cloud networks using automated theorem provers for first-order logic. To this end, we build static models of the networks, translate the properties of these models to problems in first-order logic, and check them with the theorem prover Vampire~\cite{Vampire13} run in different modes.
 
 Our motivation for using a portfolio of solvers rather than a single solver is to leverage the advantages of different types of solvers on different types of properties. \Datalog's strength lies in its efficient fixpoint computation and 
 ability to efficiently store data, thus making it an efficient solver for listing all solutions~\cite{beliefs}. On the other hand, 
 saturation based solvers exhibit superior performance on verification problems requiring large amounts of boolean reasoning. To 
-maximize performance of both solvers, we translate each constraint satisfaction problem with the chosen solver in mind, thus 
+maximize performance of both solvers, we translate each constraint satisfaction problem with the chosen solver in mind, thus
 facilitating greater scalabitity, i.e., solver computation speed and memory usage. We demonstrate the effectiveness 
 of our approach by presenting a detailed evaluation of the both backend solvers. The results qualitatively confirm the complementary 
-nature of the two backends, and show the ability of our tool to scale to large real-world VPC configurations.
+nature of the two backends, and show the ability of our tool to scale to large real-world network configurations.
 
 % Overall Architecture of Tool
 Our contributions are summarized as follows: \begin{enumerate*}[label=(\roman*)]
@@ -117,7 +117,7 @@ Let us motivate the problem of verifying virtual private networks using the foll
 \centering\includegraphics[width=1.0\textwidth]{./aws/fig/vpc.pdf}
 \end{figure*}
 
-This network consists of two subnets ``Web'' and ``Database'' and three network instances in each of them. Each of the subnets is assigned with a route table (on the right) and an access control list (ACL, on the left). The route tables allow the network traffic to flow between the subnets and between the ``Web'' subnet and the internet gateway. In other words, the network instances in the ``Web'' subnet are accessible from the internet. An ACL consists of rules that filter the network traffic to and from its subnet. In our example, one of the ACL rules of the ``Database'' subnet forbids SSH access to its instances, both directly and through an intermediate instance.
+This network consists of an internet gateway, two subnets ``Web'' and ``Database'' and three network instances in each of them. Each of the subnets is assigned with a route table (on the right) and an access control list (ACL, on the left). The route tables allow the network traffic to flow between the subnets and between the ``Web'' subnet and the internet gateway. In other words, the network instances in the ``Web'' subnet are accessible from the internet. An ACL consists of rules that filter the network traffic to and from its subnet. In our example, one of the ACL rules of the ``Database'' subnet forbids SSH access to its instances, both directly and through an intermediate instance.
 
 In a realistic setting this network might grow over time, obtaining more network instances and new security and access rules. A network administrator may want to make sure that the network retain certain properties after each change in its configuration. For example, the network administrator may want to check the following property.
 \begin{example}\label{prop:bool-property}
@@ -132,9 +132,9 @@ All network instances that have the port 22 (SSH) accessible from the internet.
 We will refer to questions that network administrators might want to answer, such as the ones in Examples~\ref{prop:bool-property} and \ref{prop:list-property}, as \emph{network questions}. In particular, we will refer to questions similar to Example~\ref{prop:bool-property} as \emph{boolean questions}, because they expect a true-or-false answer, and to questions similar to Example~\ref{prop:list-property} as \emph{list questions}, because they expect a list of networking components as an answer.
 
 %
-% Explain what we do in tiros
+% Explain what we do
 %
-Answering network questions manually might be tedious and error-prone in an industrial-size network. For that reason this task is often automated with specialized tools. In this work we answer network questions by expressing them as constraint satisfaction problems and then solving these problems using a portfolio of constraint solvers.
+Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialized tools. In this work we answer network questions by expressing them as problems in first-order logic and then solving these problems using automated theorem provers.
 
 We answer network questions using a combination of a \Datalog engines and automated theorem provers for first-order logic. We demonstrate that by using multiple types of constraint solvers we are able to pick the most appropriate solver for a given network question. This allows us to increase the overall efficiency of answering network questions. Consider the following example. Each boolean question can be equivalently phrased as a list question~--- the answer to the boolean question is true iff the answer to the correspondent list questions is not empty. However, we distinguish these two types of questions because, as we show later, we can more efficiently answer list questions with \Datalog engines and answer boolean questions with saturation-based theorem prover for first-order logic.
 
@@ -163,14 +163,10 @@ We answer network questions using a combination of a \Datalog engines and automa
 %In order to check this property one needs to know the rules of the security groups, assigned to each network instance, the rules 
 %of the network ACL, and the semantics of how these rules are enforced. Checking such reachability property involves reasoning 
 %with constraints imposed by these networking components.
-%In this work we are interested in checking a variety of properties e.g., whether the network traffic is able to flow between given 
-%instances in an Amazon~VPC network.
 %\PS{As already done below --explain what catch is with the queries and why we need two solvers}
 %In addition to checking properties such as Example~\ref{example:bool-property}, we would like to discover the set of all networking 
 %components that satisfy a given reachability property. For example, we would like to discover the following.
 %\PS{the stuff below isn't so clear and doesn't flow} 
-%We express the properties in many-sorted first-order logic and present their syntax and semantics in Section~\ref{sect:reachability/properties}.
-%We check properties symbolically, i.e. instead of sending packets in a network, we build a model of the network and reason about this model. Our model consists of two parts, the \emph{specification} and the \emph{snapshot} of the network. The specification formalizes the semantics of each of the components available in the network. For example, the specification describes how a route table directs network traffic in a subnet or in which order a firewall applies rules in the access control list. The snapshot describes the topology of the given network. For example, the snapshot contains the list of network instances, subnets, and their route tables. Naturally, the specification in the model of each particular Amazon~VPC network is the same, whereas the snapshot differs. In the following section we present the syntax and semantics of our network models.
 
 \PS{Dumping this here for now}
 Our motivation for using \Datalog rests on its success in efficiently modeling
@@ -215,7 +211,7 @@ $\type{bits16}$ and $\type{bits32}$ represent the types of 16-bit and 32-bit vec
 
 We assume that for each type $\tau\in T$ the signature contains the equality predicate $\pred{=}_\tau$ of the type $\tau\times\tau$ and the network model contains the rule $\pred{=}_\tau(X,X)$.
 
-The network specification part of the model contains types, predicates, constants, and rules that describe the semantics of the networking components in Amazon~VPCs. For example, the specification defines the semantics of SSH tunneling. One ENI can SSH tunnel to another ENI iff it can either connect to it over SSH directly, or through a chain of one or more intermediate ENIs. In order to express this concept, the specification contains predicates $\pred{canSshTunnel}$ and $\pred{canSsh}$, each of the type $\type{eni}\times\type{eni}$, and the two following rules.
+The specification part of the model contains types, constants, predicates and rules that describe the semantics of the networking components used in a network. For example, the specification defines the semantics of SSH tunneling. One ENI can SSH tunnel to another ENI iff it can either connect to it over SSH directly, or through a chain of one or more intermediate ENIs. In order to express this concept, the specification contains predicates $\pred{canSshTunnel}$ and $\pred{canSsh}$, each of the type $\type{eni}\times\type{eni}$, and the two following rules.
 \begin{align*}
 \pred{canSshTunnel}(\mathit{Eni}_1,\mathit{Eni}_2)\leftarrow\:&\pred{canSsh}(\mathit{Eni}_1,\mathit{Eni}_2). \\
 \pred{canSshTunnel}(\mathit{Eni}_1,\mathit{Eni}_2)\leftarrow\:&\pred{canSshTunnel}(\mathit{Eni}_1,\mathit{Eni}_3)\\
@@ -230,7 +226,7 @@ The network specification part of the model contains types, predicates, constant
 
 The specification of Amazon~VPC networks that we used in this work consists of approximately 50 types, 200 predicates, and over 240 rules.
 
-The network snapshot part of the model contains constants and facts that describe the configuration of the networking components in a given Amazon~VPC network. For example, the snapshot of a network with a single instance \verb'i-abcd1234' in a single subnet ``Web'' consists of the constants $\const{instance}_\text{abcd1234}$ and $\const{subnet}_\text{Web}$, and the fact $$\pred{instanceHasSubnet}(\const{instance}_\text{abcd1234},\const{subnet}_\text{Web}).$$
+The snapshot part of the model contains constants and facts that describe the configuration of the networking components in a given network. For example, the snapshot of a network with a single instance \verb'i-abcd1234' in a single subnet ``Web'' consists of the constants $\const{instance}_\text{abcd1234}$ and $\const{subnet}_\text{Web}$, and the fact $$\pred{instanceHasSubnet}(\const{instance}_\text{abcd1234},\const{subnet}_\text{Web}).$$
 
 \EK{Mention how large network snapshots get?}
 
@@ -371,7 +367,7 @@ We run a finite model builder and a saturation-based prover in parallel on each 
   \item a list question is answered with the empty list by the saturation-based prover and with a non-empty list by the finite model builder.
 \end{enumerate*}
 
-In this work we used the \vampire theorem prover both as a saturation-based theorem prover and a finite model builder. In addition to its default saturation mode \vampire implements a MACE-style~\cite{mccune1994davis} finite model builder for many-sorted first-order logic~\cite{VampireFMB}. Theorem provers for first-order logic vary in extensions of the classical FOL and theories that they support, and our translation produces problems expressed in a logic supported by \vampire. Specifically, our translation targets many-sorted first-order logic with equality, extended with the theory of linear integer arithmetic, the theory of arrays~\cite{VampireAndFOOL}, and the theory of tuples~\cite{KKV18}. %We wrote the problems in the TPTP language~\cite{TPTP}.
+In this work we used the \vampire theorem prover both as a saturation-based theorem prover and a finite model builder. In addition to its default saturation mode \vampire implements a MACE-style~\cite{mccune1994davis} finite model builder for many-sorted first-order logic~\cite{VampireFMB}. Our translation produces problems expressed in a logic supported by \vampire, namely many-sorted first-order logic with equality, extended with the theory of linear integer arithmetic, the theory of arrays~\cite{VampireAndFOOL}, and the theory of tuples~\cite{KKV18}. %We wrote the problems in the TPTP language~\cite{TPTP}.
 
 Our FOL problems use the first-order formula $\phi$ that expresses the network question and first-order axioms $A_1,\ldots,A_n$ that we translate from the network model. We translate each boolean question to a problem of the form $A_1\wedge\ldots\wedge A_n \Rightarrow \neg\phi$ and each list question to a problem of the form $$A_1\wedge\ldots\wedge A_n \wedge (\forall \bar{z})(q(\bar{z})\Leftrightarrow \phi) \Rightarrow (\forall \bar{z})q(\bar{z}),$$ where $q$ is a fresh predicate symbol, and $\bar{z}$ are free variables of $\phi$. We reconstruct the answer to a list question from the model of the $q$ predicate~--- each substitution of $\bar{z}$ that satisfies $q$ is an answer to the question.
 
@@ -649,4 +645,4 @@ We used a specification which is \Datalog-friendly and not necessarily FOL-frien
 %-------------------------------------------------------------------------------
 \section*{Acknowledgments}
 \label{sect:aws/acks}
-The third author was partially supported by the Wallenberg Academy Fellowship 2014 and the Swedish VR grant D0497701.
+This work has been partially carried out during the first author's visit to Amazon Web Services. In additional, the first author was partially supported by the Wallenberg Academy Fellowship 2014 and the Swedish VR grant D0497701.

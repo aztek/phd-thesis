@@ -84,12 +84,12 @@ This thesis presents an extension of first-order logic that contains the aforeme
 The main contributions of the thesis are the following:
 \begin{enumerate}
   \item the definition of \folb{} and its semantics;
-  \item a translation from \folb{} formulas to formulas of first-order logic, which can be used to support \folb{} in existing first-order provers;
+  \item a model-preserving translation from \folb{} formulas to formulas of first-order logic, which can be used to support \folb{} in existing first-order provers;
   \item a new technique of dealing with the boolean sort in superposition theorem provers that includes replacement of one of the boolean sort axioms with a specialised inference rule;
   \item a modification to the TPTP language that makes it compatible with \folb{};
   \item an implementation of reasoning in \folb{} in the Vampire theorem prover;
   \item experimental results showing usability and high performance of the implementation of \folb{} in Vampire on a series of benchmarks;
-  \item a translation of \folb{} formulas to first-order clauses that can produce smaller CNFs than the ones obtained by clausification of \folb{} formulas translated to first-order logic;
+  \item a translation of \folb{} formulas to first-order clauses that can produce CNFs that are easier for theorem provers than the ones obtained by clausification of \folb{} formulas translated to first-order logic;
   \item an implementation of this translation in Vampire;
   \item experimental results showing an increase in performance of Vampire on \folb{} problems thanks to the translation of \folb{} formulas directly to first-order clauses;
   \item a simple extension of \folb{}, allowing to express the next state relation of a program as a boolean formula which is linear in the size of the program.
@@ -103,10 +103,14 @@ The thesis describes a modification of the TPTP language needed to represent \fo
 
 \folb{} can be regarded as the smallest logic containing both the core theory of SMT-LIB~\cite{SMT-LIB} (the standard library of problems for SMT solvers) and the monomorphic first-order part of the TPTP language~\cite{tff0}. First-order provers that support \folb{} can therefore reason about some problems from the SMT-LIB library. This opens up an opportunity to evaluate first-order provers on problems that were previously only checked by SMT solvers.
 
-The work described in this thesis has been carried out in three papers, each presented in a separate chapter. Two papers (Chapters~\ref{chap:fool} and~\ref{chap:implementation}) were published in peer-reviewed conferences, and one (Chapter~\ref{chap:cnf}) is currently being prepared for submission to a peer-reviewed conference. The references of the papers have been combined into a single bibliography at the end of the thesis. Other than that, the papers have only been edited for formatting purposes, and in general appear in their original form. The contributions of the thesis are the cumulative contributions of all the papers. The rest of this chapter details the main contributions of each individual paper.
+\section*{Overview of the Thesis}
+\label{sect:intro:overview}
+\addcontentsline{toc}{section}{Overview of the Thesis}
+
+The work described in this thesis has been carried out in six papers, each presented in a separate chapter. Four papers (Chapters~\ref{chap:fool}, \ref{chap:implementation}, \ref{chap:cnf} and \ref{chap:boogie}) were published in peer-reviewed conferences, one (Chapter~\ref{chap:tfx}) was published in a peer-reviewed workshop, and one (Chapter~\ref{chap:aws}) is a technical report not yet submitted for publication. The references of the papers have been combined into a single bibliography at the end of the thesis. Other than that, the papers have only been edited for formatting purposes, and in general appear in their original form. The contributions of the thesis are the cumulative contributions of all the papers. The rest of this chapter details the main contributions of each individual paper.
 
 \subsection*{Chapter \ref{chap:aws}. Checking Network Reachability Properties Using Theorem Provers for First-Order Logic}
-\EK{TODO}
+The paper describes an approach for static verification of virtual private cloud networks using automated theorem proving for first-order logic. We model networks with Horn clauses and check first-order properties of these models using the Vampire theorem prover. We used Vampire both as a saturation-based theorem prover and a finite model builder for different kinds of checked properties.
 
 \paragraph{Statement of contribution.} The chapter is co-authored with Pavle Suboti\'{c} and based on a joint work with Byron~Cook, Temesghen Kahsai and Sean~McLaughlin. Evgenii Kotelnikov contributed with the encoding of network rechability properties in first-order logic and the implementation of a checker for these problems based on Vampire.
 
