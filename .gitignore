@@ -15,7 +15,7 @@
 #*.eps
 main.pdf
 insert.pdf
-graphics
+graphics/*.pdf
 
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
 *.bbl
