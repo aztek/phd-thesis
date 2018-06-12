@@ -78,116 +78,47 @@ and error for a user without a good understanding of the implementation of the u
 %
 % Explain our approach and tie back to in a nutshell how we solve problems 1 and 2
 %
-In this work we verify configurations of virtual private cloud networks. The traffic flow in these networks is typically controlled by the rules assigned to various networking components provided by the cloud platform. These components include subnets, route tables, access control lists, internet gateways, and others. We are interested in checking \emph{network reachability properties}, that is, properties that express whether the network traffic is able to flow between given nodes of a network.
-
-We check reachability properties of virtual private cloud networks using automated theorem provers for first-order logic. To this end, we build static models of the networks, translate the properties of these models to problems in first-order logic, and check them with the theorem prover Vampire~\cite{Vampire13} run in different modes.
-
-Our motivation for using a portfolio of solvers rather than a single solver is to leverage the advantages of different types of solvers on different types of properties. \Datalog's strength lies in its efficient fixpoint computation and 
-ability to efficiently store data, thus making it an efficient solver for listing all solutions~\cite{beliefs}. On the other hand, 
-saturation based solvers exhibit superior performance on verification problems requiring large amounts of boolean reasoning. To 
-maximize performance of both solvers, we translate each constraint satisfaction problem with the chosen solver in mind, thus
-facilitating greater scalabitity, i.e., solver computation speed and memory usage. We demonstrate the effectiveness 
-of our approach by presenting a detailed evaluation of the both backend solvers. The results qualitatively confirm the complementary 
-nature of the two backends, and show the ability of our tool to scale to large real-world network configurations.
-
-% Overall Architecture of Tool
-Our contributions are summarized as follows: \begin{enumerate*}[label=(\roman*)]
-% \item We describe the overall architecture of our tool 
-\item We explore efficient encodings for two types of backend solvers, including 
-saturation-based solvers, which to the best of our knowledge, have not been used to verify networks
-\item We provide a comparison of the backend solvers and classify their strengths and weaknesses
-\end{enumerate*}.
-
-The rest of the paper is organized as follows. Section~\ref{sect:aws/specification} describes the network reachability properties and the network models. Sections \ref{sect:aws/datalog}, and \ref{sect:aws/fol} present our translations of network properties for \Datalog engines, SMT solvers, and first-order theorem provers. Section~\ref{sect:aws/experiments} presents experimental results obtained by running constraint solvers on problems which we constructed from a collection of network configurations. Section~\ref{sect:aws/related} presents related work, and Section~\ref{sect:aws/conclusion} contains a discussion of this work and suggests future work.
-
-%-------------------------------------------------------------------------------
-%\section{Network Reachability}
-%\label{sect:reachability}
-
-\section{Motivation}
-\label{sect:aws/motivation}
-% \begin{figure}
-% \includegraphics[width=0.36\textwidth]{./fig/system.pdf}
-% \centering
-% \caption{Tool Architecture\label{ex:tool}}
-% \end{figure}
-
-Let us motivate the problem of verifying virtual private networks using the following example of a network.
+In this work we verify configurations of virtual private cloud networks. The traffic flow in these networks is typically controlled by the rules assigned to various networking components provided by the cloud platform. These components include subnets, route tables, access control lists, internet gateways, and others. We are interested in checking \emph{network reachability properties}, that is, properties that express whether the network traffic is able to flow between given nodes of a network. Let us illustrate these properties using the following example of a virtual private cloud network. 
 \begin{figure*}[th]
 \centering\includegraphics[width=1.0\textwidth]{./aws/fig/vpc.pdf}
 \end{figure*}
 
-This network consists of an internet gateway, two subnets ``Web'' and ``Database'' and three network instances in each of them. Each of the subnets is assigned with a route table (on the right) and an access control list (ACL, on the left). The route tables allow the network traffic to flow between the subnets and between the ``Web'' subnet and the internet gateway. In other words, the network instances in the ``Web'' subnet are accessible from the internet. An ACL consists of rules that filter the network traffic to and from its subnet. In our example, one of the ACL rules of the ``Database'' subnet forbids SSH access to its instances, both directly and through an intermediate instance.
+This network consists of an internet gateway, two subnets ``Web'' and ``Database'' and three network nodes in each of them. Each of the subnets is assigned with a route table (on the right) and an access control list (ACL, on the left). The route tables allow the network traffic to flow between the subnets and between the ``Web'' subnet and the internet gateway. In other words, the network nodes in the ``Web'' subnet are accessible from the internet. An ACL consists of rules that filter the network traffic to and from its subnet. In our example, one of the ACL rules of the ``Database'' subnet forbids SSH access to its nodes, both directly and through an intermediate node.
 
-In a realistic setting this network might grow over time, obtaining more network instances and new security and access rules. A network administrator may want to make sure that the network retain certain properties after each change in its configuration. For example, the network administrator may want to check the following property.
+In a realistic setting this network might grow over time and have more nodes, security and access rules added to it. A network administrator may want to make sure that the network retain certain properties after each change in its configuration. For example, the network administrator may want to check the following property.
 \begin{example}\label{prop:bool-property}
-All network instances in the subnet ``Web'' can access all network instances in the subnet ``Database''.
+All network nodes in the subnet ``Web'' can access all network nodes in the subnet ``Database''.
 \end{example}
 
-In addition, the network administrator might want to know which networking components satisfy a given property, such as the ones in the following example.
+The network administrator might also want to know which networking components satisfy a given property, such as the ones in the following example.
 \begin{example}\label{prop:list-property}
-All network instances that have the port 22 (SSH) accessible from the internet.
+All network nodes that have the port 22 (SSH) accessible from the internet.
 \end{example}
 
 We will refer to questions that network administrators might want to answer, such as the ones in Examples~\ref{prop:bool-property} and \ref{prop:list-property}, as \emph{network questions}. In particular, we will refer to questions similar to Example~\ref{prop:bool-property} as \emph{boolean questions}, because they expect a true-or-false answer, and to questions similar to Example~\ref{prop:list-property} as \emph{list questions}, because they expect a list of networking components as an answer.
 
-%
-% Explain what we do
-%
 Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialized tools. In this work we answer network questions by expressing them as problems in first-order logic and then solving these problems using automated theorem provers.
 
 We answer network questions using a combination of a \Datalog engines and automated theorem provers for first-order logic. We demonstrate that by using multiple types of constraint solvers we are able to pick the most appropriate solver for a given network question. This allows us to increase the overall efficiency of answering network questions. Consider the following example. Each boolean question can be equivalently phrased as a list question~--- the answer to the boolean question is true iff the answer to the correspondent list questions is not empty. However, we distinguish these two types of questions because, as we show later, we can more efficiently answer list questions with \Datalog engines and answer boolean questions with saturation-based theorem prover for first-order logic.
 
 \EK{Also mention that we use two types of theorem provers to leverage the strengths of each one of them.}
 
-%
-% Explain the two types of properties and their suitability for different solvers
-%
-% We express the properties in many-sorted first-order logic and present their .
-%
-% Properties~\ref{prop:bool-property} and~\ref{prop:list-property} while being on the surface similar in nature, pose very different 
-% challenges for constraint solvers. Property~\ref{prop:list-property} asks the tool to \emph{list} instances that can be accessed via 
-% the internet. Solving this property involves monotonically computing the set of instances that via routes, ACLs, security groups etc. 
-% can be accessed from the internet via an internet gateway connection. For such queries, \Datalog based solvers are very effective. In, 
-% Property~\ref{prop:bool-property} can be rephrased as an assertion of the \emph{existence} of an instance in the Web subnet that cannot 
-% access an instance in the Database subnet. Here, we find \Datalog solvers compute unnecessary information for the assertion. On the other 
-% hand, saturation based solvers excel in this regard \PS{EK can you add why}.
+We check reachability properties of virtual private cloud networks using automated theorem provers for first-order logic. To this end, we build static models of the networks, translate the properties of these models to problems in first-order logic, and check them with finite model builders and saturation-based theorem provers.
 
-% The goal of this work is to investigate the strengths and weaknesses of each backend and describe how their effective usage in an industrial 
-% strength tool.
+Our motivation for using a portfolio of solvers rather than a single solver is to leverage the advantages of different types of solvers on different types of properties.
 
-%are for solvers 
-%Checking a property can be seen as a special case of discovering a set of networking components that satisfy this 
-%property~--- the property holds iff the set is not empty. However, we distinguish these two problems because, as we show later, we can solve 
-%them more efficiently using different types of constraint solvers.
-%In order to check this property one needs to know the rules of the security groups, assigned to each network instance, the rules 
-%of the network ACL, and the semantics of how these rules are enforced. Checking such reachability property involves reasoning 
-%with constraints imposed by these networking components.
-%\PS{As already done below --explain what catch is with the queries and why we need two solvers}
-%In addition to checking properties such as Example~\ref{example:bool-property}, we would like to discover the set of all networking 
-%components that satisfy a given reachability property. For example, we would like to discover the following.
-%\PS{the stuff below isn't so clear and doesn't flow} 
+The rest of the paper is organized as follows. Section~\ref{sect:aws/specification} describes the network reachability properties and the network models. Sections \ref{sect:aws/datalog}, and \ref{sect:aws/fol} present our translations of network properties for \Datalog engines, SMT solvers, and first-order theorem provers. Section~\ref{sect:aws/experiments} presents experimental results obtained by running constraint solvers on problems which we constructed from a collection of network configurations. Section~\ref{sect:aws/related} presents related work, and Section~\ref{sect:aws/conclusion} contains a discussion of this work and suggests future work.
 
-\PS{Dumping this here for now}
-Our motivation for using \Datalog rests on its success in efficiently modeling
-finite domain static analyses~\cite{doop}. While \Datalog was originally designed 
-as a powerful database query language, there is a cornucopia of state-of-the-art \Datalog 
-engines that are aimed at static analysis and treat \Datalog as a limited logic. Such tools 
-have shown performance on a par with hand-crafted static analysis tools on large program 
-analysis benchmarks~\cite{souffle}.
+\paragraph{Contributions.} Our contributions are summarized as follows: \begin{enumerate}
+\item We explore efficient encodings for two types of backend solvers, including 
+saturation-based solvers, which to the best of our knowledge, have not been used to verify networks
+\item We provide a comparison of the backend solvers and classify their strengths and weaknesses.
+\end{enumerate}
 
-Unlike~\cite{beliefs}, we translate the network snapshot to the 
-EDB, that is, a set of ground input relations. The networks semantics are converted into 
-recursive and non-recursive \Datalog rules that and the user properties are converted into 
-non-recursive chained rules. Our approach allows for us to take advantage of compilation and 
-partial evaluation that is present in high performance \Datalog engines such as 
-\souffle~\cite{souffle}.
-
-
-
+%-------------------------------------------------------------------------------
 \section{Network Reachability Properties}
 \label{sect:aws/specification}
-We answer network questions \emph{statically}, that is, instead of sending packets in a network, we build a model of the network and reason about this model. Our \emph{network model} consists of two parts, the \emph{formal specification} and the \emph{snapshot} of the network. The specification formalizes the semantics of each of the components available in the network. For example, the formal specification describes how a route table directs network traffic in a subnet or in which order a firewall applies rules in the access control list. The snapshot describes the topology of the given network. For example, the snapshot contains the list of network instances, subnets, and their route tables. Naturally, the formal specification in the model of each particular virtual private network is the same, whereas the snapshot differs. We express network questions in the language of many-sorted first-order logic. In the remainder of this section we describe syntax and semantics of network models and network questions.
+We answer network questions \emph{statically}, that is, instead of sending packets in a network, we build a model of the network and reason about this model. Our \emph{network model} consists of two parts, the \emph{formal specification} and the \emph{snapshot} of the network. The specification formalizes the semantics of each of the components available in the network. For example, the formal specification describes how a route table directs network traffic in a subnet or in which order a firewall applies rules in the access control list. The snapshot describes the topology of the given network. For example, the snapshot contains the list of network nodes, subnets, and their route tables. Naturally, the formal specification in the model of each particular virtual private network is the same, whereas the snapshot differs. We express network questions in the language of many-sorted first-order logic. In the remainder of this section we describe syntax and semantics of network models and network questions.
 
 \EK{We might want to make it clear that the models and the queries are given to us. Otherwise we'd have to justify why we use Datalog for the spec and FOL for the queries.}
 
@@ -226,7 +157,7 @@ The specification part of the model contains types, constants, predicates and ru
 
 The specification of Amazon~VPC networks that we used in this work consists of approximately 50 types, 200 predicates, and over 240 rules.
 
-The snapshot part of the model contains constants and facts that describe the configuration of the networking components in a given network. For example, the snapshot of a network with a single instance \verb'i-abcd1234' in a single subnet ``Web'' consists of the constants $\const{instance}_\text{abcd1234}$ and $\const{subnet}_\text{Web}$, and the fact $$\pred{instanceHasSubnet}(\const{instance}_\text{abcd1234},\const{subnet}_\text{Web}).$$
+The snapshot part of the model contains constants and facts that describe the configuration of the networking components in a given network. For example, the snapshot of a network with a single node \verb'i-abcd1234' in a single subnet ``Web'' consists of the constants $\const{node}_\text{abcd1234}$ and $\const{subnet}_\text{Web}$, and the fact $\pred{nodeHasSubnet}(\const{node}_\text{abcd1234},\const{subnet}_\text{Web}).$
 
 \EK{Mention how large network snapshots get?}
 
@@ -275,54 +206,10 @@ The list questions in Example~\ref{prop:list-property} is expressed as the follo
 
 All predicates and constants used in Formulas~\ref{eq:bool-property} and \ref{eq:list-property} are part of the signature of the network model. Constants $\const{subnet}_\text{Web}$ and $\const{subnet}_\text{Database}$ are part of the network snapshot, and all other predicates and constants are part of the network specification.
 
-%-------------------------------------------------------------------------------
-\section{Checking Properties with \Datalog}
-\label{sect:aws/datalog}
-
-We answer a network question by translating the network model and the network question to a \Datalog program and then running it using the \Datalog engine \souffle\cite{souffle}. A \Datalog program consists of a \Datalog \emph{query} and a finite set of \Datalog \textit{rules}. We obtain a query from the network question and a set of rules from both the network model and the network question. We assume that each \Datalog rule has the standard form $A\rl L_1\comma\ldots\comma L_n$ $(n\ge0)$, where $A$ is an atom and each of $L_1,\ldots,L_n$ is a literal, and a \Datalog query has the form $L_1\comma\ldots\comma L_n$ $(n\ge0)$, where each of $L_1,\ldots,L_n$ is a literal. We also assume that all \Datalog rules use stratified negation.
-
-% \EK{Network specification is intentional database, network snapshot is extensional database.}
-
-\souffle accepts definitions of typed relations, contains the predefined symbol and numeric types, and accepts definitions of new types. The types in \souffle are interpreted under the open-world assumption. We model the types of the network models, interpreted as finite domains, using \Datalog relations with one argument. Let $\tau$ be a type and $c_1,\ldots,c_n$ ($n\ge0$) be constants of this type. We introduce a relation $\typedRel{\tau}$ and add the facts $\typed{\tau}{c_i}$, $1\le i\le n$ to the set of \Datalog rules. We use literals of the form $\typed{\tau}{t}$ in every \Datalog rule to guard the argument $t$ of the type $\tau$ in the head of the rule. \EK{Mention that we can simplify it and only use typing literals near negations.}
-
-Let $p(t_1,\ldots,t_n)\leftarrow L_1\wedge\ldots\wedge L_m$ $(n\ge0,m\ge0)$ be a rule in the network model, where $p$ is a predicate of the type $\tau_1\times\ldots\times\tau_n$ and each of $L_1,\ldots,L_m$ is a literal. We translate $p$ to a \Datalog relation $r$ and translate this rule to the \Datalog rule $$r(t_1,\ldots,t_n)\rl\typed{\tau_1}{t_1}\comma\ldots\comma\typed{\tau_n}{t_n}\comma L_1\comma\ldots\comma L_m.$$
-
-We translate a network question expressed as a first-order formula $\phi$ without function symbols to a \Datalog query and a set of \Datalog rules. We start by converting $\phi$ to a prenex disjunctive normal form that is $$(\forall x_1:\tau_1)\ldots(\forall x_n:\tau_n)(\exists y_1:\sigma_1)\ldots(\exists y_m:\sigma_m)(C_1\vee\ldots\vee C_k),$$ where $n\ge0$, $m\ge0$, $k\ge0$, and each of $C_1,\ldots,C_k$ is a conjunction of literals. Let $z_1:\upsilon_1,\ldots,z_l:\upsilon_l$ be all free variables of $\phi$. $l=0$ for formulas expressing boolean network questions and $l>0$ for formulas expressing list network question. We introduce two fresh relations $r$ and $q$ of the types $\tau_1\times\ldots\times\tau_n\times\upsilon_1\times\ldots\times\upsilon_l$ and $\upsilon_1\times\ldots\times\upsilon_l$, respectively. The translated set of \Datalog rules consists of $k+1$ rules: $k$ rules of the form
-\begin{align*}
-r(x_1,\ldots,x_n,z_1,\ldots,z_l)\rl\;&\typed{\tau_1}{x_1}\comma\ldots\comma\typed{\tau_n}{x_n}\comma~\\
-                                     &\typed{\upsilon_1}{z_1}\comma\ldots\comma\typed{\upsilon_l}{z_l}\comma C_i
-\end{align*}
-for each $1\le i\le k$ and the rule
-\begin{align*}
-q(z_1,\ldots,z_l)\rl\typed{\upsilon_1}{z_1}\comma\ldots\comma\typed{\upsilon_l}{z_l}\comma\neg r(x_1,\ldots,x_n,z_1,\ldots,z_l).
-\end{align*}
-Note that we can use each conjunction $C_i$ in a \Datalog rule because each literal in $C_i$ only contains variables and constants~--- there are no function symbols in $\phi$ and they do not appear during a conversion to prenex disjunctive normal form. Finally, the \Datalog query is $\neg q(z_1,\ldots,z_l)$.
-
-\EK{Explain why negations are needed.}
-
-We translate types $\type{bits16}$ and $\type{bits32}$ to numeric types for 32 and 16-bit integers, respectively, and translate the predicates over bit vectors into their correspondent built-in \souffle operations.
-
-We illustrate our translation using examples from Section~\ref{sect:aws/motivation}. We translate Formula~\ref{eq:bool-property} that expresses a boolean network question to the \Datalog rules
-\begin{align*}
-r(W,D)\rl\;& \typed{instance}{W}\wedge\neg\pred{instanceHasSubnet}(W,\const{subnet}_\text{Web}).\\
-r(W,D)\rl\;& \typed{instance}{D}\wedge\neg\pred{instanceHasSubnet}(D,\const{subnet}_\text{Database}).\\
-r(W,D)\rl\;& \typed{instance}{W}\wedge\typed{instance}{D}\:\wedge\:\\
-           & \pred{instanceCanConnectToInstance}(W,D).\\
-q\rl\;& \neg r(W,D).
-\end{align*}
-and the \Datalog query $\neg q$. Note that multiple rules in the definition of $r$ appear because of the translation to disjunctive normal form. We translate Formula~\ref{eq:list-property} that expresses a list network question to the \Datalog rules
-\begin{align*}
-r(I,E)\rl\;& \typed{instance}{I}\wedge\typed{eni}{E}\:\wedge\:\\
-           & \pred{instanceHasEni}(I,E)\:\wedge\:\\
-           &\begin{aligned}
-               \pred{reachablePublicTcpUdp}(&\const{dir}_\text{ingress},\const{proto}_6,E,\const{port}_{22},\\
-                                            &\const{publicIp}_\text{8:8:8:8},\const{port}_\text{40000}).
-             \end{aligned}\\
-q(I,E)\rl\;& \typed{instance}{I}\wedge\typed{eni}{E}\wedge\neg r(I,E).
-\end{align*}
-and the \Datalog query $\neg q(I,E)$.
-
-%For example, consider a list query expressed by the formula $(\forall x:\tau)(\exists y:\sigma)(r(x, y) \wedge g(y))$, where $r$ and $g$ are predicates in the network model. We translate it to a \Datalog relation $p$ of the type $\tau\times\sigma$ and a nullary \Datalog relation $q$, two \Datalog rules $p(X,Y)\rl r(X,Y)\comma g(Y)$ and $q\rl \neg p(X,Y)$, and a \Datalog query $\neg q$.
+% %-------------------------------------------------------------------------------
+% \section{Checking Properties with \Datalog}
+% \label{sect:aws/datalog}
+% \input{aws/datalog}
 
 %-------------------------------------------------------------------------------
 \section{Checking Properties with Theorem Provers}
@@ -331,7 +218,7 @@ and the \Datalog query $\neg q(I,E)$.
 
 % We translate the network models and network questions to problems in many-sorted FOL. These problems use quantifiers and theories. We solve the problems using finite model builders and saturation-based theorem provers for FOL. We use two types of provers to leverage the strengths of both of them, which we detail below.
 
-We translate network models and network questions to problems in FOL. We solve these problems using finite model builders and saturation-based theorem provers for FOL. We use these two types of provers to leverage the strengths of both of them, which we summarize below.
+We translate network models and network questions to problems in first-order logic. We solve these problems using finite model builders and saturation-based theorem provers. We use these two types of provers to leverage the strengths of both of them, which we summarize below.
 
 Finite model builders are commonly implemented in SMT (Satisfiability Modulo Theories) solvers for FOL such as Z3~\cite{Z3} or CVC4~\cite{CVC4}. SMT solvers reason in the ground subset of FOL with theories using the DPLL algorithm~\cite{davis1960computing} combined with decision procedures for theories. SMT solvers handle quantifiers using heuristic instantiation techniques such as E-matching~\cite{DBLP:journals/jacm/DetlefsNS05,DBLP:conf/cade/MouraB07} and model-based quantifier instantiation~\cite{DBLP:journals/jacm/DetlefsNS05,DBLP:conf/cade/MouraB07}. Finite model builders are designed to efficiently solve satisfiable problems. Given an unsatisfiable problem, finite model builders might detect that the problem cannot have infinite models and in such case report unsatisfiability.
 
@@ -376,7 +263,7 @@ In the rest of this section we detail our translation of network models to FOL. 
 \subsection{Translation of Types and Constants}\label{sect:aws/fol/types}
 %Each type in the specification describes a finite domain. Each element in that domain is a constant, explicitly defined in the specification. We translate each type definition to FOL by introducing a sort, constants of this sort, and the axiom of the finite domain.
 
-Let $\tau$ be a type and $c_1,\ldots,c_n$ ($n\ge0$) be constants of this type. If $n>0$ then we introduce a sort $\tau$, constants $c_1,\ldots,c_n$ of this sort and add the domain closure axiom of the form $(\forall x:\tau)(x=c_1 \vee\ldots\vee x=c_n)$ and the distinct constants axiom of the form $$\bigwedge_{1\le i\le n,1\le j\le n,i\not=j}c_i\not=c_j.$$ If $n=0$ then we do not introduce any sorts or constants and in our translation of predicate definitions replace each subformula of the form $(\forall x:\tau)\varphi$ with logical truth and each subformula of the form $(\exists x:\tau)\varphi$ with logical falsum.
+Let $\tau$ be a type and $c_1,\ldots,c_n$ ($n\ge0$) be constants of this type. If $n>0$ then we introduce a sort $\tau$, constants $c_1,\ldots,c_n$ of this sort and add the domain closure axiom of the form $(\forall x:\tau)(x=c_1 \vee\ldots\vee x=c_n)$ and the distinct constants axiom of the form of a conjunction of literals $c_i\not=c_j$ for all $1\le i\le n$, $1\le j\le n$ and $i\not=j$. If $n=0$ then we do not introduce any sorts or constants and in our translation of predicate definitions replace each subformula of the form $(\forall x:\tau)\varphi$ with logical truth and each subformula of the form $(\exists x:\tau)\varphi$ with logical falsum.
 
 For example, the signature contains the type $\type{dir}$ and two constants $\const{dir}_\text{ingress}$ and $\const{dir}_\text{egress}$ of this type. $\type{dir}$ represents the direction of a network package. We translate this type to FOL as a sort $\mathit{dir}$, two constants $\mathit{ingress}$ and $\mathit{egress}$ of this sort, and axioms $(\forall x:\mathit{dir})(x=\mathit{ingress}\vee x=\mathit{egress})$ and $\mathit{ingress}\neq\mathit{egress}$.
 
@@ -457,64 +344,6 @@ The network model uses the type $\type{bits32}$ and the predicate $\pred{bits32}
 \end{enumerate*}
 
 \section{Performance Optimizations}\label{sect:aws/optimizations}
-
-\subsection{\Datalog-specific Optimizations}
-A major bottleneck in the produced \Datalog code are existential rules 
-that are produced when a variable is bound by an existential quantifier. Such encodings 
-may result in evaluations that can be performed more efficiently with appropriate 
-optimizations. We outline 
-two cases and how we mitigate this inefficiency below:
-
-\paragraph*{Constant Existence} In such \Datalog programs 
-resulting from properties such as $\forall a . A(\mathit{foo}, x)$
-may produce \Datalog programs as shown below:
-\begin{align*}
-&a(X,Y) \rl b(X,Z)\comma c(Y,Z).\\
-&q(X) \rl a(\mathit{foo}, X)\comma \neg g(X).
-\end{align*}
-
-In the case $A$ is a large relation we do not want to 
-compute the entire relation only to check for the 
-\emph{existence} of a single constant. Fortunately, 
-such \Datalog problems are well studied and techniques 
-such as magic set rewriting can be employed. Essentially, 
-such transformations propagate the constant as far as possible 
-in a top-down computation fashion. For example the \Datalog 
-program above can be rewritten as follows:
-\begin{align*}
-&a(\mathit{foo}, Y) \rl b(\mathit{foo}, Z)\comma c(Y,Z).\\
-&q(X) \rl a(\mathit{foo}, X)\comma \neg g(X).
-\end{align*}
-
-\paragraph*{Arbitrary Existence} In such \Datalog programs 
-resulting from properties such as $(\exists x)A(x)$
-may produce \Datalog programs as shown below:
-\begin{align*}
-&a(X) \rl a(X)\comma g(X).\\
-&a(X) \rl b(X).\\
-&q \rl a(X).
-\end{align*}
-
-Again, in the case $a$ is a very large relation we want to avoid computing the entire 
-relation to assert the existence of any item in it. For such problems magic set transformation 
-is not possible. This problem is in general any relation of the where all its variables are not 
-in the head of a rule and not bound in another body relation. In this 
-case a relation is used purely in an existential fashion and hence we can ignore recursive rules which 
-do not need to be computed. Assuming we are in the realm of stratified \Datalog, then since a relation 
-cannot appear negated when its a head of a clause, a recursive rule will only produce a result if the relation 
-already contains a tuple. Hence this transformation, if applicable, results in removing all recursive 
-rules of a where relation $A$ is the head. Moreover, this may result in additional relations being 
-reduces to existential form as recursive rules are removed. The example below can be rewritten as 
-follows.
-\begin{align*}
-&a \rl b(X).\\
-&q \rl a.
-\end{align*}
-
-Here, we can treat $a$ as a nullary relation which is true or false depending 
-on the existence of an element in $b$. Note, if $b$ is an IDB relation and not 
-used in any other way, the transformation can be applied to $b$.
-
 \subsection{Theorem Provers-Specific Optimizations}
 Our translation of the theory of 32-bit vectors is not the only possible one. For example, one can use the theory of boolean arrays instead. To this end one should translate
 \begin{enumerate*}[label=(\roman*)]
@@ -543,66 +372,17 @@ Next step~--- notice that many networks only use a limited number of CIDR addres
 
 $\pred{PortRangeOverlap}$ of the type $\type{PortRange} \times \type{PortRange}$.
 
-Network only uses port ranges 0--65535, 22--22, 443--443, 5432--5432, 80--80, 80--81 anywhere. 12 facts of the form $\pred{PortRangeOverlap}(\const{portRange}_1,\const{portRange}_2).$
-% \begin{equation*}
-% \begin{aligned}
-% &\pred{PortRangeOverlap}(\const{portRange}_\text{0--65535},\const{portRange}_\text{0--65535}).\\
-% &\pred{PortRangeOverlap}(\const{portRange}_\text{0--65535},\const{portRange}_\text{443--443}).\\
-% &\pred{PortRangeOverlap}(\const{portRange}_\text{0--65535},\const{portRange}_\text{5432--5432}).\\
-% &\pred{PortRangeOverlap}(\const{portRange}_\text{0--65535},\const{portRange}_\text{80--81}).\\
-% &\pred{PortRangeOverlap}(\const{portRange}_\text{0--65535},\const{portRange}_\text{9000--9000}).\\
-% &\pred{PortRangeOverlap}(\const{portRange}_\text{22--22},\const{portRange}_\text{0--65535}).\\
-% &\pred{PortRangeOverlap}(\const{portRange}_\text{443--443},\const{portRange}_\text{0--65535}).\\
-% &\pred{PortRangeOverlap}(\const{portRange}_\text{5432--5432},\const{portRange}_\text{0--65535}).\\
-% &\pred{PortRangeOverlap}(\const{portRange}_\text{80--80},\const{portRange}_\text{0--65535}).\\
-% &\pred{PortRangeOverlap}(\const{portRange}_\text{80--81},\const{portRange}_\text{0--65535}).\\
-% &\pred{PortRangeOverlap}(\const{portRange}_\text{80--81},\const{portRange}_\text{80--80}).\\
-% &\pred{PortRangeOverlap}(\const{portRange}_\text{80--80},\const{portRange}_\text{80--81}).\\
-% \end{aligned}
-% \end{equation*}
-% -: port-range-overlap port-range/0/65535 port-range/0/65535.
-% -: port-range-overlap port-range/0/65535 port-range/443/443.
-% -: port-range-overlap port-range/0/65535 port-range/5432/5432.
-% -: port-range-overlap port-range/0/65535 port-range/80/81.
-% -: port-range-overlap port-range/0/65535 port-range/9000/9000.
-% -: port-range-overlap port-range/22/22 port-range/0/65535.
-% -: port-range-overlap port-range/443/443 port-range/0/65535.
-% -: port-range-overlap port-range/5432/5432 port-range/0/65535.
-% -: port-range-overlap port-range/80/80 port-range/0/65535.
-% -: port-range-overlap port-range/80/81 port-range/0/65535.
-% -: port-range-overlap port-range/80/81 port-range/80/80.
-% -: port-range-overlap port-range/80/80 port-range/80/81.
+Network only uses port ranges 0--65535, 22--22, 443--443, 5432--5432, 80--80, 80--81 anywhere. 12 facts of the form $$\pred{portRangeOverlap}(\mathit{portRange}_1,\mathit{portRange}_2).$$
 
 To shorten the definition further we can use the fact that $\pred{PortRangeOverlap}$ is a reflexive symmetric binary relation and 0--65535 overlaps with any other port range.
 \begin{equation*}
 \begin{aligned}
-&\pred{PortRangeOverlap}(x,x).\\
-&\pred{PortRangeOverlap}(y,x)\leftarrow\pred{PortRangeOverlap}(x,y).\\
-&\pred{PortRangeOverlap}(\const{portRange}_\text{0--65535},\mathit{portRange}).\\
-&\pred{PortRangeOverlap}(\const{portRange}_\text{80--80},\const{portRange}_\text{80--81}).\\
+&\pred{portRangeOverlap}(X,X).\\
+&\pred{portRangeOverlap}(Y,X)\leftarrow\pred{portRangeOverlap}(X,Y).\\
+&\pred{portRangeOverlap}(\const{portRange}_\text{0--65535},\mathit{Y}).\\
+&\pred{portRangeOverlap}(\const{portRange}_\text{80--80},\const{portRange}_\text{80--81}).\\
 \end{aligned}
 \end{equation*}
-% -: port-range-overlap X X.
-% -: port-range-overlap Y X
-% <- port-range-overlap X Y.
-% -: port-range-overlap port-range/0/65535 _.
-% -: port-range-overlap port-range/80/80 port-range/80/81.
-
-%-------------------------------------------------------------------------------
-\section{Experimental Results}
-\label{sect:aws/experiments}
-
-\PS{
-Compare two tools:
-\begin{itemize}
-\item Run-Time
-\item Memory usage
-\item Classify queries $\forall$, list, $\exists$, mixed
-\item Sort networks by size
-\end{itemize}
-}
-\PS{conclude with some heuristic conclusions on when to use each solver+configuration}
-% \EK{TODO}
 
 %-------------------------------------------------------------------------------
 \section{Related Work}
@@ -629,7 +409,7 @@ Synthesis of network configurations using \Datalog~\cite{DBLP:conf/cav/El-Hassan
 Weidenbach used saturation in \spass to verify security protocols~\cite{Weidenbach99}.
 
 %-------------------------------------------------------------------------------
-\section{Conclusions, Discussion, and Future Work}
+\section{Conclusions and Future Work}
 \label{sect:aws/conclusion}
 The quality of translation matters a lot. Bad translation --- poor performance. This is a well-known problem in the ATP community. Theorem provers should efficiently implement useful syntactical features and theories beyond vanilla first-order logic. In this work we missed an efficient implementation of the theory of bit vectors in \vampire.
 
@@ -639,10 +419,11 @@ When comparing the performance of \Datalog and FOL we saw that the performance t
 
 Our problems have to do with large finite domains. Superposition-based theorem provers cannot reason with them efficiently, too bad (cite Weidenbach's work~\cite{HillenbrandWeidenbach13} though).
 
-\subsection{Future Work}
-We used a specification which is \Datalog-friendly and not necessarily FOL-friendly~--- only predicates, no functions. It would be interesting to rewrite it in FOL. We only took Vampire, but would be interesting to compare other provers, or even use a portfolio of provers instead of just one.
+Interesting to translate to EPR~--- we do not have function symbols with positive arity, but we do get them because of skolemization.
+
+\paragraph{Future Work} We used a specification which is \Datalog-friendly and not necessarily FOL-friendly~--- only predicates, no functions. It would be interesting to rewrite it in FOL. We only took Vampire, but would be interesting to compare other provers, or even use a portfolio of provers instead of just one.
 
 %-------------------------------------------------------------------------------
 \section*{Acknowledgments}
 \label{sect:aws/acks}
-This work has been partially carried out during the first author's visit to Amazon Web Services. In additional, the first author was partially supported by the Wallenberg Academy Fellowship 2014 and the Swedish VR grant D0497701.
+This work has been partially carried out during the first author's visit to Amazon Web Services. In addition, the first author was partially supported by the Wallenberg Academy Fellowship 2014 and the Swedish VR grant D0497701.
