@@ -12,8 +12,7 @@ Theorem provers are used for software and hardware verification, information man
 
 This thesis contributes to the area of automated theorem proving by presenting an extension of first-order logic that is useful for applications and can be supported by first-order theorem provers. This chapter describes the background of the thesis and is structured as follows. Section~\ref{sect:intro:fol} gives an introduction to automated theorem proving in first-order logic. Sections \ref{sect:intro:analysis} and \ref{sect:intro:itp} describe two important applications of first-order provers, automation for program verification and interactive proof assistants. Section~\ref{sect:intro:problem} states the problem addressed in the thesis, and finally Section~\ref{sect:intro:contributions} summarises the contributions of the thesis.
 
-
-\section*{Automated Theorem Proving in\\First-Order Logic}
+\section*{Automated Theorem Proving in First-Order Logic}
 \label{sect:intro:fol}
 \addcontentsline{toc}{section}{Automated Theorem Proving in First-Order Logic}
 The problem of establishing validity of a first-order problem automatically can be traced back to Hilbert. In 1928 he posed a question, traditionally referred to as \emph{Entscheidungsproblem}\iffalse(German for ``decision problem'')\fi, stated as follows. Is there an algorithm that takes as input a statement in first-order logic and terminates with ``Yes'' or ``No'' according to whether or not the statement is valid?
@@ -109,7 +108,7 @@ The thesis describes a modification of the TPTP language needed to represent \fo
 
 The work described in this thesis has been carried out in six papers, each presented in a separate chapter. Four papers (Chapters~\ref{chap:fool}, \ref{chap:implementation}, \ref{chap:cnf} and \ref{chap:boogie}) were published in peer-reviewed conferences, one (Chapter~\ref{chap:tfx}) was published in a peer-reviewed workshop, and one (Chapter~\ref{chap:aws}) is a technical report not yet submitted for publication. The references of the papers have been combined into a single bibliography at the end of the thesis. Other than that, the papers have only been edited for formatting purposes, and in general appear in their original form. The contributions of the thesis are the cumulative contributions of all the papers. The rest of this chapter details the main contributions of each individual paper.
 
-\subsection*{Chapter \ref{chap:aws}. Checking Network Reachability Properties Using Theorem Provers for First-Order Logic}
+\subsection*{Chapter \ref{chap:aws}. Checking Network Reachability Properties with Automated Reasoning in First-Order Logic}
 The paper describes an approach for static verification of virtual private cloud networks using automated theorem proving for first-order logic. We model networks with Horn clauses and check first-order properties of these models using the Vampire theorem prover. We used Vampire both as a saturation-based theorem prover and a finite model builder for different kinds of checked properties.
 
 \paragraph{Statement of contribution.} The chapter is co-authored with Pavle Suboti\'{c} and based on a joint work with Byron~Cook, Temesghen Kahsai and Sean~McLaughlin. Evgenii Kotelnikov contributed with the encoding of network rechability properties in first-order logic and the implementation of a checker for these problems based on Vampire.
