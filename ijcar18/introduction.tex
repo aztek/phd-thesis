@@ -31,19 +31,19 @@ In summary, FOOL extends FOL with the following constructs.
 
 To our knowledge, no other logic, efficiently implemented in automated theorem provers, contains these constructs. Some constructs of FOOL have been previously implemented in interactive and higher-order theorem provers. However, there was no special emphasis on the efficiency or friendliness of the translation for the following processing by automatic provers.
 
-In this paper, we extend our previous work on FOOL by demonstrating the efficient use of FOOL for program analysis. To this end, we give an efficient encoding of the next state relations of imperative programs in FOOL. Let us motivate our work with the simple program on Figure~\ref{fig:boogie/simple-if}. This program contains an \verb'if' statement and assignments to integer variables. The \verb'assert' statement ensures that \verb'x' is never greater than \verb'y' after execution of the \verb'if' statement.
+In this paper, we extend our previous work on FOOL by demonstrating the efficient use of FOOL for program analysis. To this end, we give an efficient encoding of the next state relations of imperative programs in FOOL. Let us motivate our work with the simple program on Figure~\ref{fig:boogie/simple-if}. This program contains an \verb'if' statement and assignments to integer variables. The \lstinline'assert' statement ensures that \lstinline'x' is never greater than \lstinline'y' after execution of the \verb'if' statement.
 
 \begin{figure}
-  \parbox{4.6cm}{
+  \parbox{4.7cm}{
     \vspace{2em}\hspace{0.6cm}
-    \begin{minipage}{3cm}
+    \begin{minipage}{3.2cm}
     \begin{lstlisting}[language=cpp]^^J
 if (x > y) \{^^J
 \ \ t := x;^^J
 \ \ x := y;^^J
 \ \ y := t;^^J
 \}^^J
-assert x <= y;^^J
+assert(x <= y);^^J
     \end{lstlisting}
     \end{minipage}
     \vspace{1.5em}

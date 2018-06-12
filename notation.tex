@@ -25,6 +25,7 @@
 \lstset{
   literate=
     {~}{$\sim$}1
+    {:=}{$\coloneqq$}1
 }
 
 \usepackage{xpatch}
@@ -58,8 +59,8 @@
 
 \lstdefinelanguage{bnf}{}
 
-\newcommand{\reserved}[1]{\textbf{\underline{#1}}} % reserved words in algorithms
-\newcommand{\ass}{\texttt{:=}}     % assignment operator
+\newcommand{\reserved}[1]{\textbf{#1}} % reserved words in algorithms
+\newcommand{\ass}{$\coloneqq$}     % assignment operator
 \newcommand{\inc}{~~~~\= \+ \kill}    % used in algorithms
 \newcommand{\dec}{\- \kill}         % used in algorithms
 \newcommand{\semicol}{;}                  % semicolon in algorithms
@@ -79,7 +80,7 @@
 \newcommand{\END}{\reserved{end}}
 \newcommand{\LET}{\reserved{let}}
 \newcommand{\FORALL}{\reserved{forall}}
-\newcommand{\ASS}{\texttt{ := }}
+\newcommand{\ASS}{$\;\coloneqq\;$}
 \newcommand{\RETURN}{\reserved{return}}
 \newcommand{\REPEAT}{\reserved{repeat}}
 \newcommand{\LOOP}{\reserved{loop}}
@@ -245,7 +246,7 @@
 
 \newcommand{\letinparnl}[5]{\begin{aligned}[t]\mathtt{let}\;&\binding{#1}{#2};\;\binding{#3}{#4}\\\mathtt{in}\;&{#5}\end{aligned}}
 
-\newcommand{\itenll}[3]{\begin{aligned}[t]&\mathtt{if}\;{#1}\\[-0.2em]&\mathtt{then}\;{#2}\\[-0.2em]&\mathtt{else}\;{#3}\end{aligned}}
+\newcommand{\itenll}[3]{\begin{aligned}[t]&\mathtt{if}\;{#1}\;\mathtt{then}\\[-0.2em]&\quad{#2}\\[-0.2em]&\mathtt{else}\;{#3}\end{aligned}}
 
 \newcommand{\itenl}[3]{\begin{aligned}[t]\mathtt{if}\;{#1}\;&\mathtt{then}\;{#2}\\&\mathtt{else}\;{#3}\end{aligned}}
 

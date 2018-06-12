@@ -10,7 +10,7 @@ We give (rather standard) definitions of our programming language and its semant
 
 We define a programming language with assignments to typed variables, \ITE, and sequential composition. We omit variable declarations in our language and instead assume for each program a set of program variables $V$ and a type assignment $\context$. $\context$ is a function that maps each program variable into a type. Each type is either $\pint$, $\pbool$, or $\parray(\sigma,\tau)$, where $\sigma$ and $\tau$ are types of array indexes and array values, respectively. In the sequel we will assume that $V$ and $\context$ are arbitrary but fixed.
 
-Programs in our language select and update elements of arrays, including multidimentional arrays. We do not introduce a distinguished type for multidimentional arrays but instead use nested arrays. We write $\parray(\sigma_1,\ldots,\sigma_n,\tau)$, $n > 1$, to mean the nested array type $\parray(\sigma_1,\allowbreak\parray(\ldots,\parray(\sigma_n,\tau)\ldots)).$
+Programs in our language select and update elements of arrays, including multidimensional arrays. We do not introduce a distinguished type for multidimensional arrays but instead use nested arrays. We write $\parray(\sigma_1,\ldots,\sigma_n,\tau)$, $n > 1$, to mean the nested array type $\parray(\sigma_1,\allowbreak\parray(\ldots,\parray(\sigma_n,\tau)\ldots)).$
 
 \begin{definition}\label{def:boogie/expression}
 An \emph{expression} of the type $\tau$ is defined inductively as follows.
@@ -110,7 +110,7 @@ Let $\stmt$ be a statement. The \emph{interpretation} $\interp{\stmt}$ is a mapp
 
 Our setting is FOOL extended with the theory of linear integer arithmetic, the polymorphic theory of arrays~\cite{VampireAndFOOL}, and the polymorphic theory of first class tuples (Section~\ref{sec:boogie/tuples}). The theory of linear integer arithmetic includes the sort $\Z$, the predicate symbol $<$, and the function symbols $+$, $-$, and $\times$. The theory of arrays includes the sort $\arrayt(\tau,\sigma)$ for all sorts $\tau$ and $\sigma$, and function symbols $\selectf$ and $\storef$. The function symbol $\selectf$ represents a binary operation of extracting an array element by its index. The function symbol $\storef$ represents a ternary operation of updating an array at a given index with a given value. We point out that sorts $\bool$, $\Z$, and $\arrayt(\sigma,\tau)$ mirror types $\pbool$, $\pint$ and $\parray(\sigma,\tau)$ of our programming language, and have the same interpretations.
 
-We represent multidimentional arrays in FOOL as nested arrays\footnote{Multidimentional arrays can be represented in FOOL also as arrays with tuple indexes. We do not discuss such representation in this work.}. To this end we
+We represent multidimensional arrays in FOOL as nested arrays\footnote{Multidimensional arrays can be represented in FOOL also as arrays with tuple indexes. We do not discuss such representation in this work.}. To this end we
 \begin{enumerate*}[label=(\roman*)]
 %  \item write $\arrayt(\sigma_1,\ldots,\sigma_n,\tau)$, where $n > 1$, to mean $\arrayt(\sigma_1,\allowbreak\arrayt(\ldots,\allowbreak\arrayt(\sigma_n,\allowbreak\tau)\ldots));$
   \item inductively define $\select{a}{i_1,\allowbreak\ldots,\allowbreak i_n}$, $n > 1$, to be $\select{\select{a}{i_1}}{i_2,\ldots,i_n}$; and

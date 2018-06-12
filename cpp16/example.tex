@@ -93,7 +93,7 @@ Figure~\ref{fig:seqITE} in FOOL. Note that each expression from the program appe
 
 We now explain how the encoding of the next state values of program
 variables can be generated automatically.
-We consider programs using assignments \texttt{:=},
+We consider programs using assignments $\coloneqq$,
 \ITE\ and sequential composition $;$.
 We begin by making an assumption about the structure of programs (which we relax later). A program $P$ is in \emph{restricted form} if for any subprogram of the form \IF\ e \THEN\ $P_1$ \ELSE\ $P_2$ the subprograms $P_1$ and $P_2$ only make assignments to the same single variable. Given a program $P$ in restricted form let us define its translation $[P]$ inductively as follows:
 %
@@ -101,7 +101,7 @@ We begin by making an assumption about the structure of programs (which we relax
 	\item $[$x\ASS e$]$ is $\letin{x}{e}{x}$;
 	\item $[$\IF\ e \THEN\ $P_1$ \ELSE\ $P_2]$, where $P_1$ and
           $P_2$ update $x$,  is $\letin{x}{\ite{e}{[P_1]}{[P_2]}}{x}$;
-	\item $[P_1$;$P_2]$ is $\mathtt{let}~D~\mathtt{in}~[P_2]$ where $[P_1]$ is $\mathtt{let}~D~\mathtt{in}~x$.
+	\item $[P_1$;\;$P_2]$ is $\mathtt{let}~D~\mathtt{in}~[P_2]$ where $[P_1]$ is $\mathtt{let}~D~\mathtt{in}~x$.
 \end{itemize}
 %
 Given a program $P$, the next state value for variable $x$ can be
@@ -129,14 +129,13 @@ as assignments in the translation and assignments can only be made to single var
 To demonstrate the limitations of this restriction let us consider the simple program in Figure~\ref{fig:tmpSwap} that ensures that x is not larger than y. We cannot apply the translation as the conditional updates three variables. To generalise the approach we can extend FOOL with \emph{tuple expressions}, let us call this extension \foolp. In this extended logic the next state values for Figure~\ref{fig:tmpSwap} can be encoded as follows:
 %
 \[
-\begin{array}{ll}
-\mathtt{let}\; (x,y,t) =& \mathtt{if}\; x > y \;\mathtt{then} \\
-&\quad\mathtt{let}\; (x,y,t) = (x,y,x) \;\mathtt{in}\\
-&\quad\quad\mathtt{let}\; (x,y,t) = (y,y,t) \;\mathtt{in}\\
-&\quad\quad\quad\mathtt{let}\;(x,y,t) = (x,t,t)  \;\mathtt{in}\; (x,y,t) \\
-&\mathtt{else}\; (x,y,t)\\
-\mathtt{in}\; (x,y,t) \\
-\end{array}
+  \letnl{(x,y,t)}{\itenll{x > y}
+                 {\letinnl{(x,y,t)}{(x,y,x)}
+                          {\letinnl{(x,y,t)}{(y,y,t)}
+                                   {\letin{(x,y,t)}{(x,t,t)}
+                                            {(x,y,t)}}}}
+                 {(x,y,t)}}
+        {(x,y,t)}
 \]
 %
 We now give a brief sketch of the extended logic \foolp\ and the associated translation. We omit details since its full definition and semantics would require essentially repeating definitions from \cite{FOOL}.  \foolp\ extends \fool\ by tuples; for all expressions $t_i$ of type $\sigma_i$ we can use a \emph{tuple expression} $(t_1,\ldots,t_n)$ of type $(\sigma_1,\ldots,\sigma_n)$. The logic should also include a suitable tuple projection function, which we do not discuss here.
@@ -147,7 +146,7 @@ gives the next state values of {\it all} variables updated by the program. Given
 \begin{itemize}
 	\item $[\text{x}_i \text{\ASS} e]$ is $\letin{(\ldots,x_i,\ldots)}{(\ldots,e,\ldots)}{(x_1,\ldots,x_n)}$,
 	\item $[$\IF\ e \THEN\ $P_1$ \ELSE\ $P_2]$ is $\letin{(x_1,\ldots,x_n)}{\ite{e}{[P_1]}{[P_2]}}{(x_1,\ldots,x_n)},$
-	\item $[P_1$;$P_2]$ is $\mathtt{let}~D~\mathtt{in}~[P_2]$ where $[P_1]$ is $\mathtt{let}~D~\mathtt{in}~(x_1,\ldots,x_n)$.
+	\item $[P_1$;\;$P_2]$ is $\mathtt{let}~D~\mathtt{in}~[P_2]$ where $[P_1]$ is $\mathtt{let}~D~\mathtt{in}~(x_1,\ldots,x_n)$.
 \end{itemize}
 This translation is bounded by $O(v\cdot n)$, where $v$ is the number
 of variables in the program and $n$ is the program size (number of
@@ -190,8 +189,8 @@ interesting task for future work.
     (\exists i) (0 \leq i < a \wedge A[i] > 0 \wedge B[p] = A[i]))$\\[1em]
     \WHILE\ ($a \leq k$) \DO \\ \inc
       \IF\ ($A[a] > 0$) \\ \inc
-        \THEN\ \=\+ $B[b]$ \ass\ $A[a]$\semicol $b$ \ass\ $b+1$\semicol \\ \dec
-        \ELSE\ \=\+ $C[c]$ \ass\ $A[a]$\semicol $c$ \ass\ $c+1$\semicol \\ \dec \dec
+        \THEN\ \=\+ $B[b]$ \ass\ $A[a]$\semicol\; $b$ \ass\ $b+1$\semicol \\ \dec
+        \ELSE\ \=\+ $C[c]$ \ass\ $A[a]$\semicol\; $c$ \ass\ $c+1$\semicol \\ \dec \dec
       $a$ \ass\ $a+1$\semicol \\ \dec
     \OD\\[.5em]
     \reserved{assert} $(\forall p)(0 \leq p<b \implies B[p]> 0)$

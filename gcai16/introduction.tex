@@ -36,14 +36,14 @@ While this translation provides an easy way to support \folb{} in existing first
 it is not necessarily efficient.
 A more efficient translation can convert a \folb{} formula directly to a set of first-order clauses, skipping the intermediate step of converting FOOL to FOL. This way, the translation can integrate known clausification techniques and improve the quality of the resulting clausal normal form. 
 
-In this paper  we present a new clausification algorithm, called \nfcnf{},  that translates a \folb{} formula to an equisatisfiable set of first-order clauses. 
+In this paper  we present a new clausification algorithm \nfcnf{} that translates a \folb{} formula to an equisatisfiable set of first-order clauses. 
 Our algorithm 
 avoids producing large numbers  of duplicate clauses and new symbols during clausification and 
 also avoids clauses that can make theorem provers inefficient.
 We show that in practice this leads to a significant increase in the performance of a theorem prover).
 %that implements it compared e.g. to the use of the translation to full first-order logic from~\cite{FOOL}.
 
-Our \nfcnf{} algorithm  is a non-trivial  extension of the recent \newcnf{} clausification algorithm for FOL~\cite{newcnf_fol}. The extension employs several clausification techniques for handling the non-FOL features of FOOL, namely boolean terms and \ITE, \LETIN\ and tuple expressions. These techniques comprise the contributions of this work and are listed below.
+Our \nfcnf{} algorithm  is a non-trivial  extension of the recent \newcnf{} clausification algorithm for FOL~\cite{newcnf_fol}. The extension employs several clausification techniques for handling the features of FOOL, namely boolean terms and \ITE, \LETIN\ and tuple expressions. These techniques comprise the contributions of this work and are listed below.
 
 % To this end,
 % we (i) skolemise boolean variables using predicates and not functions and thus avoid introducing boolean equalities, 

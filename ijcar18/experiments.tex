@@ -59,7 +59,7 @@ It is not hard to show that if a program with a loop satisfies its specification
 %Let us make the following remark regarding our examples and their formalisation in Boogie.
 We wrote our example programs with loops as well as their loop-free unrolled versions in the Boogie language. Boogie can unroll loops automatically, but introduces \verb'goto' statements that our translation does not support. For this reason, we used the loop unrolling described above. 
 
-%Each of our Boogie programs implements a single procedure \verb'main'. We annotated every procedure with its pre-conditions using the keyword \verb'requires' and its post-conditions using the keyword \verb'ensures'. We annotated each loop with its invariants using the keyword \verb'invariant'. Some of our programs use multidimentional arrays. Boogie supports both multidimentional arrays and nested arrays. We used the latter to represent our programs.
+%Each of our Boogie programs implements a single procedure \verb'main'. We annotated every procedure with its pre-conditions using the keyword \verb'requires' and its post-conditions using the keyword \verb'ensures'. We annotated each loop with its invariants using the keyword \verb'invariant'. Some of our programs use multidimensional arrays. Boogie supports both multidimensional arrays and nested arrays. We used the latter to represent our programs.
 
 An example of our loop unrolling is available at \url{http://www.cse.chalmers.se/~evgenyk/ijcar18/}. It shows the \texttt{maxarray} program with a loop from our collection and a program generated from \texttt{maxarray} by unrolling its loop twice.
 
