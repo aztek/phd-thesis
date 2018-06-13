@@ -3,10 +3,10 @@
 \usepackage[nottoc]{tocbibind}
 
 \theoremstyle{definition}
-\newtheorem{definition}{Definition}
-\newtheorem{theorem}{Theorem}
-\newtheorem{lemma}{Lemma}
-\newtheorem{example}{Example}
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}{Lemma}[chapter]
+\newtheorem{example}{Example}[chapter]
 \newtheorem*{example*}{Example}
 
 \usepackage{fancyhdr}
@@ -58,6 +58,10 @@
   {}%[\vspace{-0.1em}]
 \titlespacing*{\section}{0pt}{20pt}{6pt}
 
+\usepackage{afterpage}
+
+\definecolor{chaptertitle}{RGB}{164, 238, 246}
+
 % paper chapter headers
 \newcommand{\paperchapter}[5]{%
   \chapter[#1]{#2}
@@ -65,7 +69,9 @@
   {\vspace{1.5em}\paragraph{Abstract.}{{#4}}}
   \vfill
   {\noindent{#5}}
+  \pagecolor{chaptertitle}
   \cleardoublepage
+  \afterpage{\nopagecolor}
 }
 
 % \usepackage{secdot}

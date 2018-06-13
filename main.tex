@@ -7,6 +7,7 @@
 \usepackage{pifont}
 \usepackage{tikz}
 \usepackage{color}
+\usepackage{xcolor}
 \usepackage{proof}
 \usepackage{url}
 \usepackage{multirow}
@@ -47,18 +48,16 @@
 \label{chap:intro}
 \input{introduction}
 
-% \setcounter{secnumdepth}{0}
-
-\def\paperSevenContentsTitle{Checking Network Reachability Properties with\\Automated Reasoning in First-Order Logic}
-\def\paperSevenChapterTitle{Checking Network Reachability\\Properties with Automated Reasoning\\in First-Order Logic}
-\def\paperSevenAuthors{Evgenii~Kotelnikov and Pavle Suboti\'{c}}
-\def\paperSevenAbstract{Verification of computer networks is an important and challenging task, often tackled with constraint solving and automated reasoning. This work presents an approach for checking and discovering reachability properties of virtual private cloud networks using automated reasoning in first-order logic. Reachability properties of a network express whether its configuration allows the network traffic to flow between given nodes of the network. We model networks with Horn clauses and check first-order properties of these models using the Vampire theorem prover.}
-\def\paperSevenPublication{A technical report based on a joint work with Byron~Cook, Temesghen Kahsai and Sean~McLaughlin, 2018.}
-\paperchapter{\paperSevenContentsTitle}
-             {\paperSevenChapterTitle}
-             {\paperSevenAuthors}
-             {\paperSevenAbstract}
-             {\paperSevenPublication}
+\def\paperSixContentsTitle{Checking Network Reachability Properties with\\Automated Reasoning in First-Order Logic}
+\def\paperSixChapterTitle{Checking Network Reachability\\Properties with Automated Reasoning\\in First-Order Logic}
+\def\paperSixAuthors{Evgenii~Kotelnikov and Pavle Suboti\'{c}}
+\def\paperSixAbstract{Verification of computer networks is an important and challenging task, often tackled with constraint solving and automated reasoning. This work presents an approach for checking and discovering reachability properties of virtual private cloud networks using automated reasoning in first-order logic. Reachability properties of a network express whether its configuration allows the network traffic to flow between given nodes of the network. We model networks with Horn clauses and check first-order properties of these models using the Vampire theorem prover.}
+\def\paperSixPublication{A technical report based on a joint work with Byron~Cook, Temesghen Kahsai and Sean~McLaughlin, 2018.}
+\paperchapter{\paperSixContentsTitle}
+             {\paperSixChapterTitle}
+             {\paperSixAuthors}
+             {\paperSixAbstract}
+             {\paperSixPublication}
 \label{chap:aws}
 \include{aws/main}
 
@@ -105,7 +104,7 @@
 \def\paperFourChapterTitle{A FOOLish Encoding of the Next State Relations of Imperative Programs}
 \def\paperFourAuthors{Evgenii~Kotelnikov, Laura~Kov\'{a}cs and Andrei~Voronkov}
 \def\paperFourAbstract{Automated theorem provers are routinely used in program analysis and verification for checking program properties. These properties are translated from program fragments to formulas expressed in the logic supported by the theorem prover. Such translations can be complex and require deep knowledge of how theorem provers work in order for the prover to succeed on the translated formulas. Our previous work introduced FOOL, a modification of first-order logic that extends it with syntactical constructs resembling features of programming languages. One can express program properties directly in FOOL and leave translations to plain first-order logic to the theorem prover. In this paper we present a FOOL encoding of the next state relations of imperative programs. Based on this encoding we implement a translation of imperative programs annotated with their pre- and post-conditions to partial correctness properties of these programs. We present experimental results that demonstrate that program properties translated using our method can be efficiently checked by the first-order theorem prover Vampire.}
-\def\paperFourPublication{Published in \EK{TODO: IJCAR 2018}}
+\def\paperFourPublication{Published in the \emph{Proceedings of the 8th International Joint Conference on Automated Reasoning}, pages \EK{XX--XX}. Springer, 2018.}
 \paperchapter{\paperFourContentsTitle}
              {\paperFourChapterTitle}
              {\paperFourAuthors}
@@ -118,7 +117,7 @@
 \def\paperFiveChapterTitle{TFX: The TPTP Extended Typed\\First-Order Form}
 \def\paperFiveAuthors{Geoff~Sutcliffe and Evgenii~Kotelnikov}
 \def\paperFiveAbstract{The TPTP world is a well established infrastructure that supports research, development, and deployment of Automated Theorem Proving systems for classical logics. The TPTP language is one of the keys to the success of the TPTP world. Originally the TPTP world supported only first-order clause normal form (CNF). Over the years support for full first-order form (FOF), monomorphic typed first-order form (TF0), rank-1 polymorphic typed first-order form (TF1), monomorphic typed higher-order form (TH0), and rank-1 polymorphic typed higher-order form (TH1), have been added. TF0 and TF1 together form the TFF language family; TH0 and TH1 together form the THF language family. This paper introduces the eXtended Typed First-order form (TFX), which extends TFF to include boolean terms, tuples, conditional expressions, and let expressions.}
-\def\paperFivePublication{Published in \EK{TODO: PAAR 2018}}
+\def\paperFivePublication{Published in the \emph{Proceedings of the 6th Workshop on Practical Aspects of Automated Reasoning}, pages \EK{XX--XX}. Springer, 2018.}
 \paperchapter{\paperFiveContentsTitle}
              {\paperFiveChapterTitle}
              {\paperFiveAuthors}

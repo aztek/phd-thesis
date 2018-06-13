@@ -1,12 +1,12 @@
 % !TEX root = ../main.tex
-{\small
 \begin{tabular}[!h]{l@{\hskip 0pt}l}
   \begin{tabular}[!h]{l}
-    \begin{minipage}[t]{0.45\textwidth}
+    \begin{minipage}[t]{0.47\textwidth}
       {\begin{lstlisting}[language=appendixcpp,title=\texttt{count\_two}]
 int a[];
 int x = 0, y = 0;
-for (int i = 0; i < n; i++) {
+for (int i = 0; i < n; i++)
+{
   if (a[i] > 0) x++;
   else y++;
 }
@@ -14,28 +14,14 @@ assert(x + y == n);
 \end{lstlisting}}
     \end{minipage}
   \\
-    \begin{minipage}[t]{0.45\textwidth}
-      {\begin{lstlisting}[language=appendixcpp,title=\texttt{count\_two\_flag}]
-int a[];
-bool b;
-int x = 0, y = 0;
-for (int i = 0; i < n; i++) {
-  b = a[i] > 0;
-  if (b) x++;
-  else y++;
-}
-assert(x + y == n);
-\end{lstlisting}}
-    \end{minipage}
-  \\
-    \begin{minipage}[ht]{0.45\textwidth}
+    \begin{minipage}[ht]{0.47\textwidth}
       {\begin{lstlisting}[language=appendixcpp,title=\texttt{count\_three}]
 int a[];
 int x = 0, y = 0, z = 0;
-for (int i = 0; i < n; i++) {
-  if (a[i] < 0) {
-    x++;
-  } else {
+for (int i = 0; i < n; i++)
+{
+  if (a[i] < 0) x++;
+  else {
     if (a[i] > 5) y++;
     else z++;
   }
@@ -43,29 +29,46 @@ for (int i = 0; i < n; i++) {
 assert(x + y + z == n);
 \end{lstlisting}}
     \end{minipage}
-  \end{tabular}
-&
-  \begin{tabular}[!h]{l}
-    \begin{minipage}[t]{0.45\textwidth}
+  \\
+    \begin{minipage}[t]{0.47\textwidth}
       {\begin{lstlisting}[language=appendixcpp,title=\texttt{two\_arrays}]
 int a[], b[];
-for (int i = 0; i < n; i++) {
+for (int i = 0; i < n; i++)
+{
   if (a[i] > b[i]) {
     int t = a[i];
     a[i] = b[i];
     b[i] = t;
   }
 }
-for (int i = 0; i < n; i++) {
+for (int i = 0; i < n; i++)
+{
   assert(a[i] <= b[i]);
 }
 \end{lstlisting}}
     \end{minipage}
+  \end{tabular}
+&
+  \begin{tabular}[!h]{l}
+    \begin{minipage}[t]{0.47\textwidth}
+      {\begin{lstlisting}[language=appendixcpp,title=\texttt{count\_two\_flag}]
+int a[];
+bool b;
+int x = 0, y = 0;
+for (int i = 0; i < n; i++)
+{
+  b = a[i] > 0;
+  if (b) x++; else y++;
+}
+assert(x + y == n);
+\end{lstlisting}}
+    \end{minipage}
   \\
-    \begin{minipage}[t]{0.45\textwidth}
+    \begin{minipage}[t]{0.47\textwidth}
       {\begin{lstlisting}[language=appendixcpp,title=\texttt{three\_arrays}]
 int a[], b[], c[];
-for (int i = 0; i < n; i++) {
+for (int i = 0; i < n; i++)
+{
   if (a[i] > b[i]) {
     int t = a[i];
     a[i] = b[i];
@@ -83,7 +86,8 @@ for (int i = 0; i < n; i++) {
     }
   }
 }
-for (int i = 0; i < n; i++) {
+for (int i = 0; i < n; i++)
+{
   assert(a[i] <= b[i]);
   assert(b[i] <= c[i]);
 }
@@ -91,4 +95,3 @@ for (int i = 0; i < n; i++) {
     \end{minipage}
   \end{tabular}
 \end{tabular}
-}

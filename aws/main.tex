@@ -36,38 +36,20 @@
 
 \newcommand{\sem}[1]{(#1)} % types
 
-%qed
-\def\eolqed{\hspace{\stretch1}\ensuremath\qedsymbol}
-
-\newcommand{\PS}[1]{\textcolor{blue}{PS: {{#1}}}}
-
 %-------------------------------------------------------------------------------
 \section{Introduction}
 \label{sect:aws/introduction}
-Computer networks are typically built from a variety of specialized heterogeneous devices running complex distributed 
-protocols. Network administrators, responsible for operability of a network, must configure and deploy every protocol 
-separately on each individual device. In an effort to simplify this task, \emph{software-defined networking} (SDN)~\cite{SDN} 
-has been proposed as a modern alternative. SDN provides an layer of software that is installed on each of the network 
-devices and a logically-centralized controller that manages connectivity settings of each device. Administrators can 
-therefore manage networks at a higher level of abstraction by programming them from the controller, typically in a domain 
-specific language~\cite{DBLP:journals/cm/FosterGRSFKMRRSWH13}. The SDN architecture is often credited with flexibility and ease 
-of maintenance compared to traditional networks~\cite{benzekki2016software}.
+Computer networks are typically built from a variety of specialized heterogeneous devices running complex distributed protocols. Network administrators, responsible for operability of a network, must configure and deploy every protocol separately on each individual device. In an effort to simplify this task, \emph{software-defined networking} (SDN)~\cite{SDN} has been proposed as a modern alternative. SDN provides an layer of software that is installed on each of the network devices and a logically-centralized controller that manages connectivity settings of each device. Administrators can therefore manage networks at a higher level of abstraction by programming them from the controller, typically in a domain specific language~\cite{DBLP:journals/cm/FosterGRSFKMRRSWH13}. The SDN architecture is often credited with flexibility and ease of maintenance compared to traditional networks~\cite{benzekki2016software}.
 
-Modern platforms for cloud computing such as Amazon Elastic Compute Cloud, Google Compute Engine and Azure Virtual Machines offer their users means of configuring \emph{virtual private networks} in the style of SDN. Administrators of such networks use a centralized control panel or a specialized API to launch network instances, set up subnets and route tables, and tune connectivity and security settings of the network. Despite the increase of usability provided by the cloud platforms, virtual private networks remain prone to misconfigurations. These 
-misconfigurations are caused by the complexity of large-scale enterprise networks and might lead to downtimes and breaches of 
-security. Discovering such misconfiguration in industrial-sized networks can be both extremely labor and computationally intensive. Therefore, 
-verifying the correctness of network configurations is an important and challenging task.
+Modern platforms for cloud computing such as Amazon Elastic Compute Cloud, Google Compute Engine and Azure Virtual Machines offer their users means of configuring \emph{virtual private cloud} (VPC) networks in the style of SDN. Administrators of such networks use a centralized control panel or a specialized API to launch network nodes, set up subnets and route tables, and tune connectivity and security settings of the network. Despite the increase of usability provided by the cloud platforms, VPC networks remain prone to misconfigurations. These misconfigurations are caused by the complexity of large-scale enterprise networks and might lead to downtimes and breaches of security. Discovering such misconfigurations in industrial-sized networks is both labor-intensive and computationally hard. %Therefore, verifying the correctness of network configurations is an important and challenging task.
 
-The presense of a centralized network configuration facilitates automated analysis and synthesis of SDN networks. Indeed, several tools have been 
-developed~\cite{batfish,jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15,DBLP:conf/pldi/BallBGIKSSV14,Veriflow,ConfigChecker,Anteater,DBLP:conf/cav/El-HassanyTVV17} in an effort to verify various SDN components. These tools employ specialized algorithms~\cite{Veriflow} as well as general purpose 
-reasoning engines such as 
-\Datalog~\cite{muZ, DBLP:conf/cav/El-HassanyTVV17}, BDD~\cite{ConfigChecker}, SMT~\cite{jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15} 
+The presense of a centralized network configuration facilitates automated analysis and synthesis of SDN networks. Indeed, several tools have been developed~\cite{batfish,jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15,DBLP:conf/pldi/BallBGIKSSV14,Veriflow,ConfigChecker,Anteater,DBLP:conf/cav/El-HassanyTVV17} in an effort to verify various SDN components. These tools employ specialized algorithms~\cite{Veriflow} as well as general purpose reasoning engines such as \Datalog~\cite{muZ, DBLP:conf/cav/El-HassanyTVV17}, BDD~\cite{ConfigChecker}, SMT~\cite{jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15} 
 and SAT~\cite{Anteater,DBLP:conf/pldi/BallBGIKSSV14}.
 
 %
 % Problem 1: Size of networks, \Datalog works good in this however certain subproblems are hard for datalog
 %
-Despite the vast body of available tools, the problem of practical verification of enterprise networks still remains a 
+Despite the vast body of available tools, the problem of practical verification of enterprise networks remains a 
 challenge. Firstly, the size and intricacy of modern industrial-sized networks results in very difficult constraint 
 satisfaction problems. While most network verification 
 tools depend on a single constraint solving paradigm, we find that no single solver achieves best performance on all 
@@ -75,10 +57,14 @@ verification problems. Secondly, general purpose solvers are very
 performance-sensitive to problem encodings. Effective encodings are often a ``black art'' for users, resulting in tedious trial 
 and error for a user without a good understanding of the implementation of the underlying solver.
 
-%
-% Explain our approach and tie back to in a nutshell how we solve problems 1 and 2
-%
-In this work we verify configurations of virtual private cloud networks. The traffic flow in these networks is typically controlled by the rules assigned to various networking components provided by the cloud platform. These components include subnets, route tables, access control lists, internet gateways, and others. We are interested in checking \emph{network reachability properties}, that is, properties that express whether the network traffic is able to flow between given nodes of a network. Let us illustrate these properties using the following example of a virtual private cloud network. 
+\EK{Our ultimate goal is to design a portfolio of complementary constraint solvers... Our motivation for using a portfolio of solvers rather than a single solver is to leverage the advantages of different types of solvers on different types of properties.
+}
+
+In this work we check reachability properties of VPC networks using automated theorem provers for first-order logic.
+
+\EK{We plan to integrate this approach in our ongoing work on portfolios.}
+
+We are interested in checking properties that express whether the network traffic is able to flow between given nodes of a VPC network. The traffic flow in these networks is typically controlled by the rules assigned to various networking components provided by the cloud platform. These components include subnets, route tables, access control lists, internet gateways, and others. Let us illustrate these properties using the following example of a VPC network. 
 \begin{figure*}[th]
 \centering\includegraphics[width=1.0\textwidth]{./aws/fig/vpc.pdf}
 \end{figure*}
@@ -95,19 +81,17 @@ The network administrator might also want to know which networking components sa
 All network nodes that have the port 22 (SSH) accessible from the internet.
 \end{example}
 
-We will refer to questions that network administrators might want to answer, such as the ones in Examples~\ref{prop:bool-property} and \ref{prop:list-property}, as \emph{network questions}. In particular, we will refer to questions similar to Example~\ref{prop:bool-property} as \emph{boolean questions}, because they expect a true-or-false answer, and to questions similar to Example~\ref{prop:list-property} as \emph{list questions}, because they expect a list of networking components as an answer.
+We will refer to questions that network administrators might want to answer, such as the ones in Examples~\ref{prop:bool-property} and \ref{prop:list-property}, as \emph{network questions}. In particular, we will refer to questions similar to Example~\ref{prop:bool-property} as \emph{boolean questions}, because an answer to them is ``yes'' or ``no'', and to questions similar to Example~\ref{prop:list-property} as \emph{list questions}, because an answer to them is a list of networking components. Each boolean question can be equivalently phrased as a list question such that the answer to the boolean question is ``yes'' iff the answer to the correspondent list questions is not empty. However, we distinguish these two types of questions because, as we show later, we can more efficiently answer them using different techniques.
 
-Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialized tools. In this work we answer network questions by expressing them as problems in first-order logic and then solving these problems using automated theorem provers.
+Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialized tools. In this work we employ finite model builders and saturation-based theorem provers. To this end, we build static models of VPC networks (Section~\ref{sect:aws/specification}), translate the network questions about these models to problems in first-order logic (Section~\ref{sect:aws/fol}), and check them with finite model builders and saturation-based theorem provers (Section~\ref{sect:aws/fol-provers}).
 
-We answer network questions using a combination of a \Datalog engines and automated theorem provers for first-order logic. We demonstrate that by using multiple types of constraint solvers we are able to pick the most appropriate solver for a given network question. This allows us to increase the overall efficiency of answering network questions. Consider the following example. Each boolean question can be equivalently phrased as a list question~--- the answer to the boolean question is true iff the answer to the correspondent list questions is not empty. However, we distinguish these two types of questions because, as we show later, we can more efficiently answer list questions with \Datalog engines and answer boolean questions with saturation-based theorem prover for first-order logic.
 
-\EK{Also mention that we use two types of theorem provers to leverage the strengths of each one of them.}
 
-We check reachability properties of virtual private cloud networks using automated theorem provers for first-order logic. To this end, we build static models of the networks, translate the properties of these models to problems in first-order logic, and check them with finite model builders and saturation-based theorem provers.
+answer network questions by expressing them as problems in first-order logic and then solving these problems using .
 
-Our motivation for using a portfolio of solvers rather than a single solver is to leverage the advantages of different types of solvers on different types of properties.
+we can more efficiently answer list questions with finite model builders and answer boolean questions with saturation-based theorem prover. This allows us to answer network questions more efficiently.
 
-The rest of the paper is organized as follows. Section~\ref{sect:aws/specification} describes the network reachability properties and the network models. Sections \ref{sect:aws/datalog}, and \ref{sect:aws/fol} present our translations of network properties for \Datalog engines, SMT solvers, and first-order theorem provers. Section~\ref{sect:aws/experiments} presents experimental results obtained by running constraint solvers on problems which we constructed from a collection of network configurations. Section~\ref{sect:aws/related} presents related work, and Section~\ref{sect:aws/conclusion} contains a discussion of this work and suggests future work.
+%The paper is organized as follows. Section~\ref{sect:aws/specification} describes the network reachability properties and the network models. Section \ref{sect:aws/fol} presents our translation of network properties for first-order theorem provers. Section~\ref{sect:aws/related} presents related work, and Section~\ref{sect:aws/conclusion} contains a discussion of this work and suggests future work.
 
 \paragraph{Contributions.} Our contributions are summarized as follows: \begin{enumerate}
 \item We explore efficient encodings for two types of backend solvers, including 
@@ -118,9 +102,9 @@ saturation-based solvers, which to the best of our knowledge, have not been used
 %-------------------------------------------------------------------------------
 \section{Network Reachability Properties}
 \label{sect:aws/specification}
-We answer network questions \emph{statically}, that is, instead of sending packets in a network, we build a model of the network and reason about this model. Our \emph{network model} consists of two parts, the \emph{formal specification} and the \emph{snapshot} of the network. The specification formalizes the semantics of each of the components available in the network. For example, the formal specification describes how a route table directs network traffic in a subnet or in which order a firewall applies rules in the access control list. The snapshot describes the topology of the given network. For example, the snapshot contains the list of network nodes, subnets, and their route tables. Naturally, the formal specification in the model of each particular virtual private network is the same, whereas the snapshot differs. We express network questions in the language of many-sorted first-order logic. In the remainder of this section we describe syntax and semantics of network models and network questions.
+We answer network questions \emph{statically}, that is, instead of sending packets in a network, we build a static model of the network and reason about properties of this model. Our \emph{network model} consists of two parts, the \emph{formal specification} and the \emph{snapshot} of the network. The specification formalizes the semantics of each of the components available in the network. For example, the formal specification describes how a route table directs network traffic in a subnet or in which order a firewall applies rules in an access control list. The snapshot describes the topology of the given network. For example, the snapshot contains the list of network nodes, subnets, and their route tables. Naturally, the formal specification in the model of each particular VPC network is the same, whereas the snapshot differs. We express network questions in the language of many-sorted first-order logic. In the remainder of this section we describe syntax and semantics of network models and network questions.
 
-\EK{We might want to make it clear that the models and the queries are given to us. Otherwise we'd have to justify why we use Datalog for the spec and FOL for the queries.}
+\EK{We might want to make it clear that the models and the queries are given to us. Otherwise we'd have to justify why we use Datalog for the spec and first-order logic for the queries.}
 
 \subsection{Network Models}
 \label{sect:aws/reachability/spec}
@@ -128,7 +112,7 @@ We formally specify networks in a logic programming style. A network model is a 
 
 A \emph{signature} of the network model is a triple $(T, C, P),$ where $T$ is a set of \emph{types}, $C$ is a set of \emph{constants}, and $P$ is a set of \emph{predicates}. We assign each constant with a type $\tau\in T$ and each predicate with a type $\tau_1\times\ldots\times\tau_n$ $(n\ge0)$, where $\tau_i\in T$ for each $1\leq i \leq n$. We assume a countable infinite set of \emph{variables}. We assign each variable with a type $\tau\in T$. We call a \emph{term} of the type $\tau\in T$ a constant or a variable of that type. We call an \emph{atom} an expression of the form $p(t_1,\ldots,t_n)$, where $n>0$, $p\in P$ is a predicate of the type $\tau_1\times\ldots\times\tau_n$, and each $t_i$, $1\leq i \leq n$ is a term of the type $\tau_i$. We call a \emph{literal} an atom or its negation.
 
-A \emph{rule} is a Horn clause of the form $A\leftarrow L_1 \wedge \ldots \wedge L_n$ $(n \ge 0)$, where $A$ is an atom which we call the \emph{head} of the rule and each of $B_1,\ldots,B_n$ is a literal. If $n=0$ and all arguments of $A$ are constants then we call such rule a fact. We call a \emph{definition} of the predicate $p \in P$ the set of all rules in the network model that use $p$ in their head.
+A \emph{rule} is a Horn clause of the form $A\leftarrow L_1 \wedge \ldots \wedge L_n$ $(n \ge 0)$, where the \emph{head} of the rule $A$ is an atom and each of $B_1,\ldots,B_n$ is a literal. If $n=0$ and all arguments of $A$ are constants then we call such rule a fact. We call a \emph{definition} of the predicate $p \in P$ the set of all rules in the network model that use $p$ in their head.
 
 We assume that the signature contains
 \begin{enumerate*}[label=(\roman*)]
@@ -187,7 +171,7 @@ The boolean question in Example~\ref{prop:bool-property} is expressed as the fol
 % (\forall \mathit{eni}:\type{eni})(\pred{eniOk(\mathit{eni})\vee\neg\pred{eniOk}(\mathit{eni})})
 % \]
 % % all Eni: (eni-ok(Eni) || !eni-ok(Eni))
-% If this query was a formula in FOL, it would be a tautology. However, we interpret the property as true iff there exists at least one ENI in the network, that is, if the $\type{eni}$ type is inhabited by at least one value.}
+% If this query was a formula in first-order logic, it would be a tautology. However, we interpret the property as true iff there exists at least one ENI in the network, that is, if the $\type{eni}$ type is inhabited by at least one value.}
 
 The list questions in Example~\ref{prop:list-property} is expressed as the following formula with the free variables $i$ of the type $\type{instance}$ and $e$ of the type $\type{eni}$. 
 \begin{equation}\label{eq:list-property}
@@ -213,21 +197,19 @@ All predicates and constants used in Formulas~\ref{eq:bool-property} and \ref{eq
 
 %-------------------------------------------------------------------------------
 \section{Checking Properties with Theorem Provers}
-\label{sect:aws/fol}
+\label{sect:aws/fol-provers}
 % The continuous advances in automated reasoning have made theorem provers into powerful tools capable of efficiently solving problems coming from real world domains. %\EK{FMB might be just as efficient as datalog search, and saturation-based proof search might be more efficient.} 
-
-% We translate the network models and network questions to problems in many-sorted FOL. These problems use quantifiers and theories. We solve the problems using finite model builders and saturation-based theorem provers for FOL. We use two types of provers to leverage the strengths of both of them, which we detail below.
 
 We translate network models and network questions to problems in first-order logic. We solve these problems using finite model builders and saturation-based theorem provers. We use these two types of provers to leverage the strengths of both of them, which we summarize below.
 
-Finite model builders are commonly implemented in SMT (Satisfiability Modulo Theories) solvers for FOL such as Z3~\cite{Z3} or CVC4~\cite{CVC4}. SMT solvers reason in the ground subset of FOL with theories using the DPLL algorithm~\cite{davis1960computing} combined with decision procedures for theories. SMT solvers handle quantifiers using heuristic instantiation techniques such as E-matching~\cite{DBLP:journals/jacm/DetlefsNS05,DBLP:conf/cade/MouraB07} and model-based quantifier instantiation~\cite{DBLP:journals/jacm/DetlefsNS05,DBLP:conf/cade/MouraB07}. Finite model builders are designed to efficiently solve satisfiable problems. Given an unsatisfiable problem, finite model builders might detect that the problem cannot have infinite models and in such case report unsatisfiability.
+Finite model builders are commonly implemented in SMT (Satisfiability Modulo Theories) solvers for first-order logic such as Z3~\cite{Z3} or CVC4~\cite{CVC4}. SMT solvers reason in the ground subset of first-order logic with theories using the DPLL algorithm~\cite{davis1960computing} combined with decision procedures for theories. SMT solvers handle quantifiers using heuristic instantiation techniques such as E-matching~\cite{DBLP:journals/jacm/DetlefsNS05,DBLP:conf/cade/MouraB07} and model-based quantifier instantiation~\cite{DBLP:journals/jacm/DetlefsNS05,DBLP:conf/cade/MouraB07}. Finite model builders are designed to efficiently solve satisfiable problems. Given an unsatisfiable problem, finite model builders might detect that the problem cannot have infinite models and in such case report unsatisfiability.
 
 Saturation-based theorem provers such as \eprover\cite{E13}, \spass\cite{Spass} or \vampire\cite{Vampire13} construct proofs of unsatisfiability of first-order problems. To that end, they first convert the input problem into a set of first-order clauses and then try to derive contradiction by applying inference rules such as binary resolution~\cite{Ganzinger01} and superposition~\cite{NieuwenhuisRubio:HandbookAR:paramodulation:2001} to these clauses. \EK{Mention orderings and redundancy elimination.} Saturation-based provers handle theories by adding incomplete first-order theory axioms to the set of clauses and by using specialized inference rules. In addition to that, the \vampire theorem prover implements the AVATAR modulo theories~\cite{DBLP:conf/gcai/RegerB0V16} architecture that relies on an SMT solver for theory-consistent reasoning in the ground subset of the problem. Saturation-based provers are designed to efficiently solve unsatisfiable problems and build proofs of unsatisfiability. Given a satisfiable problem, saturation-based provers can in rare cases report satisfiability and output the saturated set of clauses. However, it is usually not possible to reconstruct a model from this set.
 
 We translate
 \begin{enumerate*}[label=(\roman*)]
-  \item each boolean question to a FOL problem that is unsatisfiable iff the answer to the question is true; and
-  \item each list question to a FOL problem that only has finite models, each corresponding to an answer to the question. \EK{Explain why the translated formulas only have finite models.}
+  \item each boolean question to a first-order problem that is unsatisfiable iff the answer to the question is true; and
+  \item each list question to a first-order problem that only has finite models, each corresponding to an answer to the question. \EK{Explain why the translated formulas only have finite models.}
 \end{enumerate*}
 Table~\ref{fig:fol-answering-questions} summarizes how we interpret a solution found by a theorem prover as the answer to the network question. Saturation-based theorem provers generally cannot answer list questions except for the degenerate case when the answer is empty. With this exception, both types of provers are able to answer both types of network questions. 
 
@@ -246,9 +228,9 @@ Table~\ref{fig:fol-answering-questions} summarizes how we interpret a solution f
   \label{fig:fol-answering-questions}
 \end{table}
 
-%Informally speaking, finite model builders can efficiently answer list questions and saturation-based provers can efficiently answer boolean questions. To complement the performance of a finite model builder and a saturation-based prover, we run both of them in parallel on each FOL problem and record the result of the fastest successful run.
+%Informally speaking, finite model builders can efficiently answer list questions and saturation-based provers can efficiently answer boolean questions. To complement the performance of a finite model builder and a saturation-based prover, we run both of them in parallel on each first-order problem and record the result of the fastest successful run.
 
-We run a finite model builder and a saturation-based prover in parallel on each FOL problem and record the result of the fastest successful run. We expect that in most cases
+We run a finite model builder and a saturation-based prover in parallel on each problem and record the result of the fastest successful run. We expect that in most cases
 \begin{enumerate*}[label=(\roman*)]
   \item a boolean question is answered with \verb'true' by the saturation-based prover and with \verb'false' by the finite model builder; and
   \item a list question is answered with the empty list by the saturation-based prover and with a non-empty list by the finite model builder.
@@ -256,23 +238,25 @@ We run a finite model builder and a saturation-based prover in parallel on each 
 
 In this work we used the \vampire theorem prover both as a saturation-based theorem prover and a finite model builder. In addition to its default saturation mode \vampire implements a MACE-style~\cite{mccune1994davis} finite model builder for many-sorted first-order logic~\cite{VampireFMB}. Our translation produces problems expressed in a logic supported by \vampire, namely many-sorted first-order logic with equality, extended with the theory of linear integer arithmetic, the theory of arrays~\cite{VampireAndFOOL}, and the theory of tuples~\cite{KKV18}. %We wrote the problems in the TPTP language~\cite{TPTP}.
 
-Our FOL problems use the first-order formula $\phi$ that expresses the network question and first-order axioms $A_1,\ldots,A_n$ that we translate from the network model. We translate each boolean question to a problem of the form $A_1\wedge\ldots\wedge A_n \Rightarrow \neg\phi$ and each list question to a problem of the form $$A_1\wedge\ldots\wedge A_n \wedge (\forall \bar{z})(q(\bar{z})\Leftrightarrow \phi) \Rightarrow (\forall \bar{z})q(\bar{z}),$$ where $q$ is a fresh predicate symbol, and $\bar{z}$ are free variables of $\phi$. We reconstruct the answer to a list question from the model of the $q$ predicate~--- each substitution of $\bar{z}$ that satisfies $q$ is an answer to the question.
+Our problems use the first-order formula $\phi$ that expresses the network question and first-order axioms $A_1,\ldots,A_n$ that we translate from the network model. We translate each boolean question to a problem of the form $A_1\wedge\ldots\wedge A_n \Rightarrow \neg\phi$ and each list question to a problem of the form $A_1\wedge\ldots\wedge A_n \wedge (\forall \bar{z})(q(\bar{z})\Leftrightarrow \phi) \Rightarrow (\forall \bar{z})q(\bar{z}),$ where $q$ is a fresh predicate symbol, and $\bar{z}$ are free variables of $\phi$. We reconstruct the answer to a list question from the model of the $q$ predicate~--- each substitution of $\bar{z}$ that satisfies $q$ is an answer to the question.
 
-In the rest of this section we detail our translation of network models to FOL. Our translation consists of translation of types and constants, predicate definitions, and theories. We translate types and constants (Section~\ref{sect:aws/fol/types}), and predicate definitions (Section~\ref{sect:aws/fol/predicates}) using Clark completion~\cite{DBLP:conf/adbt/Clark77}. Vampire does not support the theory of bit vectors, therefore we had to craft specialised translations for them using the theories that Vampire support (Section~\ref{sect:aws/fol/theories}).
 
-\subsection{Translation of Types and Constants}\label{sect:aws/fol/types}
-%Each type in the specification describes a finite domain. Each element in that domain is a constant, explicitly defined in the specification. We translate each type definition to FOL by introducing a sort, constants of this sort, and the axiom of the finite domain.
+\section{Network Reachibility as First-Order Problem}\label{sect:aws/fol}
+Our translation consists of translation of types and constants, predicate definitions, and theories. We translate types and constants (Section~\ref{sect:aws/fol/types}), and predicate definitions (Section~\ref{sect:aws/fol/predicates}) using Clark completion~\cite{DBLP:conf/adbt/Clark77}. Vampire does not support the theory of bit vectors, therefore we had to craft specialised translations for them using the theories that Vampire support (Section~\ref{sect:aws/fol/theories}).
+
+\subsection{Types and Constants}\label{sect:aws/fol/types}
+%Each type in the specification describes a finite domain. Each element in that domain is a constant, explicitly defined in the specification. We translate each type definition to first-order logic by introducing a sort, constants of this sort, and the axiom of the finite domain.
 
 Let $\tau$ be a type and $c_1,\ldots,c_n$ ($n\ge0$) be constants of this type. If $n>0$ then we introduce a sort $\tau$, constants $c_1,\ldots,c_n$ of this sort and add the domain closure axiom of the form $(\forall x:\tau)(x=c_1 \vee\ldots\vee x=c_n)$ and the distinct constants axiom of the form of a conjunction of literals $c_i\not=c_j$ for all $1\le i\le n$, $1\le j\le n$ and $i\not=j$. If $n=0$ then we do not introduce any sorts or constants and in our translation of predicate definitions replace each subformula of the form $(\forall x:\tau)\varphi$ with logical truth and each subformula of the form $(\exists x:\tau)\varphi$ with logical falsum.
 
-For example, the signature contains the type $\type{dir}$ and two constants $\const{dir}_\text{ingress}$ and $\const{dir}_\text{egress}$ of this type. $\type{dir}$ represents the direction of a network package. We translate this type to FOL as a sort $\mathit{dir}$, two constants $\mathit{ingress}$ and $\mathit{egress}$ of this sort, and axioms $(\forall x:\mathit{dir})(x=\mathit{ingress}\vee x=\mathit{egress})$ and $\mathit{ingress}\neq\mathit{egress}$.
+For example, the signature contains the type $\type{dir}$ and two constants $\const{dir}_\text{ingress}$ and $\const{dir}_\text{egress}$ of this type. $\type{dir}$ represents the direction of a network package. We translate this type to first-order logic as a sort $\mathit{dir}$, two constants $\mathit{ingress}$ and $\mathit{egress}$ of this sort, and axioms $(\forall x:\mathit{dir})(x=\mathit{ingress}\vee x=\mathit{egress})$ and $\mathit{ingress}\neq\mathit{egress}$.
 
 % dir: type.
 % dir/ingress: dir.
 % dir/egress: dir.
 
-\subsection{Translation of Predicate Definitions}\label{sect:aws/fol/predicates}
-%The definitions of predicates in the specification assume the closed world interpretation. It means that a predicate is satisfied iff at least one of its rules is satisfied. To capture the definition in FOL we translate a predicate definition using logical equivalence.
+\subsection{Predicate Definitions}\label{sect:aws/fol/predicates}
+%The definitions of predicates in the specification assume the closed world interpretation. It means that a predicate is satisfied iff at least one of its rules is satisfied. To capture the definition in first-order logic we translate a predicate definition using logical equivalence.
 
 % as a predicate symbol $P:\tau_1\times\ldots\times\tau_n$
 
@@ -318,7 +302,7 @@ We translate the definition of $\pred{link}$ as a predicate symbol $\mathit{Link
 
 Our translation ignores definitions of equality predicates and instead uses the standard equality. Our translation ignores (the lack of) definitions of bit vector predicates and instead uses other theories as described in the following section.
 
-\subsection{Translation of Theories}
+\subsection{Theories}
 \label{sect:aws/fol/theories}
 The network model uses two theories of bit vectors: 16-bit vectors to represent port numbers (as integers between 0 and 65535) and 32-bit vectors to represent IPv4 addresses, subnet masks, and CIDR addresses. %The network model uses 16-bit and 32-bit vector types and corresponding theory predicates, but does not contain definitions for these predicates. Instead, it relies on the implementation of bit vectors in the backend solver.
 We translate 16-bit and 32-bit vectors differently.
@@ -343,8 +327,7 @@ The network model uses the type $\type{bits32}$ and the predicate $\pred{bits32}
   \item predicate $\pred{bits32}_\wedge$ to an axiom that defines the bitwise conjunction for boolean tuples.
 \end{enumerate*}
 
-\section{Performance Optimizations}\label{sect:aws/optimizations}
-\subsection{Theorem Provers-Specific Optimizations}
+\paragraph{Alternative translation for 32-bit vectors}
 Our translation of the theory of 32-bit vectors is not the only possible one. For example, one can use the theory of boolean arrays instead. To this end one should translate
 \begin{enumerate*}[label=(\roman*)]
   \item the type $\type{bits32}$ to the array sort $\mathit{array}(\mathbb{Z},\mathit{bool})$ and
@@ -352,7 +335,7 @@ Our translation of the theory of 32-bit vectors is not the only possible one. Fo
 \end{enumerate*}
 Our early experimental results showed that the translation that uses arrays of booleans produces formulas that are harder for \vampire than the translation that uses tuples. We explain it by the fact that in the latter translation a 32-bit vector is represented as a single ground term and not 32 ground literals.
 
-\subsection{Solver-Agnostic Optimizations}
+\paragraph{Theory inlining}
 Extra optimization: we discovered that operators over 32-bit vectors are only ever used in the following context:
 \begin{equation*}
 \begin{aligned}
@@ -409,19 +392,26 @@ Synthesis of network configurations using \Datalog~\cite{DBLP:conf/cav/El-Hassan
 Weidenbach used saturation in \spass to verify security protocols~\cite{Weidenbach99}.
 
 %-------------------------------------------------------------------------------
-\section{Conclusions and Future Work}
+\section{Conclusions, Discussion and Future Work}
 \label{sect:aws/conclusion}
+
+\paragraph{Sensitivity of the translation}
 The quality of translation matters a lot. Bad translation --- poor performance. This is a well-known problem in the ATP community. Theorem provers should efficiently implement useful syntactical features and theories beyond vanilla first-order logic. In this work we missed an efficient implementation of the theory of bit vectors in \vampire.
 
-FOL provers come with gazillions of options, which ones to use?
+\paragraph{Configurations of theorem provers}
+Theorem provers come with gazillions of options, which ones to use?
 
-When comparing the performance of \Datalog and FOL we saw that the performance time of \Datalog grows accordingly to the complexity of the problem. Performance of FOL looks unpredictable due to the nature of the saturation-based proof search. It's cool when a seemingly hard problem has an easy solution, not so cool the other way around. We wonder if a FOL community has an answer to it.
+\paragraph{Unpredictable complexity}
+When comparing the performance of \Datalog and theorem provers we saw that the performance time of \Datalog grows accordingly to the complexity of the problem. Performance of theorem provers looks unpredictable due to the nature of the saturation-based proof search. It's cool when a seemingly hard problem has an easy solution, not so cool the other way around. We wonder if a theorem proving community has an answer to it.
 
+\paragraph{Finite domains}
 Our problems have to do with large finite domains. Superposition-based theorem provers cannot reason with them efficiently, too bad (cite Weidenbach's work~\cite{HillenbrandWeidenbach13} though).
 
-Interesting to translate to EPR~--- we do not have function symbols with positive arity, but we do get them because of skolemization.
+\paragraph{EPR}
+We translate our network models to problems that almost fit the effectively propositional (EPR) fragment of first-order logic, also called the Bernays-Sch\"onfinkel class. These problems do not use function symbols with positive arity, but skolem functions with positive arity might be introduced during clausification. The satisfiability problem for EPR is decidable and there exist efficient tools that deal with this fragment~\cite{DBLP:conf/birthday/Korovin13} \EK{more cites here}. It is possible to translate network models to problems in EPR, for example by instantiating existentially-quantified variables with all elements in the domain of its sort. The obvious drawback of this translation is the blowup of the size of the resulting problem. Whether this blowup can be counteracted by the efficiency of EPR solvers is an interesting question for future work.
 
-\paragraph{Future Work} We used a specification which is \Datalog-friendly and not necessarily FOL-friendly~--- only predicates, no functions. It would be interesting to rewrite it in FOL. We only took Vampire, but would be interesting to compare other provers, or even use a portfolio of provers instead of just one.
+\paragraph{Future Work}
+We used a specification which is \Datalog-friendly and not necessarily friendly for reasoning in first-order logic~--- only predicates, no functions. It would be interesting to rewrite it in first-order logic. We only took Vampire, but would be interesting to compare other provers, or even use a portfolio of provers instead of just one.
 
 %-------------------------------------------------------------------------------
 \section*{Acknowledgments}

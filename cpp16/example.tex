@@ -20,7 +20,7 @@
 \end{figure*}
 
 \begin{figure*}[tb]
-{\small
+
 \begin{lstlisting}[language=tptp]
 tff(x, type, x: $int).
 tff(y, type, y: $int).
@@ -34,15 +34,15 @@ tff(transition_relation, hypothesis,
                             $let(max := x, max),
                             $let(max := y, max)),
            $let(res := $ite($greater(max, 0),
-                            $let(res := $sum(res, max), res),
-                            $let(res := $difference(res, max),
+                            $let(res := $sum(res, max),
+                                 res),
+                            $let(res := $diff(res, max),
                                  res)),
                 res)))).
 
 tff(safety_property, conjecture, $greatereq(res1, x)).
 \end{lstlisting}
 \caption{Representation of the partial correctness statement of the code on Figure~\ref{fig:seqITE} in Vampire\label{fig:VampireITE}.}
-}
 \end{figure*}
 
 In this section we illustrate how FOOL makes first-order theorem
