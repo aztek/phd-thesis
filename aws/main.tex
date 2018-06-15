@@ -49,60 +49,49 @@ and SAT~\cite{Anteater,DBLP:conf/pldi/BallBGIKSSV14}.
 %
 % Problem 1: Size of networks, \Datalog works good in this however certain subproblems are hard for datalog
 %
-Despite the vast body of available tools, the problem of practical verification of enterprise networks remains a 
-challenge. Firstly, the size and intricacy of modern industrial-sized networks results in very difficult constraint 
-satisfaction problems. While most network verification 
-tools depend on a single constraint solving paradigm, we find that no single solver achieves best performance on all 
-verification problems. Secondly, general purpose solvers are very 
-performance-sensitive to problem encodings. Effective encodings are often a ``black art'' for users, resulting in tedious trial 
-and error for a user without a good understanding of the implementation of the underlying solver.
+Despite the vast body of available tools, the problem of practical verification of enterprise networks remains a challenge. Firstly, the size and intricacy of modern industrial-sized networks results in very difficult constraint satisfaction problems. While most network verification tools depend on a single constraint solving paradigm, we find that no single solver achieves best performance on all verification problems. Secondly, general purpose solvers are very performance-sensitive to problem encodings. Effective encodings are often a ``black art'' for users, resulting in tedious trial and error for a user without a good understanding of the implementation of the underlying solver.
 
-\EK{Our ultimate goal is to design a portfolio of complementary constraint solvers... Our motivation for using a portfolio of solvers rather than a single solver is to leverage the advantages of different types of solvers on different types of properties.
-}
+We are interested in checking properties of VPC networks using complementary constraint solvers. Our ultimate goal is to build a portfolio of constraint solvers that leverages the advantages of different types of solvers on different types of properties. In an effort towards this goal in this work we describe an approach to network verification that relies on automated reasoning for first-order logic. Our plan is to integrate this approach to our ongoing work on the portfolio of solvers.
 
-In this work we check reachability properties of VPC networks using automated theorem provers for first-order logic.
-
-\EK{We plan to integrate this approach in our ongoing work on portfolios.}
-
-We are interested in checking properties that express whether the network traffic is able to flow between given nodes of a VPC network. The traffic flow in these networks is typically controlled by the rules assigned to various networking components provided by the cloud platform. These components include subnets, route tables, access control lists, internet gateways and others. Let us illustrate these properties using the following example of a VPC network. 
+We consider reachability properties that express whether the network traffic is able to flow between given nodes of a VPC network. The traffic flow in these networks is typically controlled by the rules assigned to various networking components provided by the cloud platform. These components include subnets, route tables, access control lists, internet gateways and others. Let us illustrate these properties using the following example of a VPC network. 
 \begin{figure*}[th]
 \centering\includegraphics[width=1.0\textwidth]{./aws/fig/vpc.pdf}
 \end{figure*}
 
-This network consists of an internet gateway, two subnets ``Web'' and ``Database'' and three network nodes in each of them. Each of the subnets is assigned with a route table (on the right) and an access control list (ACL, on the left). The route tables allow the network traffic to flow between the subnets and between the ``Web'' subnet and the internet gateway. In other words, the network nodes in the ``Web'' subnet are accessible from the internet. An ACL consists of rules that filter the network traffic to and from its subnet. In our example, one of the ACL rules of the ``Database'' subnet forbids SSH access to its nodes, both directly and through an intermediate node.
+This network consists of an internet gateway, two subnets ``Web'' and ``Database'' and three network nodes in each of them. Each of the subnets is assigned with a route table (on the right) and an access control list (ACL, on the left). The route tables allow the network traffic to flow between the subnets and between the ``Web'' subnet and the internet gateway. In other words, the network nodes in the ``Web'' subnet are accessible from the internet, while the nodes in the ``Database'' subnet are not. An ACL consists of rules that filter the network traffic to and from its subnet. In our example, one of the ACL rules of the ``Database'' subnet forbids SSH access to its nodes, both directly and through an intermediate node.
 
-In a realistic setting this network might grow over time and have more nodes, security and access rules added to it. A network administrator may want to make sure that the network retain certain properties after each change in its configuration. For example, the network administrator may want to check the following property.
+Imagine that this network grows over time and has more nodes and security and access rules added to it. A network administrator may want to make sure that the network retains certain properties after each change in its configuration. For example, the network administrator may want to check the following property.
 \begin{example}\label{prop:bool-property}
 All network nodes in the subnet ``Web'' can access all network nodes in the subnet ``Database''.
 \end{example}
 
-The network administrator might also want to know which networking components satisfy a given property, such as the ones in the following example.
+The network administrator might also want to know which networking components satisfy a given property, such as the ones described in the following example.
 \begin{example}\label{prop:list-property}
 All network nodes that have the port 22 (SSH) accessible from the internet.
 \end{example}
 
 We will refer to questions that network administrators might want to answer, such as the ones in Examples~\ref{prop:bool-property} and \ref{prop:list-property}, as \emph{network questions}. In particular, we will refer to questions similar to Example~\ref{prop:bool-property} as \emph{boolean questions}, because an answer to them is ``yes'' or ``no'', and to questions similar to Example~\ref{prop:list-property} as \emph{list questions}, because an answer to them is a list of networking components. Each boolean question can be equivalently phrased as a list question such that the answer to the boolean question is ``yes'' iff the answer to the correspondent list questions is not empty. However, we distinguish these two types of questions because, as we show later, we can more efficiently answer them using different techniques.
 
-Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialized tools. In this work we employ finite model builders and saturation-based theorem provers. To this end, we build static models of VPC networks (Section~\ref{sect:aws/specification}), translate the network questions about these models to problems in first-order logic (Section~\ref{sect:aws/fol}), and check them with finite model builders and saturation-based theorem provers (Section~\ref{sect:aws/fol-provers}).
+Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialized tools. In this work we employ automated theorem provers for first-order logic. To this end, we build static models of VPC networks (Section~\ref{sect:aws/specification}), translate these models the network questions about them to problems in first-order logic (Section~\ref{sect:aws/fol}) and check these problems using finite model builders and saturation-based theorem provers (Section~\ref{sect:aws/fol-provers}). We use these two types of provers to answer both types of questions more efficintly. As we show in Section~\ref{sect:aws/fol-provers}, finite model builders can more efficiently answer list questions and saturation-based theorem prover can more efficiently answer boolean questions.
 
+\EK{Experiments?}
 
+\EK{Mention challenges and future work?}
 
-answer network questions by expressing them as problems in first-order logic and then solving these problems using .
-
-we can more efficiently answer list questions with finite model builders and answer boolean questions with saturation-based theorem prover. This allows us to answer network questions more efficiently.
+\EK{Summary of contributions?}
 
 %The paper is organized as follows. Section~\ref{sect:aws/specification} describes the network reachability properties and the network models. Section \ref{sect:aws/fol} presents our translation of network properties for first-order theorem provers. Section~\ref{sect:aws/related} presents related work, and Section~\ref{sect:aws/conclusion} contains a discussion of this work and suggests future work.
 
-\paragraph{Contributions.} Our contributions are summarized as follows: \begin{enumerate}
-\item We explore efficient encodings for two types of backend solvers, including 
-saturation-based solvers, which to the best of our knowledge, have not been used to verify networks
-\item We provide a comparison of the backend solvers and classify their strengths and weaknesses.
-\end{enumerate}
+% \paragraph{Contributions.} Our contributions are summarized as follows: \begin{enumerate}
+% \item We explore efficient encodings for two types of backend solvers, including 
+% saturation-based solvers, which to the best of our knowledge, have not been used to verify networks
+% \item We provide a comparison of the backend solvers and classify their strengths and weaknesses.
+% \end{enumerate}
 
 %-------------------------------------------------------------------------------
 \section{Network Reachability Properties}
 \label{sect:aws/specification}
-We answer network questions \emph{statically}, that is, instead of sending packets in a network, we build a static model of the network and reason about properties of this model. Our \emph{network model} consists of two parts, the \emph{formal specification} and the \emph{snapshot} of the network. The specification formalizes the semantics of each of the components available in the network. For example, the formal specification describes how a route table directs network traffic in a subnet or in which order a firewall applies rules in an access control list. The snapshot describes the topology of the given network. For example, the snapshot contains the list of network nodes, subnets and their route tables. Naturally, the formal specification in the model of each particular VPC network is the same, whereas the snapshot differs. We express network questions in the language of many-sorted first-order logic. In the remainder of this section we describe syntax and semantics of network models and network questions.
+We answer network questions statically, that is, instead of sending packets in a network, we build a static model of the network and reason about properties of this model. Our \emph{network model} consists of two parts, the \emph{formal specification} and the \emph{snapshot} of the network. The specification formalizes the semantics of each of the components available in the network. For example, the formal specification describes how a route table directs network traffic in a subnet or in which order a firewall applies rules in an access control list. The snapshot describes the topology of the given network. For example, the snapshot contains the list of network nodes, subnets and their route tables. Naturally, the formal specification in the model of each particular VPC network is the same, whereas the snapshot differs. We express network questions in the language of many-sorted first-order logic. In this section we describe syntax and semantics of network models and network questions.
 
 \EK{We might want to make it clear that the models and the queries are given to us. Otherwise we'd have to justify why we use Datalog for the spec and first-order logic for the queries.}
 
@@ -119,7 +108,7 @@ We assume that the signature contains
   \item types $\type{bits16}$ and $\type{bits32}$;
   \item $2^{16}$ constants of the type $\type{bits16}$;
   \item $2^{32}$ constants of the type $\type{bits32}$;
-  \item predicates $\pred{bits16}_<$, $\pred{bits16}_\le$, $\pred{bits16}_{+1}$, $\pred{bits16}_{-1}$ of the type $\type{bits16} \times \type{bits16}$ with a special semantics \EK{Careful! $\pred{bits16}_{+1}$ and $\pred{bits16}_{-1}$ are not total functions, mention that!}; and
+  \item predicates $\pred{bits16}_{\le}$ and $\pred{bits16}_{\ge}$ of the type $\type{bits16} \times \type{bits16}$ with a special semantics; and
   \item predicate $\pred{bits32}_\wedge$ or the type $\type{bits32}\times\type{bits32}\times\type{bits32}$ with a special semantics.
 \end{enumerate*}
 $\type{bits16}$ and $\type{bits32}$ represent the types of 16-bit and 32-bit vectors. The semantics of the predicates is that of the correspondent operations over bit vectors defined in the standard way.
@@ -139,11 +128,11 @@ The specification part of the model contains types, constants, predicates and ru
 % <- can-ssh-tunnel-enis Eni1 Eni3
 % <- can-ssh-tunnel-enis Eni3 Eni2.
 
-The specification of Amazon~VPC networks that we used in this work consists of approximately 50 types, 200 predicates and over 240 rules.
+A specification of Amazon~VPC networks written in this style consists of approximately 50 types, 200 predicates and over 240 rules.
 
 The snapshot part of the model contains constants and facts that describe the configuration of the networking components in a given network. For example, the snapshot of a network with a single node \verb'i-abcd1234' in a single subnet ``Web'' consists of the constants $\const{node}_\text{abcd1234}$ and $\const{subnet}_\text{Web}$, and the fact $\pred{nodeHasSubnet}(\const{node}_\text{abcd1234},\const{subnet}_\text{Web}).$
 
-\EK{Mention how large network snapshots get?}
+%\EK{Mention how large network snapshots get?}
 
 \subsection{Network Questions}
 \label{sect:aws/reachability/properties}
@@ -219,10 +208,10 @@ Table~\ref{fig:fol-answering-questions} summarizes how we interpret a solution f
     \hline
     Output of a theorem prover & Boolean question & List question \\
     \hline
-    Saturation found unsat & \texttt{true}  & empty list \\
-    Saturation found sat   & \texttt{false} & error \\
-    FMB found unsat        & \texttt{true}  & empty list \\
-    FMB found a model      & \texttt{false} & list of answers \\
+    Saturation found unsat & yes & empty list \\
+    Saturation found sat   & no  & error \\
+    FMB found unsat        & yes & empty list \\
+    FMB found a model      & no  & list of answers \\
   \end{tabular}
   \caption{Solutions found by saturation-based theorem provers and finite model builders (FMB) interpreted as answers to network questions.}
   \label{fig:fol-answering-questions}
@@ -232,16 +221,16 @@ Table~\ref{fig:fol-answering-questions} summarizes how we interpret a solution f
 
 We run a finite model builder and a saturation-based prover in parallel on each problem and record the result of the fastest successful run. We expect that in most cases
 \begin{enumerate*}[label=(\roman*)]
-  \item a boolean question is answered with \verb'true' by the saturation-based prover and with \verb'false' by the finite model builder; and
+  \item a boolean question is answered with ``yes'' by the saturation-based prover and with ``no'' by the finite model builder; and
   \item a list question is answered with the empty list by the saturation-based prover and with a non-empty list by the finite model builder.
 \end{enumerate*}
 
 In this work we used the \vampire theorem prover both as a saturation-based theorem prover and a finite model builder. In addition to its default saturation mode \vampire implements a MACE-style~\cite{mccune1994davis} finite model builder for many-sorted first-order logic~\cite{VampireFMB}. Our translation produces problems expressed in a logic supported by \vampire, namely many-sorted first-order logic with equality, extended with the theory of linear integer arithmetic, the theory of arrays~\cite{VampireAndFOOL} and the theory of tuples~\cite{KKV18}. %We wrote the problems in the TPTP language~\cite{TPTP}.
 
-Our problems use the first-order formula $\phi$ that expresses the network question and first-order axioms $A_1,\ldots,A_n$ that we translate from the network model. We translate each boolean question to a problem of the form $A_1\wedge\ldots\wedge A_n \Rightarrow \neg\phi$ and each list question to a problem of the form $A_1\wedge\ldots\wedge A_n \wedge (\forall \bar{z})(q(\bar{z})\Leftrightarrow \phi) \Rightarrow (\forall \bar{z})q(\bar{z}),$ where $q$ is a fresh predicate symbol and $\bar{z}$ are free variables of $\phi$. We reconstruct the answer to a list question from the model of the $q$ predicate~--- each substitution of $\bar{z}$ that satisfies $q$ is an answer to the question.
+Our problems use the first-order formula $\phi$ that expresses the network question and first-order axioms $A_1,\ldots,A_n$ that we translate from the network model. We translate each boolean question to a problem of the form $A_1\wedge\ldots\wedge A_n \Rightarrow \neg\phi$ and each list question to a problem of the form $A_1\wedge\ldots\wedge A_n \wedge (\forall \bar{z})(q(\bar{z})\Leftrightarrow \phi) \Rightarrow (\forall \bar{z})q(\bar{z}),$ where $q$ is a fresh predicate symbol and $\bar{z}$ are fresh free variables of $\phi$. We reconstruct the answer to a list question from the model of the $q$ predicate~--- each substitution of $\bar{z}$ that satisfies $q$ is an answer to the question.
 
 \section{Network Reachibility as First-Order Problem}\label{sect:aws/fol}
-Our translation of network models to problems in first-order logic consists of translations of types, constants, predicate definitions and theories. We translate types, constants (Section~\ref{sect:aws/fol/types}) and predicate definitions (Section~\ref{sect:aws/fol/predicates}) using Clark completion~\cite{DBLP:conf/adbt/Clark77}. We had to craft a translation for the theory of bit vectors (Section~\ref{sect:aws/fol/theories}) because Vampire does not support it.
+Our translation of network models to problems in first-order logic consists of translations of types, constants, predicate definitions and theories. We translate types, constants (Section~\ref{sect:aws/fol/types}) and predicate definitions (Section~\ref{sect:aws/fol/predicates}) using Clark completion~\cite{DBLP:conf/adbt/Clark77}. We use specialized translations for the theory of bit vectors (Section~\ref{sect:aws/fol/theories}) because Vampire does not support it.
 
 \subsection{Types and Constants}\label{sect:aws/fol/types}
 Let $\tau$ be a type and $c_1,\ldots,c_n$ ($n\ge0$) be constants of this type. If $n>0$ then we introduce a sort $\tau$, constants $c_1,\ldots,c_n$ of this sort and add the domain closure axiom of the form $(\forall x:\tau)(x=c_1 \vee\ldots\vee x=c_n)$ and the distinct constants axiom of the form of a conjunction of literals $c_i\not=c_j$ for all $1\le i\le n$, $1\le j\le n$ and $i\not=j$. If $n=0$ then we do not introduce any sorts or constants and in our translation of predicate definitions replace each subformula of the form $(\forall x:\tau)\varphi$ with logical truth and each subformula of the form $(\exists x:\tau)\varphi$ with logical falsum.
@@ -259,7 +248,7 @@ For example, the signature contains the type $\type{dir}$ and two constants $\co
 
 Let predicate $p$ of the type $\tau_1\times\ldots\times\tau_n$ be defined using $k\ge0$ rules. Let $x_1:\tau_1,\ldots,x_n:\tau_n$ be fresh variables. If $k=0$ then we translate the definition of $p$ to the axiom $$(\forall x_1:\tau_1)\ldots(\forall x_n:\tau_n)(\neg p(x_1,\ldots,x_n)).$$ If $k>0$ then we translate the definition of $p$ to the axiom $$(\forall x_1:\tau_1)\ldots(\forall x_n:\tau_n)(p(x_1,\ldots,x_n)\Leftrightarrow R_1\vee\ldots\vee R_k),$$ where each of the formulas $R_1,\ldots,R_k$ are translations of each of the $k$ rules, respectively.
 
-Let a rule be of the form $$p(t_1,\ldots,t_n)\leftarrow L_1\wedge\ldots\wedge L_m, \quad(m\ge0)$$ where $t_1:\tau_1,\ldots,t_n:\tau_n$ are terms. Let $y_1:\sigma_1,\ldots,y_l:\sigma_l$ be variables that occur in either of $L_1,\ldots,L_m$ but not in $p(t_1,\ldots,t_n)$. If $m=0$ then we translate the rule to the formula $x_1=t_1\wedge\ldots\wedge x_n=t_n.$ If $m>0$ then we translate the rule to the formula
+Let a rule be of the form $p(t_1,\ldots,t_n)\leftarrow L_1\wedge\ldots\wedge L_m$ ($m\ge0$), where $t_1:\tau_1,\ldots,t_n:\tau_n$ are terms. Let $y_1:\sigma_1,\ldots,y_l:\sigma_l$ be variables that occur in either of $L_1,\ldots,L_m$ but not in $p(t_1,\ldots,t_n)$. If $m=0$ then we translate the rule to the formula $x_1=t_1\wedge\ldots\wedge x_n=t_n.$ If $m>0$ then we translate the rule to the formula
 \begin{equation*}
 \begin{aligned}
 &x_1=t_1\wedge\ldots\wedge x_n=t_n\;\wedge(\exists y_1:\sigma_1)\ldots(\exists y_l:\sigma_l)(L_1\wedge\ldots\wedge L_m).
@@ -301,57 +290,67 @@ Our translation ignores definitions of equality predicates and instead uses the 
 
 \subsection{Theories}
 \label{sect:aws/fol/theories}
-The network model uses two theories of bit vectors: 16-bit vectors to represent port numbers (as integers between 0 and 65535) and 32-bit vectors to represent IPv4 addresses, subnet masks and CIDR addresses. %The network model uses 16-bit and 32-bit vector types and corresponding theory predicates, but does not contain definitions for these predicates. Instead, it relies on the implementation of bit vectors in the backend solver.
-We translate 16-bit and 32-bit vectors differently.
+The network model uses two theories of bit vectors: 16-bit vectors to represent port numbers (as integers between 0 and 65535) and 32-bit vectors to represent IPv4 addresses, subnet masks and CIDR (Classless Inter-Domain Routing) addresses. These two theories use different predicates, therefore we translate 16-bit and 32-bit vectors differently.
 
-%In our initial experiments we discovered that the translation of theories crucially affects the performance of \vampire. 
+Our early experiments with translating the theory of bit vectors revealed that the quality of this translation crucially affects the performance of Vampire. This led us to develop and compare multiple translations. We translate 16-bit vectors to integers and 32-bit vectors to tuples and arrays. We also describe a technique that eliminates theories from our problems by precomputing the results of theory operations over ports, IPv4 addresses, subnet masks and CIDR addresses.
 
-% Section~\ref{sect:fol/theories/optimizations} describes the domain-specific optimizations that we implemented in the translation. They allowed us to simplify the translated problems and increase the performance of \vampire on them.
-
-\paragraph*{16-bit vectors as integers}%\label{sect:fol/theories/16}
-The network model uses the type $\type{bits16}$ and predicates $\pred{bits16}_{\le}$ (``less or equal''), $\pred{bits16}_{<}$ (``less than''), $\pred{bits16}_{+1}$ (``successor'') and $\pred{bits16}_{-1}$ (``predecessor''), which are interpreted as correspondent predicates over 16-bit unsigned integers. We translate 16-bit vectors using theory of linear integer arithmetic, supported by Vampire. To this end, we translate
+\subsubsection*{16-bit vectors}
+%\paragraph*{16-bit vectors as integers}%\label{sect:fol/theories/16}
+The network model uses the type $\type{bits16}$ and predicates $\pred{bits16}_{\le}$ (``less or equal'') and $\pred{bits16}_{\ge}$ (``greater or equal''). We translate
 \begin{enumerate*}[label=(\roman*)]
   \item the type $\type{bits16}$ to $\mathbb{Z}$,
   \item each of the 16-bit vector constants to an integer constant, and
-  \item each of the 16-bit predicates to their correspondent function symbols in the theory of integer arithmetic.
-\end{enumerate*} \EK{We are translating uint16 to $\mathbb{Z}$~--- explain why it is sound.}
+  \item each of the 16-bit predicates to their correspondent function symbols in the theory of linear integer arithmetic.
+\end{enumerate*}
+\EK{We are translating uint16 to $\mathbb{Z}$~--- explain why it is sound.}
 
-\paragraph*{32-bit vectors as tuples}%\label{sect:fol/theories/32}
-The network model uses the type $\type{bits32}$ and the predicate $\pred{bits32}_\wedge$ (bitwise conjunction). We translate 32-bit vectors using theory of tuples, supported by Vampire. To this end, we translate
+\subsubsection*{32-bit vectors}
+The network model uses the type $\type{bits32}$ and the predicate $\pred{bits32}_\wedge$ (bitwise conjunction).
+
+%Our translation of the theory of 32-bit vectors is not the only possible one. For example, one can use the theory of boolean arrays instead.
+
+%We translate 32-bit vectors using theory of tuples, supported by Vampire. To this end, we
+
+\paragraph*{Tuples}%\label{sect:fol/theories/32}
+We translate
 \begin{enumerate*}[label=(\roman*)]
   \item the type $\type{bits32}$ to the tuple sort $(\mathit{bool},\ldots,\mathit{bool})$ where $\mathit{bool}$ is repeated 32 times,
   \item each of the 32-bit vector constants to a term $(b_1,\ldots,b_{32})$ of this sort, where each of $b_1,\ldots,b_{32}$ is either $\mathit{true}$ or $\mathit{false}$, and
   \item predicate $\pred{bits32}_\wedge$ to an axiom that defines the bitwise conjunction for boolean tuples.
 \end{enumerate*}
 
-\paragraph{32-bit vectors as arrays}
-Our translation of the theory of 32-bit vectors is not the only possible one. For example, one can use the theory of boolean arrays instead. To this end one should translate
+\paragraph{Arrays}
+We translate
 \begin{enumerate*}[label=(\roman*)]
-  \item the type $\type{bits32}$ to the array sort $\mathit{array}(\mathbb{Z},\mathit{bool})$ and
-  \item each of the 32-bit vector constant to a fresh constant $v$ of this sort, defined using the axiom $\mathit{select}(v,1)=b_1\wedge\ldots\wedge\mathit{select}(v, 32)=b_{32},$ where each of $b_1,\ldots,b_{32}$ is either $\mathit{true}$ or $\mathit{false}$.
+  \item the type $\type{bits32}$ to the array sort $\mathit{array}(\mathbb{Z},\mathit{bool})$,
+  \item each of the 32-bit vector constant to a fresh constant $v$ of this sort, defined using the axiom $\mathit{select}(v,1)=b_1\wedge\ldots\wedge\mathit{select}(v, 32)=b_{32},$ where each of $b_1,\ldots,b_{32}$ is either $\mathit{true}$ or $\mathit{false}$, and
+  \item predicate $\pred{bits32}_\wedge$ to an axiom that defines the bitwise conjunction for arrays of booleans.
 \end{enumerate*}
-Our early experimental results showed that the translation that uses arrays of booleans produces formulas that are harder for \vampire than the translation that uses tuples. We explain it by the fact that in the latter translation a 32-bit vector is represented as a single ground term and not 32 ground literals.
 
-\paragraph{Extra optimization}
-We discovered that operators over 32-bit vectors are only ever used in the following context:
-\begin{equation*}
-\begin{aligned}
-\pred{=}_{bits32}(&\pred{bits32}_{\wedge}(\mathit{CidrBase}_1,\mathit{CidrMask}), \\
-                  &\pred{bits32}_{\wedge}(\mathit{CidrBase}_2,\mathit{CidrMask}))
-\end{aligned}
-\end{equation*}
+We found that the translation that uses arrays of booleans produces formulas that are harder for \vampire than the translation that uses tuples. We explain it by the fact that in the latter translation a 32-bit vector is represented as a single term and not 32 literals. This representation allows Vampire to infer bitwise conjunctions faster.
 
-Solution~-- fuse them together. Instead of translating equality and conjunction
-\begin{enumerate}
-  \item introduce a predicate $\mathit{EqMask}: \mathit{cidrBase}\times\mathit{cidrBase}\times\mathit{cidrMask}$;
-  \item translate each term of the form \texttt{bits/32/eq (bits/32/and x m) (bits/32/and y m)} into $\mathit{EqMask}(x, y, m)$, and
-  \item add an axiom for $\mathit{EqMask}$.
-\end{enumerate}
+% \paragraph{Extra optimization}
+% We discovered that operators over 32-bit vectors are only ever used in the following context:
+% \begin{equation*}
+% \begin{aligned}
+% \pred{=}_{bits32}(&\pred{bits32}_{\wedge}(\mathit{CidrBase}_1,\mathit{CidrMask}), \\
+%                   &\pred{bits32}_{\wedge}(\mathit{CidrBase}_2,\mathit{CidrMask}))
+% \end{aligned}
+% \end{equation*}
 
-\paragraph{Theory inlining}
+% Solution~-- fuse them together. Instead of translating equality and conjunction
+% \begin{enumerate}
+%   \item introduce a predicate $\mathit{EqMask}: \mathit{cidrBase}\times\mathit{cidrBase}\times\mathit{cidrMask}$;
+%   \item translate each term of the form \texttt{bits/32/eq (bits/32/and x m) (bits/32/and y m)} into $\mathit{EqMask}(x, y, m)$, and
+%   \item add an axiom for $\mathit{EqMask}$.
+% \end{enumerate}
+
+\subsubsection*{Precomputation of Theories}
+The motivation for this technique lies in the following observation. Port numbers in the network models are represented as 16-bit vectors. While the type of 16-bit vectors describes a domain with $2^{16}$ elements, most networks only use a handful of port numbers anywhere in their configuration. We can drastically decrease the size of the domain
+
 Notice that many networks only use a limited number of CIDR addresses and ports. We found that we could improve performance by representing a CIDR as finite domain that consists only of CIDRs that are used in the network and pre-compute the results of all operations over CIDRs.
 
-$\pred{PortRangeOverlap}$ of the type $\type{PortRange} \times \type{PortRange}$.
+$\pred{portRangeOverlap}$ of the type $\type{portRange} \times \type{portRange}$.
 
 Network only uses port ranges 0--65535, 22--22, 443--443, 5432--5432, 80--80, 80--81 anywhere. 12 facts of the form $$\pred{portRangeOverlap}(\mathit{portRange}_1,\mathit{portRange}_2).$$
 
@@ -392,7 +391,7 @@ Weidenbach used saturation in \spass to verify security protocols~\cite{Weidenba
 %-------------------------------------------------------------------------------
 \section{Challenges}
 \label{sect:aws/challenges}
-This paper presents a work in progress and we experienced several challenges that we have not fully addressed. We discuss these challenges in this section. We believe that similar challenges are experienced in other practical applications of automated reasoning in first-order logic.
+This paper presents a work in progress and we did not fully address some of the challenges that we faced. We discuss these challenges in this section. We believe that similar challenges are experienced in other practical applications of automated reasoning in first-order logic.
 
 \paragraph{Good translation to first-order logic}
 Automated theorem provers for first-order logic are known to be sensitive to the encoding of the problem they are solving. To ensure efficient representation of practical problems in a theorem prover, these problems should be encoded using theories and syntactical constructs beyond plain first-order logic. Yet not all automated theorem provers efficiently implement these features. While the Vampire theorem prover used in this work supports many useful theories, we miss a support for the theory of bit vectors. The need to work around this limitation hinders a good translation of our network model to first-order logic. %The lack of support for bit vectors led us to device multiple translations for this theory and experiment with these translations.
@@ -400,7 +399,7 @@ Automated theorem provers for first-order logic are known to be sensitive to the
 %\EK{In addition, theorem provers differ in the extensions of plain first-order logic and theories that they support, so one has to target a logic supported by a specific prover when devising a translation.}
 
 \paragraph{Configuration of theorem provers}
-Automated theorem provers typically offer many settings for configuring proof search. For example, Vampire has dozens of options~\cite{DBLP:conf/cade/Reger0V14} that describe a colossal number of possible proof strategies. There is no proof strategy that would be the best for all kinds of problems, and we found that changing the default options of Vampire might result in strategies that work better on our problems than the default strategy. At the same time, hand-picking good options is tedious and unintuitive, and there is no way of knowing if a hand-picked strategy will work well on all of our problems. Many modern automated theorem provers rely not on one single strategy, but on a portfolio of strategies, which they run one by one during proof search. Theorem provers typically implement portfolios for existing large collections of problems such as TPTP~\cite{TPTP} and SMT-LIB~\cite{SMT-LIB}. To the best of our knowledge, there is no systematic way of assembling a custom portfolio tailored to a specific class of problems.
+Automated theorem provers typically offer many settings for configuring proof search. For example, Vampire has dozens of options~\cite{DBLP:conf/cade/Reger0V14} that describe a colossal number of possible proof strategies. There is no proof strategy that would be the best for all kinds of problems, and we found that changing the default options of Vampire might result in a strategy that works better on our problems than the default strategy. At the same time, hand-picking good options is tedious and unintuitive, and there is no way of knowing if a hand-picked strategy will work well on all of our problems. Many modern automated theorem provers rely not on one single strategy, but on a portfolio of strategies, which they try one by one during proof search. Theorem provers typically implement portfolios for existing large collections of problems such as TPTP~\cite{TPTP} and SMT-LIB~\cite{SMT-LIB}. To the best of our knowledge, there is no systematic way of assembling a custom portfolio tailored to a specific class of problems.
 
 \paragraph{Unpredictable runtime}
 \EK{When comparing the performance of \Datalog and theorem provers we saw that the performance time of \Datalog grows accordingly to the complexity of the problem. Performance of theorem provers looks unpredictable due to the nature of the saturation-based proof search. It's cool when a seemingly hard problem has an easy solution, not so cool the other way around. We wonder if a theorem proving community has an answer to it.}
