@@ -97,11 +97,11 @@ We answer network questions statically, that is, instead of sending packets in a
 
 \subsection{Network Models}
 \label{sect:aws/reachability/spec}
-We formally specify networks in a logic programming style. A network model is a finite set of first-order Horn clauses. We disallow function symbols and allow stratified negation. We assume the plain logic programming semantics for these Horn clauses, defined in the standard way~\cite{}. In particular, we make the closed-world assumption and treat negation as failure. In addition, our network models use the theory of bit vectors to describe ports, IPv4 addresses and subnet masks.
+We use formal specifications of VPC networks written in a logic programming style. A network model is a finite set of first-order Horn clauses. We disallow function symbols with positive arity and allow stratified negation. We assume the plain logic programming semantics for these Horn clauses, defined in the standard way (see e.g.~\cite{DBLP:books/sp/Lloyd87}). In particular, we make the closed-world assumption and treat negation as failure. In addition, our network models use the theory of bit vectors to describe ports, IPv4 addresses, subnet masks and CIDR (Classless Inter-Domain Routing) addresses.
 
 A \emph{signature} of the network model is a triple $(T, C, P),$ where $T$ is a set of \emph{types}, $C$ is a set of \emph{constants} and $P$ is a set of \emph{predicates}. We assign each constant with a type $\tau\in T$ and each predicate with a type $\tau_1\times\ldots\times\tau_n$ $(n\ge0)$, where $\tau_i\in T$ for each $1\leq i \leq n$. We assume a countable infinite set of \emph{variables}. We assign each variable with a type $\tau\in T$. We call a \emph{term} of the type $\tau\in T$ a constant or a variable of that type. We call an \emph{atom} an expression of the form $p(t_1,\ldots,t_n)$, where $n>0$, $p\in P$ is a predicate of the type $\tau_1\times\ldots\times\tau_n$ and each $t_i$, $1\leq i \leq n$ is a term of the type $\tau_i$. We call a \emph{literal} an atom or its negation.
 
-A \emph{rule} is a Horn clause of the form $A\leftarrow L_1 \wedge \ldots \wedge L_n$ $(n \ge 0)$, where the \emph{head} of the rule $A$ is an atom and each of $B_1,\ldots,B_n$ is a literal. If $n=0$ and all arguments of $A$ are constants then we call such rule a fact. We call a \emph{definition} of the predicate $p \in P$ the set of all rules in the network model that use $p$ in their head.
+A \emph{rule} is a Horn clause of the form $A\leftarrow L_1 \wedge \ldots \wedge L_n$ $(n \ge 0)$, where the \emph{head} of the rule $A$ is an atom and each of $L_1,\ldots,L_n$ is a literal. If $n=0$ and all arguments of $A$ are constants then we call such rule a fact. We call a \emph{definition} of the predicate $p \in P$ the set of all rules in the network model that use $p$ in their head.
 
 We assume that the signature contains
 \begin{enumerate*}[label=(\roman*)]
@@ -290,7 +290,7 @@ Our translation ignores definitions of equality predicates and instead uses the 
 
 \subsection{Theories}
 \label{sect:aws/fol/theories}
-The network model uses two theories of bit vectors: 16-bit vectors to represent port numbers (as integers between 0 and 65535) and 32-bit vectors to represent IPv4 addresses, subnet masks and CIDR (Classless Inter-Domain Routing) addresses. These two theories use different predicates, therefore we translate 16-bit and 32-bit vectors differently.
+The network model uses two theories of bit vectors: 16-bit vectors to represent port numbers (as integers between 0 and 65535) and 32-bit vectors to represent IPv4 addresses, subnet masks and CIDR addresses. These two theories use different predicates, therefore we translate 16-bit and 32-bit vectors differently.
 
 Our early experiments with translating the theory of bit vectors revealed that the quality of this translation crucially affects the performance of Vampire. This led us to develop and compare multiple translations. We translate 16-bit vectors to integers and 32-bit vectors to tuples and arrays. We also describe a technique that eliminates theories from our problems by precomputing the results of theory operations over ports, IPv4 addresses, subnet masks and CIDR addresses.
 
