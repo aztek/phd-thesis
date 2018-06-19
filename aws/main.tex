@@ -72,19 +72,9 @@ All network nodes that have the port 22 (SSH) accessible from the internet.
 
 We will refer to questions that network administrators might want to answer, such as the ones in Examples~\ref{prop:bool-property} and \ref{prop:list-property}, as \emph{network questions}. In particular, we will refer to questions similar to Example~\ref{prop:bool-property} as \emph{boolean questions}, because an answer to them is ``yes'' or ``no'', and to questions similar to Example~\ref{prop:list-property} as \emph{list questions}, because an answer to them is a list of networking components. Each boolean question can be equivalently phrased as a list question such that the answer to the boolean question is ``yes'' iff the answer to the correspondent list questions is not empty. However, we distinguish these two types of questions because, as we show later, we can more efficiently answer them using different techniques.
 
-Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialized tools. In this work we employ automated theorem provers for first-order logic. To this end, we build static models of VPC networks (Section~\ref{sect:aws/specification}), translate these models and network questions about them to problems in first-order logic (Section~\ref{sect:aws/fol}) and check these problems using finite model builders and saturation-based theorem provers (Section~\ref{sect:aws/fol-provers}). We use these two types of provers to answer both types of questions more efficiently. In Section~\ref{sect:aws/fol-provers} we argue that finite model builders can more efficiently answer list questions and saturation-based theorem prover can more efficiently answer boolean questions.
+Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialized tools. In this work we employ automated theorem provers for first-order logic. To this end, we build static models of VPC networks (Section~\ref{sect:aws/specification}), translate these models and network questions about them to problems in first-order logic (Section~\ref{sect:aws/fol}) and check these problems using finite model builders and saturation-based theorem provers (Section~\ref{sect:aws/fol-provers}). We use these two types of provers to answer both types of questions more efficiently. In Section~\ref{sect:aws/fol-provers} we argue that finite model builders can more efficiently answer list questions and saturation-based theorem prover can more efficiently answer boolean questions. In Section~\ref{sect:aws/related} we cite related work and in Section~\ref{sect:aws/challenges} we describe the challenges that we faced in this work and outline future work.
 
-\EK{Mention challenges and future work?}
-
-\EK{Summary of contributions?}
-
-%The paper is organized as follows. Section~\ref{sect:aws/specification} describes the network reachability properties and the network models. Section \ref{sect:aws/fol} presents our translation of network properties for first-order theorem provers. Section~\ref{sect:aws/related} presents related work, and Section~\ref{sect:aws/conclusion} contains a discussion of this work and suggests future work.
-
-% \paragraph{Contributions.} Our contributions are summarized as follows: \begin{enumerate}
-% \item We explore efficient encodings for two types of backend solvers, including 
-% saturation-based solvers, which to the best of our knowledge, have not been used to verify networks
-% \item We provide a comparison of the backend solvers and classify their strengths and weaknesses.
-% \end{enumerate}
+\EK{In summary, this paper...}
 
 %-------------------------------------------------------------------------------
 \section{Network Reachability Properties}
@@ -443,9 +433,9 @@ Synthesis of network configurations using \Datalog~\cite{DBLP:conf/cav/El-Hassan
 Weidenbach used saturation in \spass to verify security protocols~\cite{Weidenbach99}.
 }
 %-------------------------------------------------------------------------------
-\section{Challenges}
+\section{Challenges and Future Work}
 \label{sect:aws/challenges}
-This paper presents a work in progress and we did not fully address some of the challenges that we faced. We discuss these challenges in this section. We believe that similar challenges are experienced in other practical applications of automated reasoning in first-order logic.
+This paper presents a work in progress and we did not fully address some of the challenges that we faced. We discuss these challenges in this section and suggest directions for future work. We believe that similar challenges are experienced in other practical applications of automated reasoning in first-order logic.
 
 \paragraph{Good translation to first-order logic}
 Automated theorem provers for first-order logic are known to be sensitive to the encoding of the problem they are solving. To ensure efficient representation of practical problems in a theorem prover, these problems should be encoded using theories and syntactical constructs beyond plain first-order logic. Yet not all automated theorem provers efficiently implement these features. While the Vampire theorem prover used in this work supports many useful theories, we miss a support for the theory of bit vectors. The need to work around this limitation hinders a good translation of our network model to first-order logic. %The lack of support for bit vectors led us to device multiple translations for this theory and experiment with these translations.
@@ -455,27 +445,22 @@ Automated theorem provers for first-order logic are known to be sensitive to the
 \paragraph{Configuration of theorem provers}
 Automated theorem provers typically offer many settings for configuring proof search. For example, Vampire has dozens of options~\cite{DBLP:conf/cade/Reger0V14} that describe a colossal number of possible proof strategies. There is no proof strategy that would be the best for all kinds of problems, and we found that changing the default options of Vampire might result in a strategy that works better on our problems than the default strategy. At the same time, hand-picking good options is tedious and unintuitive, and there is no way of knowing if a hand-picked strategy will work well on all of our problems. Many modern automated theorem provers rely not on one single strategy, but on a portfolio of strategies, which they try one by one during proof search. Theorem provers typically implement portfolios for existing large collections of problems such as TPTP~\cite{TPTP} and SMT-LIB~\cite{SMT-LIB}. To our knowledge, there is no systematic way of assembling a custom portfolio tailored to a specific class of problems.
 
-\paragraph{Unpredictable runtime}
-\EK{When comparing the performance of \Datalog and theorem provers we saw that the performance time of \Datalog grows accordingly to the complexity of the problem. Performance of theorem provers looks unpredictable due to the nature of the saturation-based proof search. It's cool when a seemingly hard problem has an easy solution, not so cool the other way around. We wonder if a theorem proving community has an answer to it.}
+% \paragraph{Unpredictable runtime}
+% \EK{When comparing the performance of \Datalog and theorem provers we saw that the performance time of \Datalog grows accordingly to the complexity of the problem. Performance of theorem provers looks unpredictable due to the nature of the saturation-based proof search. It's cool when a seemingly hard problem has an easy solution, not so cool the other way around. We wonder if a theorem proving community has an answer to it.}
 
 \paragraph{Finite domains}
 Our formalization of VPC networks uses large finite domains to describe the topology of a network and the semantics of its components. While finite domains is good news for finite model builders, saturation-based theorem provers are known to have hard time reasoning with them. Domain closure axioms $(\forall x:\tau)(x=c_1 \vee\ldots\vee x=c_n)$ for large values of $n$ result in long clauses that degrade performance of the prover. A technique for efficient superposition theorem proving with these axioms is discussed e.g. in \cite{HillenbrandWeidenbach13}, but this technique is not implemented in any modern theorem prover.
 
-%-------------------------------------------------------------------------------
-\section{Future Work}
-\label{sect:aws/future-work}
-
-\paragraph{Extensive evaluation}
-\EK{We need to run experiments.}
-
-\paragraph{Comparison of theorem provers}
-In this work we only used Vampire. \EK{but would be interesting to compare other provers, or even use a portfolio of provers instead of just one.}
+\paragraph{EPR}
+We translate network models to problems that almost fit into the effectively propositional (EPR) fragment of first-order logic, also called the Bernays-Sch\"onfinkel class. These problems do not use function symbols with positive arity, but skolem functions with positive arity might be introduced during clausification. The satisfiability problem for EPR is decidable and there exist efficient tools that deal with this fragment~\cite{DBLP:conf/birthday/Korovin13}. It is possible to translate our network models to problems in EPR, for example by grounding the existentially-quantified variables. The obvious drawback of this translation is the blowup of the size of the resulting problem. Whether this blowup can be mitigated by the efficiency of EPR solvers is an interesting question for future work.
 
 \paragraph{Solver-agnostic network models}
 \EK{We used a specification which is \Datalog-friendly and not necessarily friendly for reasoning in first-order logic~--- only predicates, no functions. It would be interesting to rewrite it in first-order logic.}
 
-\paragraph{EPR}
-We translate network models to problems that almost fit into the effectively propositional (EPR) fragment of first-order logic, also called the Bernays-Sch\"onfinkel class. These problems do not use function symbols with positive arity, but skolem functions with positive arity might be introduced during clausification. The satisfiability problem for EPR is decidable and there exist efficient tools that deal with this fragment~\cite{DBLP:conf/birthday/Korovin13}. It is possible to translate our network models to problems in EPR, for example by grounding the existentially-quantified variables. The obvious drawback of this translation is the blowup of the size of the resulting problem. Whether this blowup can be mitigated by the efficiency of EPR solvers is an interesting question for future work.
+\paragraph{Extensive evaluation}
+\EK{
+In this work we only used the Vampire theorem prover as both a saturation-based theorem prover and a finite model builder. We are interested in trying other theorem provers for our problems.
+}
 
 %-------------------------------------------------------------------------------
 \section*{Acknowledgments}
