@@ -250,8 +250,6 @@ For example, the signature contains the type $\type{dir}$ and two constants $\co
 \subsection{Predicate Definitions}\label{sect:aws/fol/predicates}
 %The definitions of predicates in the specification assume the closed world interpretation. It means that a predicate is satisfied iff at least one of its rules is satisfied. To capture the definition in first-order logic we translate a predicate definition using logical equivalence.
 
-% as a predicate symbol $P:\tau_1\times\ldots\times\tau_n$
-
 Let predicate $p$ of the type $\tau_1\times\ldots\times\tau_n$ be defined using $k\ge0$ rules. Let $x_1:\tau_1,\ldots,x_n:\tau_n$ be fresh variables. If $k=0$ then we translate the definition of $p$ to the axiom $$(\forall x_1:\tau_1)\ldots(\forall x_n:\tau_n)(\neg p(x_1,\ldots,x_n)).$$ If $k>0$ then we translate the definition of $p$ to the axiom $$(\forall x_1:\tau_1)\ldots(\forall x_n:\tau_n)(p(x_1,\ldots,x_n)\Leftrightarrow R_1\vee\ldots\vee R_k),$$ where each of the formulas $R_1,\ldots,R_k$ are translations of each of the $k$ rules, respectively.
 
 Let a rule be of the form $$p(t_1,\ldots,t_n)\leftarrow L_1\wedge\ldots\wedge L_m,\quad(m\ge0)$$ where $t_1:\tau_1,\ldots,t_n:\tau_n$ are terms. Let $y_1:\sigma_1,\ldots,y_l:\sigma_l$ be variables that occur in either of $L_1,\ldots,L_m$ but not in $p(t_1,\ldots,t_n)$. If $m=0$ then we translate the rule to the formula $x_1=t_1\wedge\ldots\wedge x_n=t_n.$ If $m>0$ then we translate the rule to the formula
@@ -319,21 +317,44 @@ We translate
 
 \paragraph{32-bit vectors to tuples}
 We translate
-\begin{enumerate*}[label=(\roman*)]
-  \item the type $\type{bits32}$ to the tuple sort $(\mathit{bool},\ldots,\mathit{bool})$ where $\mathit{bool}$ is repeated 32 times,
-  \item each of the 32-bit vector constants to a term $(b_1,\ldots,b_{32})$ of this sort, where each of $b_1,\ldots,b_{32}$ is either $\mathit{true}$ or $\mathit{false}$, and
-  \item predicate $\pred{bits32}_\wedge$ to a predicate defined by the axiom of bitwise conjunction for boolean tuples.
-  \item predicate $\pred{=}_\type{bits16}$ to the standard equality.
-\end{enumerate*}
+(i) the type $\type{bits32}$ to the tuple sort $(\mathit{bool},\ldots,\mathit{bool})$ where $\mathit{bool}$ is repeated 32 times,
+(ii) each of the 32-bit vector constants to a term $(b_1,\ldots,b_{32})$ of this sort, where each of $b_1,\ldots,b_{32}$ is either $\mathit{true}$ or $\mathit{false}$, and
+(iii) predicate $\pred{bits32}_\wedge$ to a predicate defined by the following axiom of bitwise conjunction for boolean tuples.
+\begin{equation*}
+\begin{aligned}
+&(\forall x_1\ldots x_{32}:\bool)(\forall y_1\ldots y_{32}:\bool)(\forall z_1\ldots z_{32}:\bool)\\
+&\quad(\mathit{bits32}_\wedge((x_1,\ldots,x_{32}),(y_1,\ldots,y_{32}),(z_1,\ldots,z_{32}))\liff\\
+&\quad\quad (z_1\liff x_1\wedge y_1)\wedge\ldots\wedge(z_{32}\liff x_{32}\wedge y_{32}))
+\end{aligned}
+\end{equation*}
+(iv) predicate $\pred{=}_\type{bits32}$ to the standard equality.
 
 \paragraph{32-bit vectors to arrays}
 We translate
-\begin{enumerate*}[label=(\roman*)]
-  \item the type $\type{bits32}$ to the array sort $\mathit{array}(\mathbb{Z},\mathit{bool})$,
-  \item each of the 32-bit vector constant to a fresh constant $v$ of this sort, defined using the axiom $\mathit{select}(v,1)=b_1\wedge\ldots\wedge\allowbreak\mathit{select}(v, 32)=b_{32},$ where each of $b_1,\ldots,b_{32}$ is either $\mathit{true}$ or $\mathit{false}$, and
-  \item predicate $\pred{bits32}_\wedge$ to a predicate defined by the axiom of bitwise conjunction for arrays of booleans.
-  \item predicate $\pred{=}_\type{bits16}$ to a predicate defined by the axiom of equality for 32-element arrays of booleans.
-\end{enumerate*}
+(i) the type $\type{bits32}$ to the array sort $\mathit{array}(\mathbb{Z},\mathit{bool})$,
+(ii) each of the 32-bit vector constant to a fresh constant $v$ of this sort, defined using the axiom $\mathit{select}(v,1)=b_1\wedge\ldots\wedge\allowbreak\mathit{select}(v, 32)=b_{32},$ where each of $b_1,\ldots,b_{32}$ is either $\mathit{true}$ or $\mathit{false}$, and
+(iii) predicate $\pred{bits32}_\wedge$ to a predicate defined by the axiom of bitwise conjunction for arrays of booleans.
+\begin{equation*}
+\begin{aligned}
+&(\forall x:\mathit{array}(\mathbb{Z},\mathit{bool}))(\forall y:\mathit{array}(\mathbb{Z},\mathit{bool}))(\forall z:\mathit{array}(\mathbb{Z},\mathit{bool}))\\
+&\quad\begin{aligned}
+      (\mathit{bits32}_\wedge(x,y,z)\liff\:&(\mathit{select}(z,1)\liff\mathit{select}(x,1)\wedge\mathit{select}(y,1))\\
+      &\quad\wedge\ldots\wedge\:\\
+      &(\mathit{select}(z,32)\liff\mathit{select}(x,32)\wedge\mathit{select}(y,32)))
+      \end{aligned}
+\end{aligned}
+\end{equation*}
+(iv) predicate $\pred{=}_\type{bits32}$ to a predicate defined by the following axiom of equality for 32-element arrays of booleans.
+\begin{equation*}
+\begin{aligned}
+&(\forall x:\mathit{array}(\mathbb{Z},\mathit{bool}))(\forall y:\mathit{array}(\mathbb{Z},\mathit{bool}))\\
+&\quad\begin{aligned}
+      (\pred{=}_\type{bits32}(x, y)\liff\:&\mathit{select}(x,1)=\mathit{select}(y,1)\\
+      &\quad\wedge\ldots\wedge\:\\
+      &\mathit{select}(x, 32)=\mathit{select}(y,32))
+      \end{aligned}
+\end{aligned}
+\end{equation*}
 
 % \paragraph{Extra optimization}
 % We discovered that operators over 32-bit vectors are only ever used in the following context:
@@ -391,9 +412,11 @@ We eliminate theories from network models by rewriting the definitions of set-th
 Consider a network that only uses port ranges 0--65535, 22--22, 443--443, 5432--5432, 80--80 and 80--81 in any of the configurations of its components. We found that it is not uncommon for our networks to use trivial port ranges that span one port number. The definition of $\pred{portRangeOverlap}$ precomputed for this network consists of 12 facts or the rule $\pred{portRangeOverlap}(\const{portRange}_\text{80--80},\const{portRange}_\text{80--81})$ together with the rules (\ref{eq:aws/port-range-algebraic}).
 
 \subsubsection*{Comparison of Translations}
-We found that the translation that uses arrays of booleans produces formulas that are harder for \vampire than the translation that uses tuples. We explain it by the fact that in the latter translation a 32-bit vector is represented as a single term and not 32 literals. This representation allows Vampire infer bitwise conjunctions faster.
+We observed that formulas produced by the translation of 32-bit vectors to tuples are generally easier for \vampire than formulas produced by the translation to arrays. We explain it by the fact that the former end up using a more compact representation of bit vectors in first-order logic. The translation to tuples models a 32-bit vector as a single term, while the translation to arrays models it as conjunction of 32 literals. Furthermore, the translation to tuples uses the standard equality that Vampire supports efficiently, while the translation to arrays uses a heavy equality axiom for 32-element arrays. The compact representation of bit vectors as tuples allows Vampire infer bitwise conjunctions faster.
 
-\EK{Vampire's finite model builder cannot handle any theories, so we can only precompute theories for it.}
+We observed that formulas produced by the translation with precomputed theories are generally easier for \vampire than formulas produced by any of the translations of bit vectors to other theories. We explain it by the fact that the bulky axioms for bitwise conjunction and equality slow down the proof search, whereas these operations are easy to precompute. Even though the precomputation of a theory operation has polynomial complexity, we found that for the networks we used in this study it does not significantly slow down answering network questions. Realistic VPC networks only use a small number of distinct network primitives such as port numbers or IP addresses in any of the configurations of its components and no large-scale precomputation is needed. Furthermore, precomputation of each theory operation usually involves a simple operation over machine integers that can be performed quickly.
+
+Overall we found the precomputation of theories to be the most efficient strategy for translating our network models. It is also the only applicable strategy for translating network models for Vampire's finite model builder, because it only supports plain many-sorted first-order logic without theories.
 
 %-------------------------------------------------------------------------------
 \section{Related Work}
@@ -436,7 +459,7 @@ Automated theorem provers typically offer many settings for configuring proof se
 \EK{When comparing the performance of \Datalog and theorem provers we saw that the performance time of \Datalog grows accordingly to the complexity of the problem. Performance of theorem provers looks unpredictable due to the nature of the saturation-based proof search. It's cool when a seemingly hard problem has an easy solution, not so cool the other way around. We wonder if a theorem proving community has an answer to it.}
 
 \paragraph{Finite domains}
-Our formalization of VPC networks uses large finite domains to describe the topology of a network and the semantics of its components. While finite domains is good news for finite model builders, saturation-based theorem provers are known to have hard time reasoning with them. Domain closure axioms $(\forall x:\tau)(x=c_1 \vee\ldots\vee x=c_n)$ for large values of $n$ result in long clauses that degrade performance of the prover. A technique for efficient superposition theorem proving with these axioms is discussed in \cite{HillenbrandWeidenbach13}, but this technique is not implemented in any modern theorem prover.
+Our formalization of VPC networks uses large finite domains to describe the topology of a network and the semantics of its components. While finite domains is good news for finite model builders, saturation-based theorem provers are known to have hard time reasoning with them. Domain closure axioms $(\forall x:\tau)(x=c_1 \vee\ldots\vee x=c_n)$ for large values of $n$ result in long clauses that degrade performance of the prover. A technique for efficient superposition theorem proving with these axioms is discussed e.g. in \cite{HillenbrandWeidenbach13}, but this technique is not implemented in any modern theorem prover.
 
 %-------------------------------------------------------------------------------
 \section{Future Work}
