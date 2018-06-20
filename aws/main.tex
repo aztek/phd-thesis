@@ -72,7 +72,7 @@ All network nodes that have the port 22 (SSH) accessible from the internet.
 
 We will refer to questions that network administrators might want to answer, such as the ones in Examples~\ref{prop:bool-property} and \ref{prop:list-property}, as \emph{network questions}. In particular, we will refer to questions similar to Example~\ref{prop:bool-property} as \emph{boolean questions}, because an answer to them is ``yes'' or ``no'', and to questions similar to Example~\ref{prop:list-property} as \emph{list questions}, because an answer to them is a list of networking components. Each boolean question can be equivalently phrased as a list question such that the answer to the boolean question is ``yes'' iff the answer to the correspondent list questions is not empty. However, we distinguish these two types of questions because, as we show later, we can more efficiently answer them using different techniques.
 
-Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialized tools. In this work we employ automated theorem provers for first-order logic. To this end, we build static models of VPC networks (Section~\ref{sect:aws/specification}), translate these models and network questions about them to problems in first-order logic (Section~\ref{sect:aws/fol}) and check these problems using finite model builders and saturation-based theorem provers (Section~\ref{sect:aws/fol-provers}). We use these two types of provers to answer both types of questions more efficiently. In Section~\ref{sect:aws/fol-provers} we argue that finite model builders can more efficiently answer list questions and saturation-based theorem prover can more efficiently answer boolean questions. In Section~\ref{sect:aws/related} we cite related work and in Section~\ref{sect:aws/challenges} we describe the challenges that we faced in this work and outline future work.
+Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialized tools. In this work we employ automated theorem provers for first-order logic. To this end, we build static models of VPC networks (Section~\ref{sect:aws/specification}), translate these models and network questions about them to problems in first-order logic (Section~\ref{sect:aws/fol}) and check these problems using finite model builders and saturation-based theorem provers (Section~\ref{sect:aws/fol-provers}). In Section~\ref{sect:aws/fol-provers} we argue that finite model builders can more efficiently answer list questions and saturation-based theorem prover can more efficiently answer boolean questions. In Section~\ref{sect:aws/related} we cite related work and in Section~\ref{sect:aws/challenges} we describe the challenges that we faced in this work and outline future work.
 
 \EK{In summary, this paper...}
 
@@ -328,9 +328,9 @@ We translate
 \begin{aligned}
 &(\forall x:\mathit{array}(\mathbb{Z},\mathit{bool}))(\forall y:\mathit{array}(\mathbb{Z},\mathit{bool}))(\forall z:\mathit{array}(\mathbb{Z},\mathit{bool}))\\
 &\quad\begin{aligned}
-      (\mathit{bits32}_\wedge(x,y,z)\liff\:&(\mathit{select}(z,1)\liff\mathit{select}(x,1)\wedge\mathit{select}(y,1))\\
-      &\quad\wedge\ldots\wedge\:\\
-      &(\mathit{select}(z,32)\liff\mathit{select}(x,32)\wedge\mathit{select}(y,32)))
+      (\mathit{bits32}_\wedge(x,y,z)\liff\:&(\mathit{select}(z,1)\liff\mathit{select}(x,1)\wedge\mathit{select}(y,1))\:\wedge\\
+      &\quad\ldots\\
+      \wedge\:&(\mathit{select}(z,32)\liff\mathit{select}(x,32)\wedge\mathit{select}(y,32)))
       \end{aligned}
 \end{aligned}
 \end{equation*}
@@ -339,9 +339,9 @@ We translate
 \begin{aligned}
 &(\forall x:\mathit{array}(\mathbb{Z},\mathit{bool}))(\forall y:\mathit{array}(\mathbb{Z},\mathit{bool}))\\
 &\quad\begin{aligned}
-      (\pred{=}_\type{bits32}(x, y)\liff\:&\mathit{select}(x,1)=\mathit{select}(y,1)\\
-      &\quad\wedge\ldots\wedge\:\\
-      &\mathit{select}(x, 32)=\mathit{select}(y,32))
+      (\pred{=}_\type{bits32}(x, y)\liff\:&\mathit{select}(x,1)=\mathit{select}(y,1)\:\wedge\\
+      &\quad\ldots\\
+      \wedge\:&\mathit{select}(x, 32)=\mathit{select}(y,32))
       \end{aligned}
 \end{aligned}
 \end{equation*}
@@ -404,7 +404,7 @@ Consider a network that only uses port ranges 0--65535, 22--22, 443--443, 5432--
 \subsubsection*{Comparison of Translations}
 We observed that formulas produced by the translation of 32-bit vectors to tuples are generally easier for \vampire than formulas produced by the translation to arrays. We explain it by the fact that the former end up using a more compact representation of bit vectors in first-order logic. The translation to tuples models a 32-bit vector as a single term, while the translation to arrays models it as conjunction of 32 literals. Furthermore, the translation to tuples uses the standard equality that Vampire supports efficiently, while the translation to arrays uses a heavy equality axiom for 32-element arrays. The compact representation of bit vectors as tuples allows Vampire infer bitwise conjunctions faster.
 
-We observed that formulas produced by the translation with precomputed theories are generally easier for \vampire than formulas produced by any of the translations of bit vectors to other theories. We explain it by the fact that the bulky axioms for bitwise conjunction and equality slow down the proof search, whereas these operations are easy to precompute. Even though the precomputation of a theory operation has polynomial complexity, we found that for the networks we used in this study it does not significantly slow down answering network questions. Realistic VPC networks only use a small number of distinct network primitives such as port numbers or IP addresses in any of the configurations of its components and no large-scale precomputation is needed. Furthermore, precomputation of each theory operation usually involves a simple operation over machine integers that can be performed quickly.
+We observed that formulas produced by the translation with precomputed theories are generally easier for \vampire than formulas produced by any of the translations of bit vectors to other theories. We explain it by the fact that the bulky axioms for bitwise conjunction and equality slow down the proof search, whereas these operations are easy to precompute. Although the precomputation of a theory operation has polynomial complexity, we found that for the networks we used in this study it does not significantly slow down answering network questions. Realistic VPC networks only use a small number of distinct network primitives such as port numbers or IP addresses in any of the configurations of its components and no large-scale precomputation is needed. Furthermore, precomputation of each theory operation usually involves a simple operation over machine integers that can be performed quickly.
 
 Overall we found the precomputation of theories to be the most efficient strategy for translating our network models. It is also the only applicable strategy for translating network models for Vampire's finite model builder, because it only supports plain many-sorted first-order logic without theories.
 
@@ -455,12 +455,9 @@ Our formalization of VPC networks uses large finite domains to describe the topo
 We translate network models to problems that almost fit into the effectively propositional (EPR) fragment of first-order logic, also called the Bernays-Sch\"onfinkel class. These problems do not use function symbols with positive arity, but skolem functions with positive arity might be introduced during clausification. The satisfiability problem for EPR is decidable and there exist efficient tools that deal with this fragment~\cite{DBLP:conf/birthday/Korovin13}. It is possible to translate our network models to problems in EPR, for example by grounding the existentially-quantified variables. The obvious drawback of this translation is the blowup of the size of the resulting problem. Whether this blowup can be mitigated by the efficiency of EPR solvers is an interesting question for future work.
 
 \paragraph{Solver-agnostic network models}
-\EK{We used a specification which is \Datalog-friendly and not necessarily friendly for reasoning in first-order logic~--- only predicates, no functions. It would be interesting to rewrite it in first-order logic.}
+The work presented in this paper contributes to our ultimate goal of checking network properties with diverse complementary constraint solvers. In order to succesfully use different kinds of constraint solvers we need a formalization of networks that can be equally efficiently translated to different kinds of constraint satisfaction problems. We find that our current formalization, written in the logic programming style, is friendly for Horn clause solvers such as \Datalog~\cite{Datalog}, but not necessarily for theorem provers for first-order logic. For example, some of the predicates in the specification can be more naturally expressed as functions in full first-order logic rather than translated from their encoding as Horn clauses. Ultimately this bias hinders efficient representation of the problem in first-order logic. Designing a more solver-agnostic formalization of networks is an important direction of future work.
 
-\paragraph{Extensive evaluation}
-\EK{
-In this work we only used the Vampire theorem prover as both a saturation-based theorem prover and a finite model builder. We are interested in trying other theorem provers for our problems.
-}
+\paragraph{Extensive evaluation} In this work we used a small collection of network configurations that we verified using Vampire playing a role of both a saturation-based theorem prover and a finite model builder. We leave for future work experiments with (i) other theorem provers for first-order logic, (ii) other kinds of constraint solvers, (iii) different encodings of network problems as constraint satisfaction problems, and (iv) large collections of real world network configurations.
 
 %-------------------------------------------------------------------------------
 \section*{Acknowledgments}
