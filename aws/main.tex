@@ -135,7 +135,7 @@ The specification of Amazon~VPC networks that we used in this work consists of a
 
 We express network questions as formulas of many-sorted first-order logic with the standard logical connectives $\vee$, $\wedge$, $\Rightarrow$, $\Leftrightarrow$, $\oplus$ and equality. These formulas only use types, constants and predicates from the signature of the network model. The formulas do not use any function symbols. We allow interpretation of these formulas to use empty domains and otherwise assume the standard semantics of many-sorted first-order logic.
 
-We express boolean questions as closed formulas, that is, formulas in which all variables are bound by a quantifier. Conversely, we express list questions as formulas with free variables. The answer to a boolean question is ``yes'' iff its correspondent formula is valid. The answer to a list question is the set of substitutions of variable with constants that satisfy its correspondent formula.
+We express boolean questions as closed formulas, that is, formulas in which all variables are bound by a quantifier. Conversely, we express list questions as formulas with free variables. The answer to a boolean question is ``yes'' iff its correspondent formula is valid. The answer to a list question is the set of substitutions of free variables with constants that satisfy its correspondent formula.
 
 Formula~\ref{eq:bool-property} expresses the boolean question in Example~\ref{prop:bool-property}.
 \begin{equation}\label{eq:bool-property}
@@ -185,9 +185,9 @@ All predicates and constants used in Formulas~\ref{eq:bool-property} and \ref{eq
 \label{sect:aws/fol-provers}
 % The continuous advances in automated reasoning have made theorem provers into powerful tools capable of efficiently solving problems coming from real world domains. %\EK{FMB might be just as efficient as datalog search, and saturation-based proof search might be more efficient.} 
 
-We translate network models and network questions to problems in first-order logic. We solve these problems using saturation-based theorem provers and finite model builders. We use these two types of provers to leverage the strengths of both of them, which we summarize below.
+We translate network models and network questions to problems in first-order logic, some of which use theories. We solve these problems using saturation-based theorem provers and finite model builders. We use the combination of these two types of provers to leverage the strengths of both of them, which we summarize below.
 
-Saturation-based theorem provers such as \eprover\cite{E13}, \spass\cite{Spass} or \vampire\cite{Vampire13} construct proofs of unsatisfiability of first-order problems. To that end, they first convert the input problem into a set of first-order clauses and then try to derive contradiction from it. Theorem provers saturate the search space by inferring new clauses with inference rules such as binary resolution~\cite{Ganzinger01} and superposition~\cite{NieuwenhuisRubio:HandbookAR:paramodulation:2001}. They employ multiple techniques to prune the search space such as simplification orderings, selection functions and redundancy elimination. Saturation-based provers handle theories by adding incomplete first-order theory axioms to the set of clauses and by using specialized inference rules. In addition to that, \vampire implements the AVATAR modulo theories~\cite{DBLP:conf/gcai/RegerB0V16} architecture that relies on an SMT solver for theory-consistent reasoning in the ground subset of the problem. Saturation-based provers are designed to efficiently solve unsatisfiable problems. Given a satisfiable problem, saturation-based provers can in rare cases report satisfiability and output the saturated set of clauses. However, it is usually not possible to reconstruct a model from this set.
+Saturation-based theorem provers such as E~\cite{E13}, Spass~\cite{Spass} or Vampire~\cite{Vampire13} construct proofs of unsatisfiability of first-order problems. To that end, they first convert the input problem into a set of first-order clauses and then try to derive contradiction from it. Theorem provers saturate the search space by inferring new clauses with inference rules such as binary resolution~\cite{Ganzinger01} and superposition~\cite{NieuwenhuisRubio:HandbookAR:paramodulation:2001}. They employ multiple techniques to prune the search space such as simplification orderings, selection functions and redundancy elimination. Saturation-based provers handle theories by adding incomplete first-order theory axioms to the set of clauses and by using specialized inference rules. In addition to that, \vampire implements the AVATAR modulo theories~\cite{DBLP:conf/gcai/RegerB0V16} architecture that relies on an SMT solver for theory-consistent reasoning in the ground subset of the problem. Saturation-based provers are designed to efficiently solve unsatisfiable problems. Given a satisfiable problem, saturation-based provers can in rare cases report satisfiability and output the saturated set of clauses. However, it is usually not possible to reconstruct a model from this set.
 
 Finite model builders (finders) construct finite counter-models of first-order problems. One of the mots successful methods for finite model building was pioneered by the finite model builder MACE~\cite{mccune1994davis}. This method iterates over possible domain sizes, for each domain size grounds the first-order problem with this domain, and translates the resulting formula to a SAT problem. If the SAT problem is satisfied, a finite model of the selected size is reconstructed from the SAT model. Finite model builders Gandalf~\cite{Gandalf}, Paradox~\cite{claessen2003new} and Vampire~\cite{VampireFMB} implement the MACE-style method. Finite model builders generally do not support theories with the notable exception of SMT solver CVC4~\cite{CVC4} that integrates model finding techniques into its usual theory solving~\cite{CVC4FMB}. Finite model builders are designed to efficiently solve satisfiable problems. Given an unsatisfiable problem, some finite model builders might detect that the problem cannot have infinite models and in such case report unsatisfiability.
 
@@ -302,7 +302,7 @@ We translate
 \begin{enumerate*}[label=(\roman*)]
   \item the type $\type{bits16}$ to $\mathbb{Z}$,
   \item each of the 16-bit vector constants to an integer constant, and
-  \item each of the 16-bit predicates to their correspondent function symbols in the theory of linear integer arithmetic.
+  \item each of the 16-bit predicates to their correspondent predicate symbol in the theory of linear integer arithmetic.
   \item predicate $\pred{=}_\type{bits16}$ to the standard equality.
 \end{enumerate*}
 \EK{We are translating uint16 to $\mathbb{Z}$~--- explain why it is sound.}
@@ -413,12 +413,12 @@ Overall we found the precomputation of theories to be the most efficient strateg
 %-------------------------------------------------------------------------------
 \section{Related Work}
 \label{sect:aws/related}
+%SecGuru~--- verification of network connectivity policies at Microsoft Azure using Z3~\cite{jayaraman2014automated}. Basically, they take two sets of ACL rules from firewalls (of the form: connections from this IP range on this port over this protocol are allowed/denied) and calculate their semantic difference using Z3 and ground theory of bit vectors.
+
+The complexity and potential impact of network verification makes it an attractive target for formal methods. 
+
 \EK{
-SecGuru~--- verification of network connectivity policies at Microsoft Azure using Z3~\cite{jayaraman2014automated}. Basically, they take two sets of ACL rules from firewalls (of the form: connections from this IP range on this port over this protocol are allowed/denied) and calculate their semantic difference using Z3 and ground theory of bit vectors.
-
 SecGuru is a work by Nikolaj Bj\o{}rner et al. Compared to~\cite{jayaraman2014automated} which only talks about ACLs, later they extended it~\cite{DBLP:conf/icdcit/BjornerJ15} with verification of routing tables and Border gateway Protocol (BGP). 
-
-VeriCon~\cite{DBLP:conf/pldi/BallBGIKSSV14}~--- a verification tool for SDN controllers. Basically, program verification for network applications running on firewalls and such, as I understood.
 
 VeriFlow~\cite{Veriflow}~--- checking network-wide invariants in real time, specialised algorithm, verification in the data plane.
 
@@ -426,7 +426,7 @@ ConfigChecker~\cite{ConfigChecker}~--- verification of ACLs, BDD, CRL symbolic m
 
 Anteater~\cite{Anteater}~--- data plane verification using SAT.
 
-CrystalNet~\cite{crystalnet}: Emulation of Large Production Networks
+%CrystalNet~\cite{crystalnet}: Emulation of Large Production Networks
 
 Batfish~\cite{batfish}: \Datalog and SMT
 
