@@ -367,7 +367,7 @@ We translate
 \subsubsection*{Precomputation of Theories}
 Our network models use 16-bit vectors to describe port numbers (as integers between 0 and 65535) and port ranges and 32-bit vectors to describe IPv4 addresses and subnet masks. Bit vector predicates are only used in the definitions of predicates for network primitives. For example, 16-bit vectors only occur in the definitions of predicates that encode set-theoretic operations over port ranges such as $\pred{portRangeOverlap}$ from Section~\ref{sect:aws/reachability/properties}. Definitions of higher level predicates only use these operations over port ranges and never the bit vectors predicates.
 
-We eliminate theories from network models by rewriting the definitions of set-theoretic operations over network primitives with results of precomputation of these operations for all primitives used in the network. For example, we precompute the $\pred{portRangeOverlap}$ predicate in the following way. First, we compute the set $S$ of all pairs of overlapping port ranges among the ones used in the network. This requires a quadratic number of integer comparisons. Then, we use set $S$ to build a definition of $\pred{portRangeOverlap}$ that consists of facts of the form $\pred{portRangeOverlap}(\const{portRange}_X,\const{portRange}_Y)$ where $(X,Y)\in S$. We optimize precomputation of some operations by considering their algebraic properties. For example, $\pred{portRangeOverlap}$ is a reflexive symmetric binary relation and 0--65535 overlaps with any other port range. Knowing that, we can avoid comparing each port range with itself, comparing two port ranges twice and comparing 0--65535 with other port ranges. Instead, we can use the following rules in the definition of $\pred{portRangeOverlap}$.
+We eliminate theories from network models by rewriting the definitions of set-theoretic operations over network primitives with results of precomputation of these operations for all primitives used in the network. For example, we precompute the $\pred{portRangeOverlap}$ predicate in the following way. First, we compute the set $S$ of all pairs of overlapping port ranges among the ones used in the network. This requires a quadratic number of integer comparisons. Then, we use set $S$ to build a definition of $\pred{portRangeOverlap}$ that consists of facts of the form $\pred{portRangeOverlap}(\const{portRange}_X,\const{portRange}_Y)$ where $(X,Y)\in S$. We optimize precomputation of some operations by considering their algebraic properties. For example, $\pred{portRangeOverlap}$ is a reflexive symmetric binary relation and 0--65535 overlaps with any other port range. Therefore, we avoid comparing each port range with itself, comparing two port ranges twice and comparing 0--65535 with other port ranges. Instead, we use the following rules in the definition of $\pred{portRangeOverlap}$.
 \begin{equation}\label{eq:aws/port-range-algebraic}
 \begin{aligned}
 &\pred{portRangeOverlap}(\mathit{Range},\mathit{Range}).\\
@@ -417,14 +417,21 @@ Overall we found the precomputation of theories to be the most efficient strateg
 
 The complexity and potential impact of network verification makes it an attractive target for formal methods. 
 
+Network reachability properties 
+
+Check reachability properties of IP networks using symbolic model checking 
+
+Nikolaj Bj\o{}rner et al.~\cite{DBLP:conf/icdcit/BjornerJ15} checked properties of Microsoft Azure networks  
+
 \EK{
+
 SecGuru is a work by Nikolaj Bj\o{}rner et al. Compared to~\cite{jayaraman2014automated} which only talks about ACLs, later they extended it~\cite{DBLP:conf/icdcit/BjornerJ15} with verification of routing tables and Border gateway Protocol (BGP). 
 
 VeriFlow~\cite{Veriflow}~--- checking network-wide invariants in real time, specialised algorithm, verification in the data plane.
 
 ConfigChecker~\cite{ConfigChecker}~--- verification of ACLs, BDD, CRL symbolic model checking, not SDN though.
 
-Anteater~\cite{Anteater}~--- data plane verification using SAT.
+%Anteater~\cite{Anteater}~--- data plane verification using SAT.
 
 %CrystalNet~\cite{crystalnet}: Emulation of Large Production Networks
 
@@ -433,6 +440,8 @@ Batfish~\cite{batfish}: \Datalog and SMT
 Synthesis of network configurations using \Datalog~\cite{DBLP:conf/cav/El-HassanyTVV17}.
 
 Weidenbach used saturation in \spass to verify security protocols~\cite{Weidenbach99}.
+
+Lisitsa \cite{DBLP:conf/atva/Lisitsa10}
 }
 %-------------------------------------------------------------------------------
 \section{Challenges and Future Work}
