@@ -3,9 +3,8 @@
 \usepackage{color}
 \definecolor{lstgrey}{rgb}{0.96,0.96,0.96}
 \definecolor{lstcommentgrey}{rgb}{0.5,0.5,0.5}
-\usepackage{listings}
 
-\usepackage{cmll} % for \with
+\usepackage{listings}
 \lstset{
   basicstyle=\ttfamily,
   columns=flexible,
@@ -28,22 +27,6 @@
     {:=}{$\coloneqq$}1
 }
 
-\usepackage{xpatch}
-\usepackage{realboxes}
-\makeatletter
-\xpretocmd\lstinline
-  {%
-   \bgroup\fboxsep=1.5pt
-   \Colorbox{lstgrey}\bgroup\vphantom{\ttfamily\char`\\y}%
-   \appto\lst@DeInit{\egroup\egroup}%
-  }{}{}
-\makeatother
-
-% \makeatletter
-% \xpretocmd\lstinline{\Colorbox{lstgrey}\bgroup\appto\lst@DeInit{\egroup}}{}{}
-% \makeatother
-
-
 \lstdefinelanguage{tptp}{
   keywords={tff, thf, fof, cnf, type, axiom, hypothesis, conjecture},
   morecomment=[f][\color{lstcommentgrey}][0]{\%}
@@ -58,6 +41,17 @@
 }
 
 \lstdefinelanguage{bnf}{}
+
+\usepackage{xpatch}
+\usepackage{realboxes}
+\makeatletter
+\xpretocmd\lstinline
+  {%
+   \bgroup\fboxsep=1.5pt
+   \Colorbox{lstgrey}\bgroup\vphantom{\ttfamily\char`\\y}%
+   \appto\lst@DeInit{\egroup\egroup}%
+  }{}{}
+\makeatother
 
 \newcommand{\reserved}[1]{\textbf{#1}} % reserved words in algorithms
 \newcommand{\ass}{$\coloneqq$}     % assignment operator

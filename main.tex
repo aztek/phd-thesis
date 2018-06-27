@@ -1,34 +1,36 @@
 \documentclass[10pt,twoside]{book}
-\usepackage{amssymb,amsmath,amsthm,mathrsfs,stmaryrd,dsfont,bbold,mathtools}
+
+\usepackage[nottoc]{tocbibind}
 \usepackage[english]{babel}
 \usepackage[lighttt]{lmodern}
 \usepackage[inline]{enumitem}
-\usepackage{yfonts}
-\usepackage{pifont}
+\usepackage{amssymb,amsmath,amsthm,mathrsfs,stmaryrd,dsfont,bbold,mathtools,proof}
+\usepackage{yfonts,pifont,anyfontsize}
 \usepackage{tikz}
-\usepackage{color}
-\usepackage{xcolor}
-\usepackage{proof}
-\usepackage{url}
+\usepackage{url,hyperref,nameref}
 \usepackage{multirow}
-\usepackage{subfig}
-\usepackage{wrapfig}
+\usepackage{subfig,wrapfig}
 \usepackage{xspace}
 \usepackage{fancyvrb}
-\usepackage{nameref}
+\usepackage{listings}
+\usepackage{xpatch}
+\usepackage{realboxes}
 
-\usepackage{anyfontsize}
+% \newif\if@draft
+% \@drafttrue
 
-\include{layout}
-
-\include{notation}
-
-\include{information}
-
-\newcommand{\EK}[1]{{\color{red}  EK: {#1}}}
-% \newcommand{\EK}[1]{}
+\input{notation}
+\input{layout}
 
 \begin{document}
+
+\input{information}
+
+% \if@draft
+  \newcommand{\EK}[1]{{\color{red} EK: {#1}}}
+% \else
+  %\newcommand{\EK}[1]{}
+% \fi
 
 \frontmatter
 
@@ -48,19 +50,6 @@
 \addcontentsline{toc}{chapter}{Introduction}
 \label{chap:intro}
 \input{introduction}
-
-\def\paperSixContentsTitle{Checking Network Reachability Properties by\\Automated Reasoning in First-Order Logic}
-\def\paperSixChapterTitle{Checking Network Reachability\\Properties by Automated Reasoning\\in First-Order Logic}
-\def\paperSixAuthors{Evgenii~Kotelnikov and Pavle Suboti\'{c}}
-\def\paperSixAbstract{Verification of computer networks is an important and challenging task, often tackled with constraint solving and automated reasoning. This work presents an approach for checking and discovering reachability properties of virtual private cloud networks using automated reasoning in first-order logic. Reachability properties of a network express whether its configuration allows the network traffic to flow between given nodes of the network. We model networks with Horn clauses and check first-order properties of these models using Vampire both as a finite model builder and as a saturation theorem prover.}
-\def\paperSixPublication{A technical report based on a joint work with Byron~Cook, Temesghen Kahsai and Sean~McLaughlin, 2018.}
-\paperchapter{\paperSixContentsTitle}
-             {\paperSixChapterTitle}
-             {\paperSixAuthors}
-             {\paperSixAbstract}
-             {\paperSixPublication}
-\label{chap:aws}
-\include{aws/main}
 
 \def\paperOneContentsTitle{A First Class Boolean Sort in\\First-Order Theorem Proving and TPTP}
 \def\paperOneChapterTitle{A First Class Boolean Sort in\\First-Order Theorem Proving\\and TPTP}
@@ -113,6 +102,19 @@
              {\paperFourPublication}
 \label{chap:boogie}
 \include{ijcar18/main}
+
+\def\paperSixContentsTitle{Checking Network Reachability Properties by\\Automated Reasoning in First-Order Logic}
+\def\paperSixChapterTitle{Checking Network Reachability\\Properties by Automated Reasoning\\in First-Order Logic}
+\def\paperSixAuthors{Evgenii~Kotelnikov and Pavle Suboti\'{c}}
+\def\paperSixAbstract{Verification of computer networks is an important and challenging task, often tackled with constraint solving and automated reasoning. This work presents an approach for checking and discovering reachability properties of virtual private cloud networks using automated reasoning in first-order logic. Reachability properties of a network express whether its configuration allows the network traffic to flow between given nodes of the network. We model networks with Horn clauses and check first-order properties of these models using Vampire both as a finite model builder and as a saturation theorem prover.}
+\def\paperSixPublication{A technical report based on a joint work with Byron~Cook, Temesghen Kahsai and Sean~McLaughlin, 2018.}
+\paperchapter{\paperSixContentsTitle}
+             {\paperSixChapterTitle}
+             {\paperSixAuthors}
+             {\paperSixAbstract}
+             {\paperSixPublication}
+\label{chap:aws}
+\include{aws/main}
 
 \def\paperFiveContentsTitle{TFX: The TPTP Extended Typed First-Order Form}
 \def\paperFiveChapterTitle{TFX: The TPTP Extended Typed\\First-Order Form}
