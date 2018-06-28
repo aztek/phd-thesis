@@ -9,20 +9,6 @@
 \newtheorem{example}{Example}[chapter]
 \newtheorem*{example*}{Example}
 
-% \ifbool{printed}{%
-  % \hypersetup{hidelinks}
-% }{%
-  % \hypersetup{linktocpage}
-  \definecolor{linkcolor}{RGB}{25, 25, 112}
-  \hypersetup{
-    colorlinks,
-    citecolor=linkcolor,
-    filecolor=linkcolor,
-    linkcolor=linkcolor,
-    urlcolor=linkcolor
-  }
-% }
-
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \renewcommand{\headrulewidth}{0pt}
@@ -41,7 +27,14 @@
 
 % \usepackage[showframe]{geometry}
 \usepackage{geometry}
-\geometry{papersize={169mm,239mm},inner={15mm},outer={30mm},top={20mm},bottom={30mm},bindingoffset={13mm}}
+\geometry{
+  papersize={169mm,239mm},
+  inner={15mm},
+  outer={30mm},
+  top={20mm},
+  bottom={30mm},
+  bindingoffset={13mm}
+}
 
 % \widowpenalty10000
 % \clubpenalty10000
@@ -71,22 +64,6 @@
   {1em}
   {}%[\vspace{-0.1em}]
 \titlespacing*{\section}{0pt}{20pt}{6pt}
-
-\usepackage{afterpage}
-
-\definecolor{chaptertitle}{RGB}{164, 238, 246}
-
-% paper chapter headers
-\newcommand{\paperchapter}[5]{%
-  \chapter[#1]{#2}
-  {\linespread{1.15}\large\emph #3\par}
-  {\vspace{1.5em}\paragraph{Abstract.}{{#4}}}
-  \vfill
-  {\noindent{#5}}
-  \pagecolor{chaptertitle}
-  \cleardoublepage
-  \afterpage{\nopagecolor}
-}
 
 % \usepackage{secdot}
 

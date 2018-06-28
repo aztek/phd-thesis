@@ -1,6 +1,5 @@
 \documentclass[10pt,twoside]{book}
 
-\usepackage[nottoc]{tocbibind}
 \usepackage[english]{babel}
 \usepackage[lighttt]{lmodern}
 \usepackage[inline]{enumitem}
@@ -11,26 +10,63 @@
 \usepackage{multirow}
 \usepackage{subfig,wrapfig}
 \usepackage{xspace}
-\usepackage{fancyvrb}
-\usepackage{listings}
-\usepackage{xpatch}
-\usepackage{realboxes}
-
-% \newif\if@draft
-% \@drafttrue
+\usepackage{afterpage}
 
 \input{notation}
 \input{layout}
 
-\begin{document}
-
 \input{information}
 
-% \if@draft
+\newif\if@paper
+\@paperfalse
+
+\newif\if@draft
+\@drafttrue
+
+\if@paper
+  \hypersetup{hidelinks}
+\else
+  \definecolor{linkcolor}{RGB}{25, 25, 112}
+  \hypersetup{
+    colorlinks,
+    citecolor=linkcolor,
+    filecolor=linkcolor,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor
+  }
+\fi
+
+\definecolor{chaptertitle}{RGB}{164, 238, 246}
+
+% paper chapter headers
+\newcommand{\paperchapter}[5]{%
+  \chapter[#1]{#2}
+  {\linespread{1.15}\large\emph #3\par}
+  {\vspace{1.5em}\paragraph{Abstract.}{{#4}}}
+  \vfill
+  {\noindent{#5}}
+  \if@paper
+    % \if@draft
+      % \pagecolor{chaptertitle}
+      % \afterpage{\nopagecolor}
+    % \fi
+    \cleardoublepage
+  \else
+    % \if@draft
+      % \pagecolor{chaptertitle}
+      % \afterpage{\nopagecolor}
+    % \fi
+    \clearpage
+  \fi
+}
+
+\if@draft
   \newcommand{\EK}[1]{{\color{red} EK: {#1}}}
-% \else
+\else
   %\newcommand{\EK}[1]{}
-% \fi
+\fi
+
+\begin{document}
 
 \frontmatter
 
@@ -64,7 +100,7 @@
              {\paperOneAbstract}
              {\paperOnePublication}
 \label{chap:fool}
-\include{cicm15/main}
+\input{cicm15/main}
 
 \def\paperTwoContentsTitle{The Vampire and the FOOL}
 \def\paperTwoChapterTitle{The Vampire and the FOOL}
@@ -77,7 +113,7 @@
              {\paperTwoAbstract}
              {\paperTwoPublication}
 \label{chap:implementation}
-\include{cpp16/main}
+\input{cpp16/main}
 
 \def\paperThreeContentsTitle{A Clausal Normal Form Translation for \folb{}}
 \def\paperThreeChapterTitle{A Clausal Normal Form\\Translation for \folb{}}
@@ -90,7 +126,7 @@
              {\paperThreeAbstract}
              {\paperThreePublication}
 \label{chap:cnf}
-\include{gcai16/main}
+\input{gcai16/main}
 
 \def\paperFourContentsTitle{A FOOLish Encoding of the Next State Relations\\of Imperative Programs}
 \def\paperFourChapterTitle{A FOOLish Encoding of the Next State Relations of Imperative Programs}
@@ -103,7 +139,7 @@
              {\paperFourAbstract}
              {\paperFourPublication}
 \label{chap:boogie}
-\include{ijcar18/main}
+\input{ijcar18/main}
 
 \def\paperSixContentsTitle{Checking Network Reachability Properties by\\Automated Reasoning in First-Order Logic}
 \def\paperSixChapterTitle{Checking Network Reachability\\Properties by Automated Reasoning\\in First-Order Logic}
@@ -116,7 +152,7 @@
              {\paperSixAbstract}
              {\paperSixPublication}
 \label{chap:aws}
-\include{aws/main}
+\input{aws/main}
 
 \def\paperFiveContentsTitle{TFX: The TPTP Extended Typed First-Order Form}
 \def\paperFiveChapterTitle{TFX: The TPTP Extended Typed\\First-Order Form}
@@ -129,7 +165,7 @@
              {\paperFiveAbstract}
              {\paperFivePublication}
 \label{chap:tfx}
-\include{paar18/main}
+\input{paar18/main}
 
 \bibliography{refs}
 
