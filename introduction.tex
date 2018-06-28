@@ -15,10 +15,12 @@ Theorem provers are used for software and hardware verification, information man
 This thesis contributes to the area of automated theorem proving by presenting an extension of first-order logic that is useful for applications and can be supported by first-order theorem provers. This chapter describes the background of the thesis and is structured as follows. Section~\ref{sect:intro:fol} gives an introduction to automated theorem proving in first-order logic. Sections \ref{sect:intro:analysis} and \ref{sect:intro:itp} describe two important applications of first-order provers, automation for program verification and interactive proof assistants. Section~\ref{sect:intro:problem} states the problem addressed in the thesis, and finally Section~\ref{sect:intro:contributions} summarises the contributions of the thesis.
 }
 
+\section*{Automated Reasoning for First-Order Logic}
+\addcontentsline{toc}{section}{Automated Theorem Proving for First-Order Logic}
+
+\subsection*{Resolution and Superposition}
+\addcontentsline{toc}{subsection}{Resolution and Superposition}
 \EK{
-\section*{Automated Theorem Proving in First-Order Logic}
-\label{sect:intro:fol}
-\addcontentsline{toc}{section}{Automated Theorem Proving in First-Order Logic}
 The problem of establishing validity of a first-order problem automatically can be traced back to Hilbert. In 1928 he posed a question, traditionally referred to as \emph{Entscheidungsproblem}\iffalse(German for ``decision problem'')\fi, stated as follows. Is there an algorithm that takes as input a statement in first-order logic and terminates with ``Yes'' or ``No'' according to whether or not the statement is valid?
 
 This question has been answered negatively in 1936 independently by Church~\cite{church1936unsolvable} and Turing~\cite{turing1936computable}. Their proofs rely on the famous G\"{o}del's incompleteness theorem\iffalse~\cite{godel1931formal} (for an English translation see e.g. \cite[pp. 4--38]{davis1965undecidable})\fi. G\"{o}del's result entails that the problem of provability in first-order logic is not decidable, but \emph{semi-decidable}. Informally, it means that if a logical sentence of the form ``$\varphi$ implies $\psi$'' is valid, that can be established by enumerating all finite derivations in the logical system. A derivation between $\varphi$ and $\psi$ will necessarily be found in that enumeration. On the other hand, if the sentence is invalid, there is no algorithm that could in general demonstrate that.
@@ -48,19 +50,31 @@ First-order provers are currently evaluated on empirical grounds. Comparison bet
 %Automated methods of theorem proving are appealing for mechanically checking problems that are too dull and time-consuming to be checked by humans.
 }
 
+\subsection*{Finite Model Building}
+\addcontentsline{toc}{subsection}{Finite Model Building}
+\EK{TODO}
+
+\subsection*{Satisfiability Modulo Theories}
+\addcontentsline{toc}{subsection}{Satisfiability Modulo Theories}
+\EK{TODO}
+
+\section*{Applications of Automated Reasoning}
+\addcontentsline{toc}{section}{Applications of Automated Reasoning}
+\EK{TODO}
+
+\subsection*{Deductive Program Verification}
+\addcontentsline{toc}{subsection}{Deductive Program Verification}
 \EK{
-\section*{Automation for Program Verification}
-\label{sect:intro:analysis}
-\addcontentsline{toc}{section}{Automation for Program Verification}
 Methods of program verification check that a program satisfies its specification. A program specification can be expressed with logical formulas that annotate program statements, capturing their properties. Typical examples of such properties are pre- and post-conditions, loop invariants and Craig interpolants. These program properties are checked using various tools, including theorem provers (see e.g. \cite{Bonacina10} for a detailed overview).
 
 Automated program verification sees compliance with specification as a theorem that can be automatically checked by theorem provers. For that, program statements are first translated to logical formulas that capture the semantics of the statements. Then, a theorem is built with the translated formulas as axioms and program properties as the conjecture. Validity of the theorem is interpreted as that the program statements have their annotated properties.
 
 Theorem provers can be used not just for checking program properties, but also for generating them. Recent approaches in interpolation and loop invariant generation~\cite{McMillan08,fase2009,hoder2012popl} present initial results of using first-order theorem provers for generating quantified program properties. First-order theorem provers can also be used to generate program properties with quantifier alternations~\cite{fase2009}; such properties could not be generated fully automatically by any previously known method.
+}
 
-\section*{Automation for Proof Assistants}
-\label{sect:intro:itp}
-\addcontentsline{toc}{section}{Automation for Proof Assistants}
+\subsection*{Automation for Proof Assistants}
+\addcontentsline{toc}{subsection}{Automation for Proof Assistants}
+\EK{
 A proof assistant (also called an interactive theorem prover) is a software tool that assists the user in constructing proofs of mathematical problems. Proof assistants use formalisations of mathematics based on higher-order logic (Isabelle/HOL~\cite{Isabelle}), type theory (Coq~\cite{Coq}), set theory (Mizar~\cite{Mizar}) and others.
 
 Many proof assistants enhance the workflow of their users by automatically filling in parts of the user's proof with the help of tactics. Tactics are specialised scripts that run a predefined collection of proof searching strategies. These strategies can be implemented inside the proof assistant itself or rely on third-party automated theorem provers~\cite{Sledgehammer,DBLP:conf/icms/UrbanHV10}.
@@ -68,10 +82,9 @@ Many proof assistants enhance the workflow of their users by automatically filli
 To automate proof search for a problem using a theorem prover, a proof assistant first translates the problem into the logic supported by the theorem prover. Since the logics of proof assistants are usually more expressive than the logics of automated provers, the translation can be incomplete. If the theorem prover reports back a proof, the proof assistant uses it to reconstruct a proof in its own logic.
 }
 
-\EK{
 \section*{Problem Statement}
-\label{sect:intro:problem}
 \addcontentsline{toc}{section}{Problem Statement}
+\EK{
 Both systems of automated program verification and proof assistants use first-order theorem provers but usually do not natively work with first-order logic. Instead, they translate problems in their respective domains (program properties or formulas in the logic of the proof assistant) to problems in first-order logic. Such translations are not straightforward because of a mismatch between the semantics of first-order logic and that of the domain. They can be very complex and thus error prone.
 
 The performance of a theorem prover on the result of a translation crucially depends on whether the translation introduces formulas potentially making the prover inefficient. Theorem provers, especially first-order ones, are known to be very fragile with respect to the input. Expressing program properties in the ``right'' format therefore requires solid knowledge about how theorem provers work and are implemented~--- something that a user of a prover might not have. 
@@ -90,7 +103,7 @@ This thesis contributes to the area of automated reasoning by exploring which ex
 
 % This thesis \begin{enumerate*}[label=(\roman*)]\item presents a extension of first-order logic with the missing syntactical constructs mentioned before; \item explores how reasoning with this extension can be implemented in existing automated theorem provers for first-order logic; and \item gives practical evidence of usefulness of the extension and efficiency of reasoning with it for applications.\end{enumerate*}
 
-The thesis presents an extension called \folb{}, standing for first-order logic (FOL) with boolean sort. \folb{} extends the ordinary many-sorted FOL with \begin{enumerate*}[label=(\roman*)]\item first class boolean sort, \item boolean variables used as formulas, \item formulas used as arguments to function and predicate symbols, \item \ITE\ expressions and \item \LETIN\ expressions.\end{enumerate*}
+The thesis presents the extension FOOL of first-order logic (FOL), standing for FOL with boolean sort. \folb{} extends ordinary many-sorted FOL with \begin{enumerate*}[label=(\roman*)]\item first class boolean sort, \item boolean variables used as formulas, \item formulas used as arguments to function and predicate symbols, \item \ITE\ expressions and \item \LETIN\ expressions.\end{enumerate*}
 
 \EK{
 The main contributions of the thesis are the following:
@@ -108,23 +121,25 @@ The main contributions of the thesis are the following:
 \end{enumerate}
 
 The thesis focuses on practical features extending first-order theorem provers for making them better suited for applications of program verification and proof automation for interactive theorem provers. While the thesis describes implementation details and challenges in the Vampire theorem prover, the described features and their implementation can be carried out in any other first-order prover.
-
-The thesis describes a modification of the TPTP language needed to represent \folb{} formulas. This modification will be included in the future TPTP standard.
+}
 
 \folb{} contains features of higher-order logic. Some problems that previously required higher-order logic can now be expressed directly in \folb{}. For example, the current version of the TPTP library contains over a hundred of such problems. One can check these problems with first-order provers that support \folb{} rather than higher-order provers. 
 
-\folb{} can be regarded as the smallest logic containing both the core theory of SMT-LIB~\cite{SMT-LIB} (the standard library of problems for SMT solvers) and the monomorphic first-order part of the TPTP language~\cite{tff0}. First-order provers that support \folb{} can therefore reason about some problems from the SMT-LIB library. This opens up an opportunity to evaluate first-order provers on problems that were previously only checked by SMT solvers.
-}
+The language of FOOL is a superset of the monomorphic first-order part of the TPTP language~\cite{tff0}, the standard language of first-order provers. The thesis describes a modification of the TPTP language needed to represent \folb{} formulas. This modification has been included in the TPTP standard as the TPTP Extended Typed First-Order Form (TFX).
 
-\section*{Overview of the Thesis}
+The language of FOOL is a superset of the core theory of the SMT-LIB language~\cite{SMT-LIB}, the standard language of SMT solvers. First-order provers that support \folb{} can therefore reason about some problems from the SMT-LIB library. This opens up an opportunity to evaluate first-order provers on problems that were previously only checked by SMT solvers. Vampire gained support for SMT-LIB based on its implementation of FOOL, and since 2016 has been participating in the SMT-COMP competition~\cite{DBLP:conf/cav/BarrettMS05} where it competes against SMT solvers.
+
+\section*{Structure of the Thesis}
 \label{sect:intro:overview}
-\addcontentsline{toc}{section}{Overview of the Thesis}
+\addcontentsline{toc}{section}{Structure of the Thesis}
 
-The work described in this thesis has been carried out in six papers, each presented in a separate chapter. Four papers (Chapters~\ref{chap:fool}, \ref{chap:implementation}, \ref{chap:cnf} and \ref{chap:boogie}) were published in peer-reviewed conferences, one (Chapter~\ref{chap:tfx}) was published in a peer-reviewed workshop, and one (Chapter~\ref{chap:aws}) is a technical report not yet submitted for publication. The chapters of this thesis are placed in the order in which their correspondent papers were written. Chapter~\ref{chap:fool} presents the syntax and semantics of FOOL. Chapter~\ref{chap:implementation} presents the implementation of FOOL in Vampire. Chapter~\ref{chap:cnf} presents an efficient clausification algorithm for FOOL. Chapter~\ref{chap:boogie} describes an encoding of the next state relations of imperative programs in FOOL. Chapter~\ref{chap:aws} describes an approach to network verification based on automated reasoning in first-order logic, which uses features of FOOL. Finally, Chapter~\ref{chap:tfx} describes the extension of the TPTP language that contains the syntax for FOOL.
+The work described in this thesis has been carried out in six papers, each contained in a separate chapter. Four papers (Chapters~\ref{chap:fool}, \ref{chap:implementation}, \ref{chap:cnf} and \ref{chap:boogie}) were published in peer-reviewed conferences, one (Chapter~\ref{chap:tfx}) was published in a peer-reviewed workshop, and one (Chapter~\ref{chap:aws}) is a technical report not yet submitted for publication. The references of the papers have been combined into a single bibliography at the end of the thesis. Other than that, the papers have only been edited for formatting purposes, and in general appear in their original form.
 
-Each of the papers contained in this thesis has been written and presented separately. As a result, the content of some of the chapters necessarily overlaps. On a few occations an idea presented in an earlier chapter is revisited and refined in later chapters. One example of it is the encoding of imperative programs in FOOL. A sketch of this encoding is given in Chapter~\ref{chap:implementation} and preliminary experimental results are discussed in Chapter~\ref{chap:cnf}. However, the precise formal description of the encoding and extensive evaluation is the topic of Chapter~\ref{chap:boogie}. Another example is the set of syntactical constructs available in FOOL. The original definition of FOOL in Chapter~\ref{chap:fool} does not include \LETIN\ expressions with simultaneous definitions, definitions of tuples and tuple expressions. These constructs are incuded in later chapters.
+The chapters of this thesis are placed in the order in which their correspondent papers were written. Chapter~\ref{chap:fool} presents the syntax and semantics of FOOL. Chapter~\ref{chap:implementation} presents the implementation of FOOL in Vampire. Chapter~\ref{chap:cnf} presents an efficient clausification algorithm for FOOL. Chapter~\ref{chap:boogie} describes an encoding of the next state relations of imperative programs in FOOL. Chapter~\ref{chap:aws} describes an approach to network verification based on automated reasoning in first-order logic, which uses features of FOOL. Finally, Chapter~\ref{chap:tfx} describes the extension of the TPTP language that contains the syntax for FOOL.
 
-The contributions of the thesis are the cumulative contributions of all the papers. The rest of this chapter details the main contributions of each individual paper. The references of the papers have been combined into a single bibliography at the end of the thesis. Other than that, the papers have only been edited for formatting purposes, and in general appear in their original form.
+Each of the papers contained in this thesis has been written and presented separately. As a result, the introductory remarks and preliminaries of some of the chapters necessarily overlap. Another consequence is that some ideas presented in earlier chapters are revisited and refined in later chapters. One example of such idea is the encoding of imperative programs in FOOL. A sketch of this encoding first appears in Chapter~\ref{chap:implementation} and preliminary experimental results are discussed in Chapter~\ref{chap:cnf}. The precise formal description of the encoding and extensive evaluation is however given later in Chapter~\ref{chap:boogie}. Another example is the set of syntactical constructs available in FOOL. The original description of FOOL in Chapter~\ref{chap:fool} does not include \LETIN\ expressions with simultaneous definitions, definitions of tuples and tuple expressions. These constructs are incuded in later chapters.
+
+The contributions of the thesis are the cumulative contributions of all six papers. The rest of this chapter details the main contributions of each individual paper.
 
 \subsection*{\hyperref[chap:fool]{Chapter 1.} A First Class Boolean Sort in\\First-Order Theorem Proving and TPTP}
 The paper presents the syntax and semantics of \folb. We show that \folb\ is a modification of FOL and reasoning in it reduces to reasoning in FOL. We give a model-preserving \iffalse(modulo introduced definitions)\fi translation of \folb\ to FOL that can be used for proving theorems in \folb\ in a first-order prover. We discuss a modification of superposition calculus that can reason efficiently in the presence of boolean sort. This modification includes replacement of one of the boolean sort axioms with a specialised inference rule that we called \folb\ paramodulation. We note that the TPTP language can be changed to support \folb, which will also simplify some parts of the TPTP syntax. 
