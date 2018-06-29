@@ -1,29 +1,22 @@
-\newcommand*{\thesis}[1]{\gdef\@thesis{#1}%
-}
-\newcommand*{\@thesis}{Thesis for the Degree of Doctor of Philosophy}
+\newcommand*{\thesis}[1]{\gdef\@thesis{#1}}
+\newcommand*{\@thesis}{}
 
-\newcommand*{\department}[1]{\gdef\@department{#1}%
-}
-\newcommand*{\@department}{Department of Computer Science and Engineering}
+\newcommand*{\department}[1]{\gdef\@department{#1}}
+\newcommand*{\@department}{}
 
-\newcommand*{\institution}[1]{\gdef\@institution{#1}%
-}
-\newcommand*{\@institution}{Chalmers University of Technology}
+\newcommand*{\institution}[1]{\gdef\@institution{#1}}
+\newcommand*{\@institution}{}
 
-\newcommand*{\infopageinstitution}[1]{\gdef\@infopageinstitution{#1}%
-}
+\newcommand*{\infopageinstitution}[1]{\gdef\@infopageinstitution{#1}}
 \newcommand*{\@infopageinstitution}{\@institution}
 
-\newcommand*{\reportnumber}[1]{\gdef\@reportnumber{#1}%
-}
-\newcommand*{\@reportnumber}{XXXX}
+\newcommand*{\reportnumber}[1]{\gdef\@reportnumber{#1}}
+\newcommand*{\@reportnumber}{}
 
-\newcommand*{\issn}[1]{\gdef\@issn{#1}%
-}
-\newcommand*{\@issn}{XXXX-XXXX}
+\newcommand*{\issn}[1]{\gdef\@issn{#1}}
+\newcommand*{\@issn}{}
 
-\newcommand*{\infopagetitle}[1]{\gdef\@infopagetitle{#1}%
-}
+\newcommand*{\infopagetitle}[1]{\gdef\@infopagetitle{#1}}
 \newcommand*{\@infopagetitle}{\@title}
 
 \renewcommand*{\maketitle}{%
@@ -59,8 +52,10 @@
 {SE-412 96 Gothenburg, Sweden}\\
 {Telephone +46 (0)31-772 1000}\\
 
+\if@paper
 \noindent Printed at Reproservice, Chalmers University of Technology \\
-Gothenburg, Sweden, \the\year
+\fi
+\noindent Gothenburg, Sweden, \the\year
 \setcounter{page}{0}
 \end{titlepage}
 }

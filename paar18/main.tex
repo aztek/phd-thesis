@@ -40,8 +40,8 @@ See \cite{Sut17} for a recent review of the TPTP.
 
 Since the inception of TFF there have been some features that have 
 received little use, and hence little attention. 
-In particular, tuples, conditional expressions (if-then-else), and let 
-expressions (let-defn-in) were neglected, and the latter two were horribly 
+In particular, tuples, conditional expressions (\ITE), and let 
+expressions (\LETIN) were neglected, and the latter two were horribly 
 formulated with variants to distinguish between their use as formulae and 
 terms. 
 Recently, conditional expressions and let expressions have become more 
@@ -586,8 +586,8 @@ The following is the relevant BNF excerpt.
 \end{lstlisting}
 
 The keyword \lstinline'$ite' is used for conditional expressions occurring both as
-terms and formulae, which is different from the old TFF syntax of if-then-else
-that contained two separate keywords \lstinline'$ite_t' and \lstinline'$ite_f'.
+terms and formulae, which is different from the old TFF syntax of \ITE\ that
+contained two separate keywords \lstinline'$ite_t' and \lstinline'$ite_f'.
 
 The definition and a property of the $\mathit{max}$ function on Formulae~\ref{eq:tfx/ite-t-example} and \ref{eq:tfx/ite-f-example} can be expressed in
 TFX as

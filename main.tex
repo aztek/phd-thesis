@@ -1,32 +1,52 @@
 %%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 %% OBS
 %% Paper version must use 'twoside' in the document class options
+% \documentclass[10pt,twoside]{book}
 %%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 \documentclass[10pt,oneside]{book}
 
+% Text
 \usepackage[english]{babel}
+\usepackage{hyphenat}
+
+% Fonts
 \usepackage[lighttt]{lmodern}
-\usepackage[inline]{enumitem}
-\usepackage{amssymb,amsmath,amsthm,mathrsfs,stmaryrd,dsfont,bbold,mathtools,proof}
+\usepackage[T1]{fontenc}
 \usepackage{yfonts,pifont,anyfontsize}
-\usepackage{tikz}
+\usepackage[stretch=10]{microtype}
+
+% Math
+\usepackage{amssymb,amsmath,amsthm,mathrsfs,stmaryrd,dsfont,bbold,mathtools,proof}
+
+% Graphics and figures
+\usepackage{tikz,subfig,wrapfig}
+
+% References, cites, bibliography
+\usepackage[nottoc]{tocbibind}
 \usepackage{url,hyperref,nameref}
+\usepackage[pageref]{backref}
+
+% Spacing
+\usepackage{setspace,xspace}
+
+% Miscellaneous
+\usepackage[inline]{enumitem}
 \usepackage{multirow}
-\usepackage{subfig,wrapfig}
-\usepackage{xspace}
 \usepackage{afterpage}
 
 \input{notation}
 \input{layout}
-
-\input{information}
 
 \newif\if@paper
 \@paperfalse
 
 \newif\if@draft
 \@drafttrue
+
+\usepackage{titlepage}
+
+\input{information}
 
 \usepackage{geometry}
 \if@paper

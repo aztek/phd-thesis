@@ -4,8 +4,6 @@ Our extended \newcnf{} algorithm translates \folb{} formulas to sets of first-or
 
 In what follows, we look at the translation of different features of \folb{} done by the extended \newcnf{} and point out how the integrated clausification techniques help to obtain smaller clausal normal forms. We compare the extended \newcnf{} with our translation of \folb{} formulas to full first-order logic presented in~\cite{FOOL}.
 
-%In the rest of this section we give specific simple examples of \folb{} formulas featuring different \folb{} constructs that are converted to a smaller CNF by the new translation compared to the old one. This comparison is merely illustrative. We provide a thorough evaluation of the new translation on a large set of benchmarks in Section~\ref{sec:newcnf/experiments}.
-
 \subsection{Boolean Variables}
 Our translation of \folb{} formulas to full first-order logic replaces each boolean variable $x$ occurring as formula with $x \eql \true$ and skolemises boolean variables using boolean Skolem functions. The extended \newcnf{} skolemises boolean variables using Skolem predicates and substitutes boolean variables that do not need skolemisation with constants $\true$ and $\false$. The approach taken in \newcnf{} is superior in two regards.
 \begin{enumerate}
@@ -36,43 +34,7 @@ Formula naming averts the exponential increase in the number of sequents caused 
 
 Our translation of FOOL formulas to full first-order logic replaces each non-boolean \ITE\ expression with an application of a fresh function symbol and adds the definition of the symbol to the set of assumptions. The definition is expressed as an equality. The extended \newcnf{} avoids introducing new equalities and uses predicate guards for naming. This avoids possible performance problems caused by self-paramodulation similar to the ones described in~\cite{FOOL}.
 
-%\paragraph{Formulas inside terms.} Consider a \folb\ formula $(\forall x:\sigma)P((\forall y:\tau)Q(x,y)),$ where $P$ and $Q$ are predicate symbols of the sorts $\bool \to \bool$ and $\sigma \times \tau \to \bool$, respectively. The old translation converts it to $(\forall x:\sigma)P(g(x)),$ where $g$ is a fresh function symbol with the following definition: $$(\forall x:\sigma)(g(x) \eql \true \liff (\forall y:\tau)Q(x,y)).$$
-%
-%These two formulas are then translated to the following set of clauses $$\{P(g(x))\}, \{g(x) \not\eql \true, Q(x,y\}, \{\neg Q(x,\mathit{sk}_y(x)), g(x) \eql \true\},$$ where $\mathit{sk}_y$ is a Skolem function introduced for the variable $y$.
-% in one of the two implications which the equivalence represents 
-
-%The new translation inlines $(\forall y:\tau)Q(x,y)$, yielding two sequents that are then converted to the following CNF $$\{\neg Q(x,\mathit{sk}_y(x)), P(\true)\}, \{Q(x,y), P(\false)\},$$ where $\mathit{sk}_y$ is again a Skolem function for the variables $y$.
-
-%\paragraph{if-then-else expressions.} \cite{VampireAndFOOL} gives a definition of a $\mathit{max}$ function using an \ITE\ expression $$(\forall x:\Z)(\forall y:\Z)(\mathit{max}(x, y) \eql \ite{x \geq y}{x}{y}),$$ that is converted by the old translation to $$(\forall x:\Z)(\forall y:\Z)(\mathit{max}(x, y) \eql g(x, y)),$$ where $g$ is a fresh function symbol defined by the following formulas:
-%\begin{enumerate}
-%  \item $(\forall x:\Z)(\forall y:\Z)(x \geq y \implies g(x, y) \eql x)$;
-%  \item $(\forall x:\Z)(\forall y:\Z)(x \not\geq y \implies g(x, y) \eql y).$
-%\end{enumerate}
-%This translation ultimately yields the set of three clauses $$\{\mathit{max}(x,y) \eql g(x,y)\}, \{x \not\geq y, g(x,y) \eql x\}, \{x \geq y, g(x,y) \eql y\}.$$
-%
-%The new translation inlines the \ITE\ expression and produces the following CNF $$\{x \not\geq y, \mathit{max}(x,y) \eql x\}, \{x \geq y, \mathit{max}(x,y) \eql y\}.$$
-
 \subsection{\LETIN}
 Our translation of \folb{} formulas to full first-order logic always names \LETIN\ expressions. The extended \newcnf{} provides the option to either name or inline \LETIN\ expressions. Naming introduces a fresh function or predicate symbol and does not multiply the number of resulting clauses. Inlining, on the other hand, does not introduce any symbols, but can drastically increase the number of clauses. Either of the translations might make a theorem prover inefficient. We point out that the number of clauses and the size of the resulting signature are not the only factors in that. For example, consider inlining of a \LETIN\ expression that defines a non-boolean term. It does not introduce a fresh function symbol and does not increase the number of clauses. However, the inlined definition might increase the size of the term with respect to the simplification ordering. This affects the order in which literals will be selected during superposition, and ultimately the performance of the prover.
 
 Designing a syntactical criteria for choosing between naming and inlining is an interesting task for future work.
-
-% \cite{VampireAndFOOL} gives an example of a formula that swaps two constants in a \LETIN\ expression $\letinpar{a}{b}{b}{a}{f(a, b)}.$ The old translation converts it to $f(a'',b')$, where $a''$ and $b$ are fresh symbols with definitions $a'' \eql b$ and $b' \eql a$. The new translation simply inlines both \verb'let'-bindings, yilding $f(b,a)$.
-
-% \paragraph{let-in expressions.} FOOL contains \LETIN\ expressions that can be used to introduce local function definitions. Consider the following \folb\ formula that expresses the fact that a binary relation $\mathit{Rel}$ on the set $\sigma$ is symmetric:
-% \begin{equation*}
-% \begin{aligned}
-%   &\mathtt{let}\;\binding{\mathit{Inv}(x:\sigma, y:\sigma)}{\mathit{Rel}(y,x)}\;\mathtt{in}\\
-%   &\quad(\forall x:\sigma)(\forall y:\sigma)(\mathit{Rel}(x,y) \liff \mathit{Inv}(x,y)))
-% \end{aligned}
-% \end{equation*}
-
-% After the translation from~\cite{FOOL} is applied, it becomes $(\forall x:\sigma)(\forall y:\sigma)(\mathit{Rel}(x,y) \liff G(x,y))),$ where $C$ is a fresh predicate symbol with the definition $(\forall x:\sigma)(\forall y:\sigma)(G(x,y) \liff \mathit{Rel}(y,x)).$ This translation leads to the following set of clauses:
-% \begin{equation*}
-% \begin{aligned}
-% &\{\neg\mathit{Rel}(x,y), G(x,y)\}, \{\neg G(x,y), \mathit{Rel}(x,y)\},\\
-% &\{\neg G(x,y), \mathit{Rel}(y,x)\}, \{\neg\mathit{Rel}(y,x), G(x,y)\}.
-% \end{aligned}
-% \end{equation*}
-
-% An equivalent smaller CNF can be obtained if $\mathit{Inv}$ is inlined in the \LETIN\ expression. The resulting set of clauses in such case will be $$\{\neg\mathit{Rel}(x,y), \mathit{Rel}(y,x)\}, \{\neg\mathit{Rel}(y,x), \mathit{Rel}(x,y)\}.$$

@@ -1,7 +1,5 @@
 % !TEX root = main.tex
 
-\usepackage[nottoc]{tocbibind}
-
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[chapter]
 \newtheorem{theorem}{Theorem}[chapter]
@@ -9,23 +7,14 @@
 \newtheorem{example}{Example}[chapter]
 \newtheorem*{example*}{Example}
 
-\usepackage{setspace}
 \renewcommand{\baselinestretch}{1.1} 
-
-\usepackage{titlesec}
-
-\usepackage[T1]{fontenc}
-\usepackage[stretch=10]{microtype}
-\usepackage{hyphenat}
 
 \usepackage[labelsep=period]{caption}
 
-% \widowpenalty10000
-% \clubpenalty10000
+\widowpenalty10000
+\clubpenalty10000
 
 % title page
-\usepackage{titlepage}
-
 \usepackage{titlesec}
 
 \titleformat{\chapter}[display]
@@ -49,15 +38,6 @@
   {}%[\vspace{-0.1em}]
 \titlespacing*{\section}{0pt}{20pt}{6pt}
 
-% \usepackage{secdot}
-
-% \titlelabel{\thetitle~}
-% \renewcommand{\thechapter}{\arabic{chapter}.}
-% \renewcommand{\thesection}{\thechapter\arabic{section}.}
-% \renewcommand{\thesubsection}{\thesection\arabic{subsection}.}
-
-\usepackage[pageref]{backref}
-\usepackage{textcomp}
 \renewcommand*{\backref}[1]{}
 \renewcommand*{\backrefalt}[4]{%
     \ifcase #1 \\\----\ Not cited%
