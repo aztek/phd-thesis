@@ -1,11 +1,10 @@
-% !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-% OBS
-% Paper version must use 'twoside' in the document class options
-% !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+%%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+%% OBS
+%% Paper version must use 'twoside' in the document class options
+%%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 \documentclass[10pt,oneside]{book}
 
-\usepackage{geometry}
 \usepackage[english]{babel}
 \usepackage[lighttt]{lmodern}
 \usepackage[inline]{enumitem}
@@ -29,6 +28,7 @@
 \newif\if@draft
 \@drafttrue
 
+\usepackage{geometry}
 \if@paper
   \geometry{
     papersize={169mm,239mm},
@@ -44,10 +44,14 @@
     inner={29mm},
     outer={29mm},
     top={20mm},
-    bottom={30mm},
-    bindingoffset={0mm}
+    bottom={30mm}
   }
 \fi
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead{}
 
 \if@paper
   \hypersetup{hidelinks}
