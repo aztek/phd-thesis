@@ -24,13 +24,13 @@ First-order logic is not decidable, there is no algorithm that could in general 
 
 First-order theorem provers work with first-order formulas represented as sets of \emph{clauses}. A first-order formula is in a clausal normal form (CNF) if it is a universally quantified conjunction of disjunctions of literals. An alternative representation of a CNF is a set of first-order clauses, where each clause is a finite multiset of literals. \emph{Clausification} algorithms convert arbitrary first-order formulas to a set of first-order clauses, preserving satisfiability. First-order provers that support formulas in full first-order logic implement such algorithms as part of their preprocessing of the input.
 
-First-order theorem provers construct proofs by \emph{refutation}. Given a first-order problem of the form $\mathit{Axiom}_1\wedge\ldots\wedge\mathit{Axiom}_n\implies\mathit{Conjecture}$, a theorem prover first negates the conjecture, obtaining $\mathit{Axiom}_1\wedge\ldots\wedge\mathit{Axiom}_n\implies\neg\mathit{Conjecture}$, then converts this formula to a set of clauses $S$ and then tries to show that $S$ is unsatisfiable. To this end, the theorem prover attepts to derive contradiction (empty clause) using some \emph{inference system} $\mathcal{I}$ that is a collection of \emph{inference rules}. An inference rule is a $n$-ary ($n\ge0$) relation on clauses written as \[\infer[,]{B}{A_1 & \ldots & A_n}\] where $A_1,\ldots,A_n$ are premises and $B$ is the conclusion. The theorem prover systematically and exhaustively applies inference rules from $\mathcal{I}$ to premises from the search space $S$ and adds the conclusion of each inference to $S$. If the empty clause is derived then the initial set $S$ is unsatisfiable and the input problem is valid. In such case the theorem prover returns the proof of the problem as a tree of inferences with clauses from the initial set $S$ as leafs and the empty clause as the root. If after applying all inferences between clauses in the set $S$ the empty clause has not been derived and the inference system $\mathcal{I}$ is complete then the input set $S$ is satisfiable and the problem is not valid. In such case the theorem prover returns the saturated set $S$. In practice, finite saturation is rarely possible and theorem provers try to make deriving the empty clause more likely.
+First-order theorem provers construct proofs by \emph{refutation}. Given a first-order problem of the form $\mathit{Premises}\implies\mathit{Conjecture}$, a theorem prover first negates the conjecture, obtaining $\mathit{Premises}\wedge\neg\mathit{Conjecture}$, then converts this formula to a set of clauses $S$ and then attempts to show that $S$ is unsatisfiable. The theorem prover shows unsatisfiability by deriving contradiction (empty clause) using some \emph{inference system} $\mathcal{I}$ which is a collection of \emph{inference rules}. An inference rule is a $n$-ary ($n\ge0$) relation on clauses written as \[\infer[,]{B}{A_1 & \ldots & A_n}\] where $A_1,\ldots,A_n$ are premises and $B$ is the conclusion. The theorem prover systematically and exhaustively applies inference rules from $\mathcal{I}$ to premises from the search space $S$ and adds the conclusion of each inference to $S$. If the empty clause is derived then the initial set $S$ is unsatisfiable and the input problem is valid. In such case the theorem prover returns the proof of the problem as a tree of inferences with clauses from the initial set $S$ as leafs and the empty clause as the root. If after applying all inferences between clauses in the set $S$ the empty clause has not been derived and the inference system $\mathcal{I}$ is complete then the input set $S$ is satisfiable and the problem is not valid. In such case the theorem prover returns the saturated set $S$. In practice, finite saturation is rarely possible and theorem provers try to make deriving the empty clause more likely.
 
-Modern theorem provers employ inference systems that include refinements of the calculus of resolution, derived from the work of Robinson~\cite{Robinson65}, and superposition, derived from the work of Bachmair and Ganzinger~\cite{BG94} (see also \cite{Ganzinger01,NieuwenhuisRubio:HandbookAR:paramodulation:2001}). The inference rules in this calculus are guarded with side conditions which determine whether a rule can be applied. These conditions prevent the search space of clauses from growing too fast and are essential in practice. The key concepts used in these conditions are a \emph{simplification ordering} and a \emph{literal selection function}. They are understood as parameters of the calculus. A simplification ordering on terms $\succeq$ captures the notion of simplicity (see e.g. \cite{DBLP:books/el/RV01/DershowitzP01}) i.e. $t_1 \succ t_2$ implies that $t_2$ is in some way simpler than $t_1$. There are simple extensions of simplification ordering to literals and clauses. A literal selection function determines for a given clause which literals should be used for inferences. Figure~\ref{fig:intro/calculus} shows the most important inference rules of the superposition and resolution calculus. In that figure, selected literals are underlined and $\mathrm{mgu}$ denotes a most general unifier.
+Modern theorem provers employ inference systems that include refinements of the calculus of resolution, derived from the work of Robinson~\cite{Robinson65}, and superposition, derived from the work of Bachmair and Ganzinger~\cite{BG94} (see also \cite{Ganzinger01,NieuwenhuisRubio:HandbookAR:paramodulation:2001}). The inference rules in this calculus are guarded with side conditions which determine whether a rule can be applied. These conditions prevent the search space of clauses from growing too fast and are essential in practice. The key concepts used in these conditions are a \emph{simplification ordering} and a \emph{literal selection function}. They are understood as parameters of the calculus. A simplification ordering on terms $\succeq$ captures the notion of simplicity (see e.g. \cite{DBLP:books/el/RV01/DershowitzP01}) i.e. $t_1 \succ t_2$ implies that $t_2$ is in some way simpler than $t_1$. There are simple extensions of simplification ordering to literals and clauses. A literal selection function determines for a given clause which literals should be used for inferences. Figure~\ref{fig:intro/calculus} shows the most important inference rules of the superposition and resolution calculus (selected literals are underlined). In this figure, $\theta$ denotes the standard first-order substitution, $\mathrm{mgu}$ denotes a most general unifier and $L[s]$ ($t[s]$) denotes that a term $s$ occurs in a literal $L$ (term $t$).
 
 % An example of such ordering, used in some theorem provers, is Knuth-Bendix ordering~\cite{KB83}.
 
-% \paragraph{Saturation-based proof search}
+% \paragraph{Saturation-based proof search.}
   % \EK{TODO
 
 % attempts to saturate this set with respect to some inference system $\mathcal{I}$. The clause set is saturated if for every inference from $I$ with premises in $S$ the conclusion of the inference is also added to $S$.
@@ -68,7 +68,7 @@ Modern theorem provers employ inference systems that include refinements of the 
         \\
         &
         \begin{aligned}
-          &\infer[,]{(L[r]_p \vee C_1 \vee C_2)\theta}{\underline{l \eql r} \vee C_1 & \underline{L[s]_p} \vee C_2}
+          &\infer[,]{(L[r] \vee C_1 \vee C_2)\theta}{\underline{l \eql r} \vee C_1 & \underline{L[s]} \vee C_2}
           &\begin{array}{l}
              \text{where $\theta=\mathrm{mgu}(l,s)$, $t\theta\not\succeq s\theta$}\\
              \text{and $L[r]$ is not an equality}
@@ -80,7 +80,7 @@ Modern theorem provers employ inference systems that include refinements of the 
         \\[0.4em]
         &
         \begin{aligned}
-          &\infer[,]{(t[r]_p \otimes t' \vee C_1 \vee C_2)\theta}{\underline{l \eql r} \vee C_1 & \underline{t[s]_p \otimes t'} \vee C_2}
+          &\infer[,]{(t[r] \otimes t' \vee C_1 \vee C_2)\theta}{\underline{l \eql r} \vee C_1 & \underline{t[s] \otimes t'} \vee C_2}
           &\begin{array}{l}
               \text{where $\theta=\mathrm{mgu}(l,s)$, $t\theta\not\succeq s\theta$, $t'\theta\not\succeq t[s]\theta$}\\
               \text{and $\otimes$ is either $\eql$ or $\not\eql$}
@@ -109,7 +109,7 @@ Modern theorem provers employ inference systems that include refinements of the 
 
 Another important concept related to saturation in \emph{redundancy elimination}. A clause $C$ from a set $S$ is called redundant in $S$ if it is a logical consequence of clauses in $S$ strictly smaller than $C$ w.r.t. to a simplification ordering. Redundant clauses can be eliminated from the search space without compromising completeness. A powerful criterion of redundancy of a clause is \emph{subsumption}. A clause $A$ subsumes $B$ if some subclause of $B$ is an instance of $A$. If a clause $A$ from a set $S$ subsumes $B$, $B$ is redundant in $S$. \emph{Saturation up to redundancy}~\cite{NieuwenhuisRubio:HandbookAR:paramodulation:2001} terminates when the inference system cannot derive any new clauses that are not redundant in the search space. The notion of redundancy improves the performance of theorem provers by constraining the growth of the search space.
 
-%\paragraph{AVATAR}
+%\paragraph{AVATAR.}
 %  \EK{TODO
 
 %Another useful tool in reducing search space explosion is splitting [8] where clauses are split so that the search space can be explored in smaller parts.
@@ -178,28 +178,28 @@ The complexity of preparing problems for first-order theorem provers can be batt
 
 This thesis contributes to the area of automated reasoning by exploring which extensions of first-order theorem provers facilitate their practical applications, in particular for program verification and automation for proof assistants. The thesis identifies the following syntactical constructs that are generally not supported by first-order provers: first class boolean sort, \ITE\ expressions and \LETIN\ expressions. These constructs are ubiquitous in problems coming from program verification and interactive theorem provers, but all of them currently require specialised translations. Boolean values in programming languages are used both as expressions in conditional or loop statements and as boolean flags passed as arguments to functions. A natural way of translating program statements with booleans into formulas is by translating conditions as formulas and function arguments as terms. Yet we cannot mix boolean terms and formulas in the same way in first-order logic, unless the boolean sort is first class. Properties expressed in higher-order logic routinely use quantification over the interpreted boolean sort; this is not allowed in first-order logic either. Both programming languages and logic of proof assistants actively use \ITE\ and \LETIN\ statements that require non-trivial dedicated translation in first-order logic. This section summarises the main contributions of the thesis.
 
-\paragraph{FOOL}
+\paragraph{FOOL.}
 The thesis presents FOOL, standing for first-order logic (FOL) with boolean sort. \folb{} extends ordinary many-sorted FOL with \begin{enumerate*}[label=(\roman*)]\item first class boolean sort, \item boolean variables used as formulas, \item formulas used as arguments to function and predicate symbols, \item \ITE\ expressions and \item \LETIN\ expressions.\end{enumerate*} \ITE\ and \LETIN\ expressions can occur as both terms and formulas. \LETIN\ expressions can use (multiple simultaneous) definitions of function symbols, predicate symbols, and tuples. The thesis presents the definition of FOOL, its semantics, and a simple model-preserving translation from \folb{} formulas to formulas of first-order logic. This translation can be used to support \folb{} in existing first-order provers.
 
-\paragraph{Reasoning with FOOL}
+\paragraph{Reasoning with FOOL.}
 The thesis presents two approaches to an implementation of FOOL in first-order provers that improve over the simple translation of FOOL to FOL. The first approach is a new technique of dealing with the boolean sort in superposition theorem provers. This technique includes replacement of one of the boolean sort axioms with a specialised inference rule, called FOOL paramodulation. The second approach is a new algorithm \nfcnf{} that transforms FOOL formulas directly to first-order clauses. The thesis presents an implementation of the simple translation from FOOL to FOL and both improved approaches in Vampire.
 
-\paragraph{Applications of FOOL}
+\paragraph{Applications of FOOL.}
 The thesis presents an encoding of the next state relations of imperative programs in FOOL. Compared to similar methods, this encoding avoids introducing intermediate variables and results in FOOL formulas that concisely represent program fragments in logic.
 %The thesis presents a translation of imperative programs annotated with their pre- and post-conditions to partial correctness properties of these programs.
 The thesis present a work on verification of virtual private cloud network configurations with Vampire. The encoding of verification problems in this work relies on first class booleans, the theory of arrays and the theory of tuples.
 
-\paragraph{Practical Evaluation}
+\paragraph{Practical Evaluation.}
 The thesis presents extensive experiments on running Vampire, other first-order theorem provers, higher-order theorem provers and SMT solvers on FOL and FOOL problems. These problems come from various sources: benchmarks from the TPTP and SMT-LIB library, proof obligations generated by the Isabelle proof assistant, and verification conditions generated by multiple different program verification tools. The experimental results obtained with these problems show in particular that \begin{enumerate}
   \item Vampire with FOOL paramodulation performs better than Vampire with the simple translation from FOOL to FOL;
   \item Vampire with \nfcnf{} performs better that Vampire with FOOL paramodulation;
   \item Vampire performs better on verification conditions translated to FOOL than translated to FOL using current state-of-the-art methods.
 \end{enumerate}
 
-\paragraph{Impact on TPTP}
+\paragraph{Impact on TPTP.}
 The language of FOOL is a superset of TFF0~--- the monomorphic first-order part of the TPTP language. The thesis describes a modification of the TPTP language needed to represent \folb{} formulas. This modification has been included in the TPTP standard as the TPTP Extended Typed First-Order Form (TFX).
 
-\paragraph{Impact on Vampire}
+\paragraph{Impact on Vampire.}
 The language of FOOL is a superset of the core theory of the SMT-LIB language~\cite{SMT-LIB}, the standard language of SMT solvers. First-order provers that support \folb{} can therefore reason about some problems from the SMT-LIB library. This opens up an opportunity to evaluate first-order provers on problems that were previously only checked by SMT solvers. Vampire gained support for SMT-LIB based on its implementation of FOOL, and since 2016 has been participating in the SMT-COMP competition~\cite{DBLP:conf/cav/BarrettMS05} where it contends against SMT solvers.
 
 \section*{Structure of the Thesis}

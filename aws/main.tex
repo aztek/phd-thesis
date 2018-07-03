@@ -296,7 +296,7 @@ Recall that our network models use
 %These two theories use different predicates, therefore we translate 16-bit and 32-bit vectors differently.
 We translate 16-bit vectors to integers and 32-bit vectors to tuples and arrays.
 
-\paragraph{16-bit vectors to integers}
+\paragraph{16-bit vectors to integers.}
 We translate
 \begin{enumerate*}[label=(\roman*)]
   \item the type $\type{bits16}$ to $\mathbb{Z}$,
@@ -306,7 +306,7 @@ We translate
 \end{enumerate*}
 \EK{We are translating uint16 to $\mathbb{Z}$~--- explain why it is sound.}
 
-\paragraph{32-bit vectors to tuples}
+\paragraph{32-bit vectors to tuples.}
 We translate
 (i) the type $\type{bits32}$ to the tuple sort $(\mathit{bool},\ldots,\mathit{bool})$ where $\mathit{bool}$ is repeated 32 times,
 (ii) each of the 32-bit vector constants to a term $(b_1,\ldots,b_{32})$ of this sort, where each of $b_1,\ldots,b_{32}$ is either $\mathit{true}$ or $\mathit{false}$, and
@@ -320,7 +320,7 @@ We translate
 \end{equation*}
 (iv) predicate $\pred{=}_\type{bits32}$ to the standard equality.
 
-\paragraph{32-bit vectors to arrays}
+\paragraph{32-bit vectors to arrays.}
 We translate
 (i) the type $\type{bits32}$ to the array sort $\mathit{array}(\mathbb{Z},\mathit{bool})$,
 (ii) each of the 32-bit vector constant to a fresh constant $v$ of this sort, defined using the axiom $\mathit{select}(v,1)=b_1\wedge\ldots\wedge\allowbreak\mathit{select}(v, 32)=b_{32},$ where each of $b_1,\ldots,b_{32}$ is either $\mathit{true}$ or $\mathit{false}$, and
@@ -347,7 +347,7 @@ We translate
 \end{aligned}
 \end{equation*}
 
-% \paragraph{Extra optimization}
+% \paragraph{Extra optimization.}
 % We discovered that operators over 32-bit vectors are only ever used in the following context:
 % \begin{equation*}
 % \begin{aligned}
@@ -438,27 +438,27 @@ Lisitsa used superposition to proof reachability \cite{DBLP:conf/atva/Lisitsa10}
 \label{sect:aws/challenges}
 This paper presents a work in progress and some of the challenges that we faced are yet to be overcome. We discuss these challenges in this section and suggest directions for future work. We believe that similar challenges are experienced in other practical applications of automated reasoning in first-order logic.
 
-\paragraph{Good translation to first-order logic}
+\paragraph{Good translation to first-order logic.}
 Automated theorem provers for first-order logic are known to be sensitive to the encoding of the problem they are solving. To ensure efficient representation of practical problems in a theorem prover, these problems should be encoded using theories and syntactical constructs beyond plain first-order logic. Yet not all automated theorem provers efficiently implement these features. While the Vampire theorem prover used in this work supports many useful theories, we miss a support for the theory of bit vectors. The need to work around this limitation hinders a good translation of our network model to first-order logic. %The lack of support for bit vectors led us to device multiple translations for this theory and experiment with these translations.
 
 %\EK{In addition, theorem provers differ in the extensions of plain first-order logic and theories that they support, so one has to target a logic supported by a specific prover when devising a translation.}
 
-\paragraph{Configuration of theorem provers}
+\paragraph{Configuration of theorem provers.}
 Automated theorem provers typically offer many settings for configuring proof search. For example, Vampire has dozens of options~\cite{DBLP:conf/cade/Reger0V14} that describe a colossal number of possible proof strategies. There is no proof strategy that would be the best for all kinds of problems, and we found that changing the default options of Vampire might result in a strategy that works better on our problems than the default strategy. At the same time, hand-picking good options is tedious and unintuitive, and there is no way of knowing if a hand-picked strategy will work well on all of our problems. Many modern automated theorem provers rely not on one single strategy, but on a portfolio of strategies, which they try one by one during proof search. Theorem provers typically implement portfolios for existing large collections of problems such as TPTP~\cite{TPTP} and SMT-LIB~\cite{SMT-LIB}. To our knowledge, there is no systematic way of assembling a custom portfolio tailored to a specific class of problems.
 
-% \paragraph{Unpredictable runtime}
+% \paragraph{Unpredictable runtime.}
 % \EK{When comparing the performance of \Datalog and theorem provers we saw that the performance time of \Datalog grows accordingly to the complexity of the problem. Performance of theorem provers looks unpredictable due to the nature of the saturation-based proof search. It's cool when a seemingly hard problem has an easy solution, not so cool the other way around. We wonder if a theorem proving community has an answer to it.}
 
-\paragraph{Finite domains}
+\paragraph{Finite domains.}
 Our formalization of VPC networks uses large finite domains to describe the topology of a network and the semantics of its components. While finite domains is good news for finite model builders, saturation-based theorem provers are known to have hard time reasoning with them. Domain closure axioms $(\forall x:\tau)(x=c_1 \vee\ldots\vee x=c_n)$ for large values of $n$ result in long clauses that degrade performance of the prover. A technique for efficient superposition theorem proving with these axioms is discussed e.g. in \cite{HillenbrandWeidenbach13}, but this technique is not implemented in any modern theorem prover.
 
-\paragraph{EPR}
+\paragraph{EPR.}
 We translate network models to problems that almost fit into the effectively propositional (EPR) fragment of first-order logic, also called the Bernays-Sch\"onfinkel class. These problems do not use function symbols with positive arity, but skolem functions with positive arity might be introduced during clausification. The satisfiability problem for EPR is decidable and there exist efficient tools that deal with this fragment~\cite{DBLP:conf/birthday/Korovin13}. It is possible to translate our network models to problems in EPR, for example by grounding the existentially-quantified variables. The obvious drawback of this translation is the blowup of the size of the resulting problem. Whether this blowup is mitigated by the efficiency of EPR solvers is an interesting question for future work.
 
-\paragraph{Solver-agnostic network models}
+\paragraph{Solver-agnostic network models.}
 The work presented in this paper contributes to our ultimate goal of checking network properties with diverse complementary constraint solvers. In order to succesfully use different kinds of constraint solvers we need a formalization of networks that can be equally efficiently translated to different kinds of constraint satisfaction problems. We find that our current formalization, written in the logic programming style, is friendly for systems like \Datalog~\cite{Datalog}, but not necessarily for theorem provers for first-order logic. For example, some of the predicates in the specification can be more naturally expressed as functions in full first-order logic rather than translated from their encoding as Horn clauses. Ultimately this bias hinders efficient representation of the problem in first-order logic. Designing a more solver-agnostic formalization of networks is an important direction of future work.
 
-\paragraph{Evaluation} In this work we used a small collection of network configurations that we verified using Vampire playing a role of both a saturation-based theorem prover and a finite model builder. We leave for future work experiments with (i) other theorem provers for first-order logic, (ii) other kinds of constraint solvers, (iii) different encodings of network problems as constraint satisfaction problems, and (iv) large collections of real world network configurations.
+\paragraph{Evaluation.} In this work we used a small collection of network configurations that we verified using Vampire playing a role of both a saturation-based theorem prover and a finite model builder. We leave for future work experiments with (i) other theorem provers for first-order logic, (ii) other kinds of constraint solvers, (iii) different encodings of network problems as constraint satisfaction problems, and (iv) large collections of real world network configurations.
 
 %-------------------------------------------------------------------------------
 \section*{Acknowledgments}
