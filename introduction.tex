@@ -11,73 +11,123 @@ This thesis addresses the following research question: \emph{which new extension
 
 This chapter describes the background of the thesis and is structured as follows. Firstly, we introduce the key concepts of automated theorem proving in first-order logic. Secondly, we describe the applications of first-order provers for program verification and automation of proof assistants. Thirdly, we overview common extensions to first-order provers and motivate the need for new extensions. Finally, we summarise the main contributions of the thesis and make concluding remarks.
 
-% \EK{
+% how to construct proofs automatically using a computer. The latter is the domain of automated theorem proving. It is one of the central and hardest areas of computer mathematics and artificial intelligence. Automated methods of proving theorems precede the existence of computers.
 
-%Computer mathematics studies processing of mathematical knowledge with a computer. It explores questions of how to represent mathematical problems and their proofs in a computer, how to check correctness of proofs by a computer and even how to construct proofs automatically using a computer. The latter is the domain of automated theorem proving. It is one of the central and hardest areas of computer mathematics and artificial intelligence. Automated methods of proving theorems precede the existence of computers.
+% Algorithms of automated theorem proving are implemented in computer programs called theorem provers. A theorem prover takes a logical conjecture as input and tries to either construct its proof or demonstrate that the conjecture is invalid. Theorem provers can be classified by the logic they support. Propositional, first-order and higher-order logic are among the logics that received the most attention in automated theorem proving.
 
-%In order to be represented in a computer, a mathematical problem must be expressed in a language of some formal logic. Among the logics used for this purpose are propositional, first-order and higher-order logic, intuitionistic logic, modal, temporal, many-values logic and others.
-
-% Algorithms of automated theorem proving are implemented in computer programs called theorem provers. A theorem prover takes a logical conjecture as input and tries to either construct its proof or demonstrate that the conjecture is invalid. Theorem provers can be classified by the logic they support. Propositional, first-order and higher-order logic are among the logics that received the most attention in automated theorem proving. Reasoning in propositional logic, i.e. solving the problem of propositional satisfiability (SAT), is implemented in \emph{SAT solvers}, such as Lingeling~\cite{Lingeling} and Minisat~\cite{Minisat}. Solving the problem of satisfiability modulo theory (SMT) is implemented in \emph{SMT solvers}, such as Z3~\cite{Z3} and CVC4~\cite{CVC4}. Reasoning is first-order logic is implemented in \emph{first-order theorem provers}, such as Vampire~\cite{Vampire13}, E~\cite{E13} and iProver~\cite{iProver}. Reasoning in higher-order logic is implemented in \emph{higher-order theorem provers}, such as Satallax~\cite{Satallax} and Leo-II~\cite{LeoII}.
-
-%This thesis contributes to the area of automated theorem proving by presenting an extension of first-order logic that is useful for applications and can be supported by first-order theorem provers. This chapter describes the background of the thesis and is structured as follows. Section~\ref{sect:intro:fol} gives an introduction to automated theorem proving in first-order logic. Sections \ref{sect:intro:analysis} and \ref{sect:intro:itp} describe two important applications of first-order provers, automation for program verification and interactive proof assistants. Section~\ref{sect:intro:problem} states the problem addressed in the thesis, and finally Section~\ref{sect:intro:contributions} summarises the contributions of the thesis.
-% }
+%Theorem provers work by applying \emph{inference rules}. An inference rule is a $n$-ary ($n>0$) relation on clauses written as \[\infer[,]{B}{A_1 & \ldots & A_n}\] where $A_1,\ldots,A_n$ are premises and $B$ is the conclusion. An \emph{inference system} $\mathcal{I}$ is a collection of inference rules.
 
 \section*{Automated Theorem Proving in First-Order Logic}
 \addcontentsline{toc}{section}{Automated Theorem Proving in First-Order Logic}
 
-First-order logic is not decidable, there is no algorithm that could in general determine whether a given first-order formula is valid or not. First-order logic is semi-decidable, an algorithm that enumerates all finite derivations in the logical system until a given first-order formula is found, terminates if the formula is valid, and runs forever otherwise. If a formula is invalid, there is no algorithm that could in general demonstrate that.
+First-order logic is not decidable, there is no algorithm that could in general determine whether a given first-order formula is valid or not. First-order logic is semi-decidable, an algorithm that enumerates all finite derivations in the logical system until a given first-order formula is found, terminates if the formula is valid, and runs forever otherwise. If a formula is invalid, there is no algorithm that could in general demonstrate that. A well studied and generally best performing class of algorithms that search for validity of first-order problems are those based on \emph{saturation} and the calculus of \emph{resolution} and \emph{superposition}. These algorithms are implemented in automated theorem provers such as E~\cite{E13}, iProver~\cite{iProver} and Vampire~\cite{Vampire13}.
 
-A well studied and generally best performing family of automated theorem provers that search for validity of first-order problems are those based on refinements of the calculus of resolution and superposition~\cite{NieuwenhuisRubio:HandbookAR:paramodulation:2001}. This family includes E~\cite{E13}, iProver~\cite{iProver} and Vampire~\cite{Vampire13}. %In what follows, we overview the key concepts used by these tools for first-order proof search.
+First-order theorem provers work with first-order formulas represented as sets of \emph{clauses}. A first-order formula is in a clausal normal form (CNF) if it is a universally quantified conjunction of disjunctions of literals. An alternative representation of a CNF is a set of first-order clauses, where each clause is a finite multiset of literals. \emph{Clausification} algorithms convert arbitrary first-order formulas to a set of first-order clauses, preserving satisfiability. First-order provers that support formulas in full first-order logic implement such algorithms as part of their preprocessing of the input.
 
-% Resolution calculus is refutationally complete, meaning that a contradiction can be deduced from any unsatisfiable set of clauses.
+First-order theorem provers construct proofs by \emph{refutation}. Given a first-order problem of the form $\mathit{Axiom}_1\wedge\ldots\wedge\mathit{Axiom}_n\implies\mathit{Conjecture}$, a theorem prover first negates the conjecture, obtaining $\mathit{Axiom}_1\wedge\ldots\wedge\mathit{Axiom}_n\implies\neg\mathit{Conjecture}$, then converts this formula to a set of clauses $S$ and then tries to show that $S$ is unsatisfiable. To this end, the theorem prover attepts to derive contradiction (empty clause) using some \emph{inference system} $\mathcal{I}$ that is a collection of \emph{inference rules}. An inference rule is a $n$-ary ($n\ge0$) relation on clauses written as \[\infer[,]{B}{A_1 & \ldots & A_n}\] where $A_1,\ldots,A_n$ are premises and $B$ is the conclusion. The theorem prover systematically and exhaustively applies inference rules from $\mathcal{I}$ to premises from the search space $S$ and adds the conclusion of each inference to $S$. If the empty clause is derived then the initial set $S$ is unsatisfiable and the input problem is valid. In such case the theorem prover returns the proof of the problem as a tree of inferences with clauses from the initial set $S$ as leafs and the empty clause as the root. If after applying all inferences between clauses in the set $S$ the empty clause has not been derived and the inference system $\mathcal{I}$ is complete then the input set $S$ is satisfiable and the problem is not valid. In such case the theorem prover returns the saturated set $S$. In practice, finite saturation is rarely possible and theorem provers try to make deriving the empty clause more likely.
 
-Proof search algorithms used by first-order theorem prover work not with arbitrary first-order formulas, but with first-order clauses. A first-order formula is in clausal normal form (CNF) if it is a universally-quantified conjunction of disjunctions of first-order literals. An alternative representation of a CNF is a set of first-order clauses, where each clause is a finite multiset of literals. \emph{Clausification} algorithms convert arbitrary first-order formulas to CNF, preserving satisfiability. First-order provers that support formulas in full first-order logic implement such algorithms as part of their preprocessing of the input.
+Modern theorem provers employ inference systems that include refinements of the calculus of resolution, derived from the work of Robinson~\cite{Robinson65}, and superposition, derived from the work of Bachmair and Ganzinger~\cite{BG94} (see also \cite{Ganzinger01,NieuwenhuisRubio:HandbookAR:paramodulation:2001}). The inference rules in this calculus are guarded with side conditions which determine whether a rule can be applied. These conditions prevent the search space of clauses from growing too fast and are essential in practice. The key concepts used in these conditions are a \emph{simplification ordering} and a \emph{literal selection function}. They are understood as parameters of the calculus. A simplification ordering on terms $\succeq$ captures the notion of simplicity (see e.g. \cite{DBLP:books/el/RV01/DershowitzP01}) i.e. $t_1 \succ t_2$ implies that $t_2$ is in some way simpler than $t_1$. There are simple extensions of simplification ordering to literals and clauses. A literal selection function determines for a given clause which literals should be used for inferences. Figure~\ref{fig:intro/calculus} shows the most important inference rules of the superposition and resolution calculus. In that figure, selected literals are underlined and $\mathrm{mgu}$ denotes a most general unifier.
 
-%\paragraph{Refutation}
-The problem of validity of a problem in first-order logic can be formulated in terms of unsatisfiability. Validity of a formula is equivalent to unsatisfiability of its negation. Given a set of axioms and a conjecture, first-order theorem provers first negate the conjecture and then try to derive contradiction, thus constructing a proof by \emph{refutation}.
+% An example of such ordering, used in some theorem provers, is Knuth-Bendix ordering~\cite{KB83}.
 
-\paragraph{Saturation-based proof search}
-  \EK{TODO
+% \paragraph{Saturation-based proof search}
+  % \EK{TODO
 
-% After negating the conjecture and converting the problem into a set of clauses, theorem provers try to \emph{saturate} this set. Saturation involves systematical and exhaustive application of inference rules from an inference system $\mathcal{I}$ until a contradiction (empty clause) is found.
+% attempts to saturate this set with respect to some inference system $\mathcal{I}$. The clause set is saturated if for every inference from $I$ with premises in $S$ the conclusion of the inference is also added to $S$.
 
-% After a clause set has been produced, Vampire attempts to saturate this set with respect to some inference system I. The clause set is saturated if for every inference from I with premises in S the conclusion of the inference is also added to S. If the saturated set S contains a contradiction then the initial formulas are unsatisfiable. Otherwise, if I is a complete inference system and, importantly, the requirements for this completeness have been preserved, then the initial formulas are satisfiable. Finite saturation may not be possible and many heuristics are employed to make finding a contradiction more likely.
-}
+% Even for small problems this search space can grow quickly and provers often employ heuristics to control its exploration.
 
-\paragraph{Resolution and superposition}
-  \EK{TODO
+% Robinsons's resolution calculus and many of its refinements are refutationally complete, meaning that a contradiction can be deduced from any unsatisfiable set of clauses.
 
-%Superposition-based theorem proving stems from the work of Robinson~\cite{Robinson65} on \emph{resolution calculus}. Resolution calculus establishes unsatisfiability of a set of first-order clauses by systematically and exhaustively applying a set of inference rules which include the resolution inference rule.
+% }
 
-%Vampire uses resolution and superposition as its inference system I [1, 34]. A key feature of this calculus is the use of literal selection and orderings to restrict the application of inference rules, thus restricting the growth of the clause sets. Vampire uses a Knuth-Bendix term ordering (KBO) [23, 25, 32] which orders terms first by weight and then by symbol precedence whilst agreeing with a multisubset ordering on free variables. The symbol ordering is taken as a parameter but is relatively coarse in Vampire e.g. by order of occurrence in the input, arity, frequency or the reverse of these.
+\begin{figure}[ht]
+  \begin{equation*}
+    \begin{aligned}
+      &
+      \begin{aligned}
+        &
+        \begin{aligned}
+          \begin{aligned}
+            &\text{\textbf{Resolution}}\\
+            &\infer[,]{(C_1\vee C_2)\theta}{\underline{A} \vee C_1 & \underline{\neg A'} \vee C_2}
+          \end{aligned}
+          &\quad\quad
+          \begin{aligned}
+            &\text{\textbf{Factoring}}\\
+            &\infer[,]{(A \vee C)\theta}{\underline{A} \vee A' \vee C}
+          \end{aligned}
+        \end{aligned}
+        \\[0.25em]
+        &\text{where, for both inferences, $\theta=\mathrm{mgu}(A,A')$ and $A$ is not an equality}
+      \end{aligned}
+      \\[1em]
+      &
+      \begin{aligned}
+        &\text{\textbf{Superposition}}
+        \\
+        &
+        \begin{aligned}
+          &\infer[,]{(L[r]_p \vee C_1 \vee C_2)\theta}{\underline{l \eql r} \vee C_1 & \underline{L[s]_p} \vee C_2}
+          &\begin{array}{l}
+             \text{where $\theta=\mathrm{mgu}(l,s)$, $t\theta\not\succeq s\theta$}\\
+             \text{and $L[r]$ is not an equality}
+           \end{array}
+        \end{aligned}
+        \\
+        &
+        \quad\quad\text{or}
+        \\[0.4em]
+        &
+        \begin{aligned}
+          &\infer[,]{(t[r]_p \otimes t' \vee C_1 \vee C_2)\theta}{\underline{l \eql r} \vee C_1 & \underline{t[s]_p \otimes t'} \vee C_2}
+          &\begin{array}{l}
+              \text{where $\theta=\mathrm{mgu}(l,s)$, $t\theta\not\succeq s\theta$, $t'\theta\not\succeq t[s]\theta$}\\
+              \text{and $\otimes$ is either $\eql$ or $\not\eql$}
+           \end{array}
+        \end{aligned}
+      \end{aligned}
+      \\[1em]
+      &
+      \begin{aligned}
+        \begin{aligned}
+          &\text{\textbf{Equality resolution}}\\
+          &\infer[,]{C\theta}{\underline{s\eql t} \vee C}\\
+          &\text{where $\theta=\mathrm{mgu}(s,t)$}
+        \end{aligned}
+        &\quad\quad
+        \begin{aligned}
+          &\text{\textbf{Equality factoring}}\\
+          &\infer[,]{(t \not\eql t' \vee s' \eql t' \vee C)\theta}{\underline{s \eql t} \vee s' \eql t' \vee C}\\
+          &\text{where $\theta=\mathrm{mgu}(s,t)$, $t\theta\not\succeq s\theta$ and $t'\theta\not\succeq s'\theta$}
+        \end{aligned}
+      \end{aligned}
+    \end{aligned}
+  \end{equation*}
+  \caption{The inference rules of the superposition and resolution calculus.\label{fig:intro/calculus}}
+\end{figure}
 
-%Theorem provers saturate the search space by inferring new clauses with inference rules such as binary resolution~\cite{Ganzinger01} and superposition~\cite{NieuwenhuisRubio:HandbookAR:paramodulation:2001}. They employ multiple techniques to prune the search space such as simplification orderings, selection functions and redundancy elimination.
-}
+Another important concept related to saturation in \emph{redundancy elimination}. A clause $C$ from a set $S$ is called redundant in $S$ if it is a logical consequence of clauses in $S$ strictly smaller than $C$ w.r.t. to a simplification ordering. Redundant clauses can be eliminated from the search space without compromising completeness. A powerful criterion of redundancy of a clause is \emph{subsumption}. A clause $A$ subsumes $B$ if some subclause of $B$ is an instance of $A$. If a clause $A$ from a set $S$ subsumes $B$, $B$ is redundant in $S$. \emph{Saturation up to redundancy}~\cite{NieuwenhuisRubio:HandbookAR:paramodulation:2001} terminates when the inference system cannot derive any new clauses that are not redundant in the search space. The notion of redundancy improves the performance of theorem provers by constraining the growth of the search space.
 
-\paragraph{Term ordering}
-  \EK{TODO
-%Resolution calculus is refined by \emph{superposition calculus}~\cite{BG90, BG94} that employs term orderings for restricting the number of inferences. The basic idea of superposition is to only allow inferences that replace ``big'' terms by ``smaller'' ones, with respect to the given ordering.
+%\paragraph{AVATAR}
+%  \EK{TODO
 
-%An important ingredient in paramodulation is the use of \emph{term orderings} for restricting the number of inferences. The basic idea of ordered paramodulation is to only perform replacements of ``big'' terms by ``smaller'' ones, with respect to the given ordering. The first instances of ordered paramodulation appeared in Knuth-Bendix completion~\cite{KB83}. Roughly, a completion procedure attempts to transform a given set of equations into an equivalent confluent one. A crucial step of the transformation process is the computation of critical pairs between equations. A critical pair is an equation obtained by \emph{superposition}, the restricted version of paramodulation in which inferences only involve left hand sides of possible rewrite steps, i.e., only the ``big'' terms (w.r.t. the given ordering) are considered. During the completion process equations are simplified by rewriting, and tautologies are removed. \EK{I don't quite understand this, so it reads a bit vague.} Bachmair and Ganzinger refined these ideas into what got to be known as \emph{superposition calculus}~\cite{BG90, BG94}, that now forms the basis for most first-order theorem provers.
-}
+%Another useful tool in reducing search space explosion is splitting [8] where clauses are split so that the search space can be explored in smaller parts.
 
-\paragraph{Redundancy elimination}
-  \EK{TODO
-
-%Another very important concept related to saturation is the notion of redundancy. The idea is that some clauses in S are redundant in the sense that they can be safely removed from S without compromising completeness. The notion of saturation then becomes saturation-up-to-redundancy [1, 34]. An important redundancy check is subsumption. A clause $A$ subsumes $B$ if some subclause of $B$ is an instance of $A$, in which case $B$ can be safely removed from the search space as doing so does not change the possible models of the search space $S$. The fact that Vampire removes redundant formulas is good
-}
-
-\paragraph{AVATAR}
-  \EK{TODO
 %A recent addition to this story is AVATAR [50, 40], which (optionally) performs clause splitting using a SAT solver. The main point here is that the success of AVATAR is driven by the observation that saturation-based proof search does not perform well with long or heavy clauses. Therefore, encodings should avoid the introduction of such clauses. As an additional point, AVATAR can only be utilised if the boolean structure of a problem is exposed at the literal-level. For example, including a predicate implies with associated axioms would not play to AVATAR's strengths.
 
 %Vampire also implements the AVATAR architecture~\cite{DBLP:conf/cav/Voronkov14} for splitting clauses. The idea behind AVATAR is to use a SAT or an SMT solver to guide proof search. AVATAR selects sub-problems for the saturation-based prover to tackle by making decisions over a propositional abstraction of the clause search space.
-}
 
-%\paragraph{Portfolio of proof search strategies}
-Proof search in first-order logic can be configured in many ways, and different proof search strategies might solve different problems. Theorem provers such as E, iProver and Vampire implement not just one proof search strategy, but a \emph{portfolio} of them. Based on certain characteristics of the input, theorem provers select the appropriate proof search strategies and schedules for them, and then run these strategies one by one in a time-slicing fashion. This approach allows theorem provers to succeed on a larger number of problems. Some provers extend their portfolios with proof search techniques other than saturation. For example, Vampire includes in its portfolios an implementation of the Inst-Gen calculus~\cite{DBLP:conf/birthday/Korovin13} and a finite model builder~\cite{VampireFMB}.
+% A new, highly successful, approach to splitting is found in the AVATAR architecture [23], which uses a Splitting module with a SAT solver at its core to make splitting decisions.
+%}
+
+Proof search in first-order logic can be configured in many ways, and different proof search strategies might solve different problems. Theorem provers such as E, iProver and Vampire implement not just one proof search strategy, but a \emph{portfolio} of them. Based on certain characteristics of the input, theorem provers select the appropriate proof search strategies and schedules for them, and then run these strategies one by one in a time-slicing fashion. Some of these strategies are designed to be incomplete~--- they cannot find satisfiability but can in some cases find unsatisfiability faster. The usage of multiple proof search strategies in the same run allows theorem provers to succeed on a larger number of problems. Some provers extend their portfolios with proof search techniques other than saturation. For example, Vampire includes in its portfolios an implementation of the Inst-Gen calculus~\cite{DBLP:conf/birthday/Korovin13} and a finite model builder~\cite{VampireFMB}.
 
 First-order theorem provers are currently evaluated empirically. Comparison of provers is mostly based on success rates and run times on standard corpora of problems. The main corpus is the Thousands of Problems for Theorem Provers (TPTP) library~\cite{TPTP}. The problems in this corpus are written in a variety of languages, such as FOF for untyped first-order formulas, TFF0~\cite{tff0} for typed monomorphic first-order formulas and TFF1~\cite{tff1} for typed rank-1 polymorphic first-order formulas. The TPTP library is used as a basis for the annual CASC system competition~\cite{CASC}.
+
+%\EK{Mention the search of unsatisfiability?}
+
+%\EK{The success of a theorem prover on a given problem depends on many factors.}
 
 \section*{Deductive Program Verification}
 \addcontentsline{toc}{section}{Deductive Program Verification}
@@ -158,7 +208,7 @@ The language of FOOL is a superset of the core theory of the SMT-LIB language~\c
 
 The work described in this thesis has been carried out in six papers, each contained in a separate chapter. Four papers (Chapters~\ref{chap:fool}, \ref{chap:implementation}, \ref{chap:cnf} and \ref{chap:boogie}) were published in peer-reviewed conferences, one (Chapter~\ref{chap:tfx}) was published in a peer-reviewed workshop, and one (Chapter~\ref{chap:aws}) is a technical report not yet submitted for publication. The references of the papers have been combined into a single bibliography at the end of the thesis. Other than that, the papers have only been edited for formatting purposes, and in general appear in their original form.
 
-The chapters of this thesis are placed in the order in which their correspondent papers were written. Chapter~\ref{chap:fool} presents the syntax and semantics of FOOL. Chapter~\ref{chap:implementation} presents the implementation of FOOL in Vampire. Chapter~\ref{chap:cnf} presents an efficient clausification algorithm for FOOL. Chapter~\ref{chap:boogie} describes an encoding of the next state relations of imperative programs in FOOL. Chapter~\ref{chap:aws} describes an approach to network verification based on automated reasoning in first-order logic, which uses features of FOOL. Finally, Chapter~\ref{chap:tfx} describes TFX, the extension of the TPTP language that contains the syntax for FOOL.
+The chapters of this thesis are arranged in the order in which their correspondent papers were written. Chapter~\ref{chap:fool} presents the syntax and semantics of FOOL. Chapter~\ref{chap:implementation} presents the implementation of FOOL in Vampire. Chapter~\ref{chap:cnf} presents an efficient clausification algorithm for FOOL. Chapter~\ref{chap:boogie} describes an encoding of the next state relations of imperative programs in FOOL. Chapter~\ref{chap:aws} describes an approach to network verification based on automated reasoning in first-order logic, which uses features of FOOL. Finally, Chapter~\ref{chap:tfx} describes TFX, the extension of the TPTP language that contains the syntax for FOOL.
 
 Each of the papers contained in this thesis has been written and presented separately. As a result, the introductory remarks and preliminaries of some of the chapters necessarily overlap. Another consequence is that some ideas presented in earlier chapters are revisited and developed in later chapters. One example of such idea is the encoding of the next state relations of imperative programs in FOOL. A sketch of this encoding first appears in Chapter~\ref{chap:implementation} and preliminary experimental results are discussed in Chapter~\ref{chap:cnf}. The precise formal description of the encoding and extensive evaluation is however given later in Chapter~\ref{chap:boogie}. Another example is the set of syntactical constructs available in FOOL. The original description of FOOL in Chapter~\ref{chap:fool} does not include \LETIN\ expressions with simultaneous definitions, definitions of tuples and tuple expressions. These constructs are included in later chapters.
 
