@@ -56,7 +56,7 @@ Note that it is possible to directly express quantified boolean formulas (QBF) i
 
 TFF0 does not support quantification over booleans. Vampire supports an extended version of TFF0 where the sort symbol \tptpo\ is allowed to occur as the sort of a quantifier and boolean variables are allowed to occur as formulas. The formula $(\forall x:\bool)(x \lor \neg x)$ can be expressed in this syntax as \lstinline[language=tptp]{![X:$o]: (X | ~X)}. %$
 
-\subsection[Functions and Predicates with Boolean Arguments]{Functions and Predicates with\\Boolean Arguments}
+\subsection[Functions and Predicates with Boolean Arguments]{Functions and Predicates\\with Boolean Arguments}
 
 Functions and predicates in FOOL are allowed to take booleans as arguments. For example, one can define the logical implication as a binary function $\mathit{impl}$ of the type $\bool \times \bool \to \bool$ using the following axiom:
 \[

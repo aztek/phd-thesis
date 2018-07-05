@@ -2,9 +2,8 @@
 %% OBS
 %% Paper version must use 'twoside' in the document class options
 % \documentclass[10pt,twoside]{book}
-%%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 \documentclass[10pt,oneside]{book}
+%%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 % Text
 \usepackage[english]{babel}
@@ -25,7 +24,7 @@
 % References, cites, bibliography
 \usepackage[nottoc]{tocbibind}
 \usepackage{url,hyperref,nameref}
-\usepackage[pageref]{backref}
+\usepackage[hyperpageref]{backref}
 
 % Spacing
 \usepackage{setspace,xspace}
@@ -39,10 +38,12 @@
 \input{layout}
 
 \newif\if@paper
+% \@papertrue
 \@paperfalse
 
 \newif\if@draft
-\@drafttrue
+% \@drafttrue
+\@draftfalse
 
 \usepackage{titlepage}
 
@@ -113,7 +114,7 @@
 \if@draft
   \newcommand{\EK}[1]{{\color{red} EK: {#1}}}
 \else
-  %\newcommand{\EK}[1]{}
+  \newcommand{\EK}[1]{}
 \fi
 
 \begin{document}
