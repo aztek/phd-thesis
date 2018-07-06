@@ -179,7 +179,7 @@ Vampire accepts this code, finds that the problem is satisfiable and outputs the
 
 This example makes one think about representing sentences in various epistemic or first-order modal logics in FOOL.
 
-\subsection{\ITE}
+\subsection{\ITE\ Expressions}
 
 FOOL contains expressions of the form $\ite{\psi}{s}{t}$, where $\psi$ is a boolean term, and $s$ and $t$ are terms of the same sort. The semantics of such expressions mirrors the semantics of conditional expressions in programming languages.
 
@@ -244,7 +244,7 @@ Its encoding in the extended TFF0 can use the same \dite\ expression:
 
 Note that TFF0 without \dite\ has to differentiate between terms and formulas, and so requires to use \ditet\ in~\eqref{eq:ite-t-example} and \ditef\ in~\eqref{eq:ite-f-example}.
 
-\subsection{\LETIN}
+\subsection{\LETIN\ Expressions}
 
 FOOL contains \LETIN\ expressions that can be used to introduce local function definitions. They have the form
 \begin{equation}\label{eq:let}
