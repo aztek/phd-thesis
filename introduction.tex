@@ -8,7 +8,7 @@ The complexity of preparing problems for first-order theorem provers can be batt
 
 This thesis addresses the following research question: \emph{which new extensions of first-order theorem provers are useful for applications and how can these extensions be efficiently implemented?} The thesis identifies that first class boolean sort, \ITE\ and \LETIN\ expressions are useful for problems from program verification and automation of proof assistants and are generally not supported by first-order theorem provers. The thesis presents a modification of first-order logic named FOOL that contains these features and gives new techniques for reasoning in it and using it. The thesis describes implementation details and challenges in the Vampire theorem prover, however the described extensions and their implementation can be carried out in any other first-order prover.
 
-This chapter describes the background of the thesis and is structured as follows. First, we overview the key concepts of automated theorem proving in first-order logic. Then, we explain how problems coming from program verification and automation of proof assistants benefit from extensions of theorem provers presented in the thesis. Finally, we detail the main contributions of the thesis and overview its structure.
+This chapter describes the background of the thesis and is structured as follows. First, we overview the key concepts of automated theorem proving in first-order logic. Then, we explain how program verification tools and proof assistants benefit from extensions of theorem provers presented in the thesis. Finally, we detail the main contributions of the thesis and overview its structure.
 
 % how to construct proofs automatically using a computer. The latter is the domain of automated theorem proving. It is one of the central and hardest areas of computer mathematics and artificial intelligence. Automated methods of proving theorems precede the existence of computers.
 
@@ -115,12 +115,14 @@ Many practical problems tackled by theorem provers are expressed in the combinat
 \section*{Extensions of First-Order Logic for Applications}
 \addcontentsline{toc}{section}{Extensions of First-Order Logic for Applications}
 
+%The two main areas of application of first-order theorem provers, considered in this thesis, are deductive program verification and automation of proof assistants. 
+
 \paragraph{Deductive Program Verification.}
 The task of a program verification tool is to check whether a given program satisfies its specification. A program specification can be expressed with logical formulas that annotate program statements and capture their properties. Typical examples of such properties are pre-conditions, post-conditions and loop invariants. These program properties are checked using various tools (see e.g. \cite{Bonacina10} for a detailed overview). Deductive program verification sees compliance with specification as a logical problem that can be checked by automated theorem provers. For that, program statements are first translated to logical formulas that capture the semantics of the statements. Then, a theorem is built with the translated formulas as premises and program properties as the conjecture. Validity of the theorem is interpreted as that the program statements have their annotated properties. Conversely, failure to show validity might indicate a bug in the program. Program verification frameworks such as Boogie~\cite{DBLP:conf/fmco/BarnettCDJL05}, Why3~\cite{DBLP:conf/esop/FilliatreP13} and Frama-C~\cite{FramaC} rely on automated theorem provers for checking program properties.
 
 Theorem provers can be used not just for checking program properties, but also for generating them. Recent approaches in interpolation and loop invariant generation~\cite{McMillan08,fase2009,hoder2012popl} present initial results of using first-order theorem provers for generating quantified program properties. First-order theorem provers can also be used to generate program properties with quantifier alternations~\cite{fase2009}; such properties could not be generated fully automatically by any previously known method.
 
-\paragraph{Automation for Proof Assistants.}
+\paragraph{Automation of Proof Assistants.}
 Proof assistants are software tools that assist users in constructing proofs of mathematical problems. Proof assistants use formalisations of mathematics based on higher-order logic (Isabelle/HOL~\cite{Isabelle}), type theory (Coq~\cite{Coq}), set theory (Mizar~\cite{Mizar}) and others. Many proof assistants enhance the workflow of their users by automatically filling in parts of the user's proof with the help of tactics. Tactics are specialised scripts that run a predefined collection of proof searching strategies. These strategies can be implemented inside the proof assistant itself or rely on third-party automated theorem provers~\cite{Sledgehammer,DBLP:conf/icms/UrbanHV10}. Automation using external theorem provers, including first-order ones, is implemented e.g. in the Sledgehammer extension~\cite{Sledgehammer} of Isabelle. Sledgehammer heuristically picks lemmas and definitions that might be necessary for the proof, translates them to the logic of automated theorem provers and hands over the resulting formulas to the provers. If one of the provers returns a proof, Sledgehammer uses this proof to reconstruct a proof in the calculus of Isabelle. The translation of Isabelle's lemmas and definitions might be incomplete because the logic of Isabelle is more expressive than that of automated provers.
 
 The translation of the following features of programming languages and more expressive logics to plain first-order logic might be cumbersome and inefficient. This thesis presents features of FOOL that can be used for a more straightforward translation. Further, the thesis present methods of efficient support of these features and an implementation of these methods in Vampire.
@@ -141,7 +143,7 @@ In summary, the work presented in this thesis
   \item introduces the extension FOOL of first-order logic that contains useful syntactical constructs that are usually not supported by first-order provers, mentioned before;
   \item explores how reasoning in FOOL can be efficiently implemented in existing automated theorem provers for first-order logic;
   \item gives practical evidence of usefulness of FOOL for application through examples and developed translation techniques;
-  \item gives practical evidence of the efficiency of reasoning with FOOL through extensive experimentation.
+  \item gives practical evidence of efficiency of reasoning with FOOL through experimental results on large diverse collections of problems.
 \end{enumerate}
 
 \paragraph{FOOL.}
