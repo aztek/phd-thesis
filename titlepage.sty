@@ -1,23 +1,4 @@
-\newcommand*{\thesis}[1]{\gdef\@thesis{#1}}
-\newcommand*{\@thesis}{}
 
-\newcommand*{\department}[1]{\gdef\@department{#1}}
-\newcommand*{\@department}{}
-
-\newcommand*{\institution}[1]{\gdef\@institution{#1}}
-\newcommand*{\@institution}{}
-
-\newcommand*{\infopageinstitution}[1]{\gdef\@infopageinstitution{#1}}
-\newcommand*{\@infopageinstitution}{\@institution}
-
-\newcommand*{\reportnumber}[1]{\gdef\@reportnumber{#1}}
-\newcommand*{\@reportnumber}{}
-
-\newcommand*{\issn}[1]{\gdef\@issn{#1}}
-\newcommand*{\@issn}{}
-
-\newcommand*{\infopagetitle}[1]{\gdef\@infopagetitle{#1}}
-\newcommand*{\@infopagetitle}{\@title}
 
 \renewcommand*{\maketitle}{%
 \begin{titlepage}
@@ -40,17 +21,21 @@
 \newpage
 \thispagestyle{empty}
 \quad \vfill
-\noindent\@infopagetitle\\*[3mm]
+{\noindent\@infopagetitle}\\*[1mm]
+{\noindent\emph{\@author}}\\*[2mm]
+{\noindent ISBN \@isbn}\\*[3mm]
 
-{\noindent\copyright\ \the\year\ \@author}\\*[3mm]
+{\noindent\copyright\ \@author,\ \the\year}\\*[3mm]
 
-%{\noindent Technical Report \@reportnumber}\\
-%{\noindent ISSN \@issn}\\
-{\noindent\@department}\\
+{\noindent Doktorsavhandlingar vid Chalmers tekniska h\"{o}gskola}\\*
+{\noindent Ny serie nr. \@serie}\\*
+{\noindent ISSN \@issn}\\*[3mm]
 
-{\noindent\sc\@infopageinstitution}\\[1mm]
-{SE-412 96 Gothenburg, Sweden}\\
-{Telephone +46 (0)31-772 1000}\\
+{\noindent\@department}\\*
+{\noindent\@infopageinstitution}\\*
+{SE-412 96 Gothenburg}\\*
+{Sweden}\\*
+{Telephone +46 (0)31-772 1000}\\*[3mm]
 
 \if@paper
 \noindent Printed at Reproservice, Chalmers University of Technology \\
