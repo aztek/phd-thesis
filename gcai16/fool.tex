@@ -206,7 +206,7 @@ We first describe this step of \nfcnf{} for a single \ITE\ expression and then g
   (\forall x:\Z)(\forall y:\Z)(\mathit{max}(x, y) \eql \ite{x \geq y}{x}{y}).
 \end{equation}
 
-To translate \eqref{eq:formula-ite-example}, \nfcnf{} first applies twice the rule for existential quantifier inherited from \newcnf, obtaining the sequent $$\genclause{ \{ \genlit{(\mathit{max}(x, y) \eql \ite{x \geq y}{x}{y})}{\possign} \} }{\emptySubst}.$$ Then, either expanding or naming processes the result.
+To translate \eqref{eq:formula-ite-example}, \nfcnf{} first applies twice the rule for universal quantifier inherited from \newcnf, obtaining the sequent $$\genclause{ \{ \genlit{(\mathit{max}(x, y) \eql \ite{x \geq y}{x}{y})}{\possign} \} }{\emptySubst}.$$ Then, either expanding or naming processes the result.
 \begin{itemize}
   \item Expanding results in $$\genclause{ \{ \genlit{(x \geq y)}{\negsign}, \genlit{(\mathit{max}(x,y) \eql x)}{\possign} \} }{\emptySubst},
   \genclause{ \{ \genlit{(x \geq y)}{\possign}, \genlit{(\mathit{max}(x,y) \eql y)}{\negsign} \} }{\emptySubst}.$$
@@ -266,7 +266,7 @@ for naming subformulas with many occurrences (as explained in the previous secti
   (\forall x:\Z)(\forall y:\Z)(\ite{\mathit{max}(x, y) \eql x}{x \geq y}{y \geq x}).
 \end{equation}
 
-To process \eqref{eq:term-ite-example}, \nfcnf{} first applies twice the rule for existential quantifier inherited from \newcnf{}, obtaining the sequent $$\genclause{\genlit{\{(\ite{\mathit{max}(x, y) \eql x}{x \geq y}{y \geq x})}{\possign}\}}{\emptySubst}.$$ Then, \nfcnf{} applies the rule for the \ITE\ expression: $$\genclause{ \{ \genlit{(\mathit{max}(x,y) \eql x)}{\negsign} , \genlit{(x \geq y)}{\possign} \} }{\emptySubst}, \genclause{ \{ \genlit{(\mathit{max}(x,y) \eql x)}{\possign} , \genlit{(x \geq y)}{\negsign} \} }{\emptySubst}.$$ Finally, \nfcnf{} converts signed formulas to literals and obtains the resulting set of clauses $$\{ \mathit{max}(x,y) \not\eql x, x \geq y \}, \{ \mathit{max}(x,y) \eql x, y \not\geq y \}.$$
+To process \eqref{eq:term-ite-example}, \nfcnf{} first applies twice the rule for universal quantifier inherited from \newcnf{}, obtaining the sequent $$\genclause{\genlit{\{(\ite{\mathit{max}(x, y) \eql x}{x \geq y}{y \geq x})}{\possign}\}}{\emptySubst}.$$ Then, \nfcnf{} applies the rule for the \ITE\ expression: $$\genclause{ \{ \genlit{(\mathit{max}(x,y) \eql x)}{\negsign} , \genlit{(x \geq y)}{\possign} \} }{\emptySubst}, \genclause{ \{ \genlit{(\mathit{max}(x,y) \eql x)}{\possign} , \genlit{(x \geq y)}{\negsign} \} }{\emptySubst}.$$ Finally, \nfcnf{} converts signed formulas to literals and obtains the resulting set of clauses $$\{ \mathit{max}(x,y) \not\eql x, x \geq y \}, \{ \mathit{max}(x,y) \eql x, y \not\geq y \}.$$
 
 In contrast, \oldcnf{} introduces a name for the \ITE\ expression and translates \eqref{eq:term-ite-example} to $(\forall x:\Z)(\forall y:\Z)P(x,y)$, where $P$ is a fresh predicate symbol of the sort $\Z \times \Z$ with the following definitions:
 \begin{enumerate}
