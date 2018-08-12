@@ -2,7 +2,7 @@
 Handling boolean terms as formulas is common in the SMT community. The SMT-LIB project~\cite{SMT-LIB} defines its core logic as first-order logic extended with the distinguished first-class boolean sort and the \verb'let'-\verb'in' expression used for local bindings of variables. The core theory of SMT-LIB defines logical connectives as boolean functions and the ad-hoc polymorphic \verb'if'-\verb'then'-\verb'else' ($ite$) function, used for conditional expressions. 
 % SMT-solvers do not reason in the core logic, but use quantifier-free fragments of it with theories. 
 The language \folb\ defined here extends the SMT-LIB core language with local function definitions,
-using \verb'let'-\verb'in' expressions defining functions of arbitrary, and not just zero, arity. This, \folb\ contains both this language and the TFF0 subset of TPTP. Further, we present a translation of \folb\ to FOL and show how one can improve superposition theorem provers to reason with the boolean sort. 
+using \verb'let'-\verb'in' expressions defining functions of arbitrary, and not just zero, arity. Thus, \folb\ contains both this language and the TFF0 subset of TPTP. Further, we present a translation of \folb\ to FOL and show how one can improve superposition theorem provers to reason with the boolean sort. 
 
 % Unlike SMT-LIB, \folb{} defines logical connectives as interpreted functions and not as part of a theory, and the \verb'if'-\verb'then'-\verb'else' construct as part of the logic language.
 
