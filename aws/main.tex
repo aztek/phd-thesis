@@ -31,8 +31,8 @@
 
 % Notation for Horn clauses definitions
 \newcommand{\pred}[1]{\mathit{#1}} % predicates
-\newcommand{\const}[1]{\mathrm{#1}} % constants
-\newcommand{\type}[1]{\mathrm{#1}} % types
+\newcommand{\const}[1]{\mathit{#1}} % constants
+\newcommand{\type}[1]{\mathit{#1}} % types
 
 \newcommand{\sem}[1]{(#1)} % types
 
@@ -48,9 +48,7 @@ The presence of a centralised network configuration facilitates automated analys
 %
 % Problem 1: Size of networks, \Datalog works good in this however certain subproblems are hard for datalog
 %
-Despite the vast body of available tools, the problem of practical verification of enterprise networks remains a challenge. Firstly, the size and intricacy of modern industrial-sized networks results in very difficult constraint satisfaction problems. While most network verification tools depend on a single constraint solving paradigm, we find that no single solver achieves best performance on all verification problems. Secondly, general purpose solvers are very performance-sensitive to problem encodings. Effective encodings are often a ``black art'' for users, resulting in tedious trial and error for a user without a good understanding of the implementation of the underlying solver.
-
-We are interested in checking properties of VPC networks using complementary constraint solvers. Our ultimate goal is to build a portfolio of constraint solvers that leverages the advantages of different types of solvers on different types of properties. In an effort towards this goal in this work we describe an approach to network verification that relies on automated reasoning for first-order logic. Our plan is to integrate this approach in our ongoing work on the portfolio of solvers.
+Despite the vast body of available tools, the problem of practical verification of enterprise networks remains a challenge. The size and intricacy of modern industrial-sized networks results in very difficult constraint satisfaction problems. While most network verification tools depend on a single constraint solving paradigm, we find that no single solver achieves best performance on all verification problems. We are interested in checking properties of VPC networks using complementary constraint solvers. Our ultimate goal is to build a portfolio of constraint solvers that leverages the advantages of different types of solvers on different types of properties. In an effort towards this goal in this work we describe an approach to network verification that relies on automated reasoning for first-order logic. Our plan is to integrate this approach in our ongoing work on the portfolio of solvers.
 
 We consider reachability properties that express whether the network traffic is able to flow between given nodes of a VPC network. The traffic flow in these networks is typically controlled by the rules assigned to various networking components provided by the cloud platform. These components include subnets, route tables, access control lists, internet gateways and others. Let us illustrate these properties using the following example of a VPC network. 
 \begin{figure*}[th]
@@ -71,18 +69,18 @@ All network nodes that have the port 22 (SSH) accessible from the internet.
 
 We will refer to questions that network administrators might want to answer, such as the ones in Examples~\ref{prop:bool-property} and \ref{prop:list-property}, as \emph{network questions}. In particular, we will refer to questions similar to Example~\ref{prop:bool-property} as \emph{boolean questions}, because an answer to them is ``yes'' or ``no'', and to questions similar to Example~\ref{prop:list-property} as \emph{list questions}, because an answer to them is a list of networking components. Each boolean question can be equivalently phrased as a list question such that the answer to the boolean question is ``yes'' iff the answer to the correspondent list questions is not empty. However, we distinguish these two types of questions because, as we show later, we can more efficiently answer them using different techniques.
 
-Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialised tools. In this work we employ automated theorem provers for first-order logic. To this end, we build static models of VPC networks (Section~\ref{sect:aws/specification}), translate these models and network questions about them to problems in first-order logic (Section~\ref{sect:aws/fol}) and check these problems using finite model builders and saturation-based theorem provers (Section~\ref{sect:aws/fol-provers}). In Section~\ref{sect:aws/fol-provers} we argue that finite model builders can more efficiently answer list questions and saturation-based theorem prover can more efficiently answer boolean questions. In Section~\ref{sect:aws/related} we cite related work and in Section~\ref{sect:aws/challenges} we describe the challenges that we faced in this work and outline future work.
+Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialised tools. In this work we employ automated reasoning tools for first-order logic. To this end, we build static models of VPC networks (Section~\ref{sect:aws/specification}), translate these models and network questions about them to problems in first-order logic (Section~\ref{sect:aws/fol}) and check these problems using finite model builders and saturation-based theorem provers (Section~\ref{sect:aws/fol-provers}). In Section~\ref{sect:aws/fol-provers} we argue that for our purposes these two types of reasoning tools complement each other: finite model builders can more efficiently answer list questions and saturation-based theorem prover can more efficiently answer boolean questions. In Section~\ref{sect:aws/related} we cite related work and in Section~\ref{sect:aws/challenges} we describe the challenges that we faced in this work and outline future work.
 
 \EK{In summary, this paper...}
 
 %-------------------------------------------------------------------------------
 \section{Network Reachability Properties}
 \label{sect:aws/specification}
-We answer network questions statically, that is, instead of sending packets in a network, we build a static model of the network and reason about properties of this model. Our \emph{network model} consists of two parts, the \emph{formal specification} and the \emph{snapshot} of the network. The specification formalises the semantics of each of the components available in the network. For example, the formal specification describes how a route table directs network traffic in a subnet or in which order a firewall applies rules in an access control list. The snapshot describes the topology of the given network. For example, the snapshot contains the list of network nodes, subnets and their route tables. Naturally, the formal specification in the model of each particular VPC network is the same, whereas the snapshot differs. We used models of Amazon VPC networks as part of our ongoing work on network verification using complementary constraint solvers. We express network questions in the language of many-sorted first-order logic. In this section we describe syntax and semantics of network models and network questions.
+We answer network questions by building a static model of the network and reasoning about properties of this model. Our \emph{network model} consists of two parts, the \emph{formal specification} and the \emph{snapshot} of the network. The specification formalises the semantics of each of the components available in the network. For example, the formal specification describes how a route table directs network traffic in a subnet or in which order a firewall applies rules in an access control list. The snapshot describes the topology of the given network. For example, the snapshot contains the list of network nodes, subnets and their route tables. Naturally, the formal specification in the model of each particular VPC network is the same, whereas the snapshot differs. We used models of Amazon VPC networks as part of our ongoing work on network verification using complementary constraint solvers. We express network questions in the language of many-sorted first-order logic. In this section we describe syntax and semantics of network models and network questions.
 
 \subsection{Network Models}
 \label{sect:aws/reachability/spec}
-A network model is a finite set of first-order Horn clauses expressed in a logic programming style. We disallow function symbols with positive arity and allow stratified negation. We assume the plain logic programming semantics for these Horn clauses, defined in the standard way (see e.g.~\cite{DBLP:books/sp/Lloyd87}). In particular, we make the closed-world assumption and treat negation as failure. In addition, our network models use the theory of bit vectors to describe ports, port ranges, IPv4 addresses and subnet masks.
+A network model is a finite set of first-order Horn clauses expressed in a logic programming style. We disallow function symbols with positive arity and allow stratified negation. We assume the plain logic programming semantics for these Horn clauses, defined in the standard way (see e.g.~\cite{DBLP:books/sp/Lloyd87}). In particular, we make the closed-world assumption and treat negation as failure. In addition, our network models use equality and the theory of bit vectors to describe ports, port ranges, IPv4 addresses and subnet masks.
 
 A \emph{signature} of the network model is a triple $(T, C, P),$ where $T$ is a set of \emph{types}, $C$ is a set of \emph{constants} and $P$ is a set of \emph{predicates}. We assign each constant with a type $\tau\in T$ and each predicate with a type $\tau_1\times\ldots\times\tau_n$ $(n\ge0)$, where $\tau_i\in T$ for each $1\leq i \leq n$. We assume a countable infinite set of \emph{variables}. We assign each variable with a type $\tau\in T$. We call a \emph{term} of the type $\tau\in T$ a constant or a variable of that type. We call an \emph{atom} an expression of the form $p(t_1,\ldots,t_n)$, where $n>0$, $p\in P$ is a predicate of the type $\tau_1\times\ldots\times\tau_n$ and each $t_i$, $1\leq i \leq n$ is a term of the type $\tau_i$. We call a \emph{literal} an atom or its negation.
 
@@ -123,7 +121,7 @@ The network specification uses 16-bit vectors to encode port numbers (as integer
   \end{aligned}
 \end{equation*}
 
-Finally, we assume that for each type $\tau\in T$ the signature contains the equality predicate $\pred{=}_\tau$ of the type $\tau\times\tau$ and the network model contains the rule $\pred{=}_\tau(X,X)$.
+Finally, we assume that for each type $\tau\in T$ the signature contains the predicate $\pred{=}_\tau$ of the type $\tau\times\tau$ interpreted as equality.
 
 The specification of Amazon~VPC networks that we used in this work consists of approximately 50 types, 200 predicates and over 240 rules.
 
@@ -281,7 +279,7 @@ We translate the definition of $\pred{link}$ as a predicate symbol $\mathit{Link
 \end{aligned}
 \end{equation*}
 
-Our translation ignores definitions of equality predicates and instead uses the standard equality in first-order logic. %Our translation ignores (the lack of) definitions of bit vector predicates and instead uses other theories as described in the following section.
+We translate the equality predicate $\pred{=}_\tau$ for each type $\tau$ to the standard equality in first-order logic. %Our translation ignores (the lack of) definitions of bit vector predicates and instead uses other theories as described in the following section.
 
 \subsection{Theories}
 \label{sect:aws/fol/theories}
@@ -407,7 +405,13 @@ We observed that formulas produced by the translation of 32-bit vectors to tuple
 
 We observed that formulas produced by the translation with precomputed theories are generally easier for \vampire than formulas produced by any of the translations of bit vectors to other theories. We explain it by the fact that the bulky axioms for bitwise conjunction and equality slow down the proof search, whereas these operations are easy to precompute. Although the precomputation of a theory operation has polynomial complexity, we found that for the networks we used in this study it does not significantly slow down answering network questions. Realistic VPC networks only use a small number of distinct network primitives such as port numbers and IP addresses in any of the configurations of its components and the precomputation for them is not heavy. Furthermore, the precomputation of each theory operation usually involves a simple operation over machine integers that can be performed quickly.
 
-Overall we found the precomputation of theories to be the most efficient strategy for translating our network models. It is also the only applicable strategy for translating network models for Vampire's finite model builder, because it only supports plain many-sorted first-order logic without theories.
+Overall we found the precomputation of theories to be the most efficient strategy for translating our network models. It is also the only applicable strategy for translating network models for Vampire's finite model builder, because it only supports plain many-sorted first-order logic without theories. % As mentioned here, we do not build models for bit vectors. Even if we did, why would they be huge? If represented as tuples, each 32-bit vector would be just a single term with 32 boolean arguments.
+
+%-------------------------------------------------------------------------------
+\section{Evaluation}
+\label{sect:aws/evaluation}
+
+
 
 %-------------------------------------------------------------------------------
 \section{Related Work}
