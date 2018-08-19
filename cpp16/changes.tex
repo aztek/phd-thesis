@@ -2,18 +2,18 @@
 The language of monomorphically typed first-order formulas TFF0 is not sufficient to express formulas of FOOL and polymorphic theory of arrays. In order to support them Vampire uses an extended version of TFF0. In the sequel we will refer to it as \extTFF. In this section we summarise the differences between TFF0 and \extTFF.
 
 \subsection{Boolean Sort}
-In TFF0 the symbol \tptpo\ can only occur as the result sort of a predicate symbol. In \extTFF\ it denotes a proper boolean sort and is allowed to occur as the sort of an argument, a result sort, and the sort of a quantifier.
+In TFF0 the symbol \tptpo\ can only occur as the result sort of a predicate symbol. In \extTFF\ it denotes a proper Boolean sort and is allowed to occur as the sort of an argument, a result sort, and the sort of a quantifier.
 
-In TFF0 variables are not allowed to occur as formulas. In \extTFF\ boolean variables are allowed to occur as formulas.
+In TFF0 variables are not allowed to occur as formulas. In \extTFF\ Boolean variables are allowed to occur as formulas.
 
-In TFF0 formulas are not allowed to occur as arguments. In \extTFF\ formulas are allowed to occur as boolean arguments.
+In TFF0 formulas are not allowed to occur as arguments. In \extTFF\ formulas are allowed to occur as Boolean arguments.
 
 In TFF0 equality cannot be used for formulas. In \extTFF\ equality can be used for formulas to indicate logical equivalence.
 
 \subsection{\ITE}
 TFF0 has two different expressions for \ITE: \ditet\ for constructing terms and \ditef\ for constructing formulas. \ditet\ takes a formula and two terms of the same sort as arguments. \ditef\ takes three formulas as arguments.
 
-\extTFF\ instead uses the \dite\  expression, that takes a formula and two terms of the same sort as arguments. If the second and the third arguments are boolean, such \dite\ expression is equivalent to TFF0's \ditef, otherwise it is equivalent to \ditet.
+\extTFF\ instead uses the \dite\  expression, that takes a formula and two terms of the same sort as arguments. If the second and the third arguments are Boolean, such \dite\ expression is equivalent to TFF0's \ditef, otherwise it is equivalent to \ditet.
 
 \subsection{\LETIN}
 TFF0 has four different expressions for \LETIN: \dlettt\ and \dletft\ for constructing terms, and \dlettf\ and \dletff\ for constructing formulas. All of them denote a single binding. \dlettt\ and \dlettf\ denote a binding of a function symbol, whereas \dletft\ and \dletff\ denote a binding of a predicate symbol. All four expressions take a (possibly universally quantified) equation as the first argument and a term (in case of \dlettt\ and \dletft) or a formula (in case of \dlettf\ and \dletff) as the second argument.

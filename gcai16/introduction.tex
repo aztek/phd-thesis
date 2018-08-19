@@ -23,7 +23,7 @@
 
 Automated theorem provers for first-order logic usually operate on sets of first-order clauses. In order to check a formula in full first-order logic, theorem provers first translate it to clausal normal form (CNF). It is well-known that the quality of this translation affects the performance of the theorem prover. While there is no absolute criterion of what the best CNF for a formula is, theorem provers usually try to make the CNF smaller according to some measure. This measure can include the number of clauses, the number of literals, the lengths of the clauses and the size of the resulting signature, i.e.~the number of function and predicate symbols. Implementors of CNF translations commonly employ formula simplification~\cite{nonnengart2001computing}, (generalised) formula naming~\cite{nonnengart2001computing,azmy2013computing}, and other clausification techniques, aimed to make the CNF smaller.
 
-Our recent work~\cite{FOOL} presented a modification of many-sorted first-order logic with first-class boolean sort. We called this logic \folb{}, standing for first-order logic (FOL) with boolean sort. \folb{} extends standard FOL by (i) treating boolean terms as formulas, (ii) \ITE\ expressions, (iii) \LETIN\ expressions, and (iv) tuple expressions. While \ITE\ and \LETIN\ expressions are also available in the SMT-LIB core language~\cite{BarFT-SMTLIB}, the standard input language for SMT solvers, FOOL is a strict superset of SMT-LIB as tuple expressions are not part of SMT-LIB and \LETIN\ expressions in FOOL can define non-constant functions and predicate symbols. 
+Our recent work~\cite{FOOL} presented a modification of many-sorted first-order logic with first-class Boolean sort. We called this logic \folb{}, standing for first-order logic (FOL) with Boolean sort. \folb{} extends standard FOL by (i) treating Boolean terms as formulas, (ii) \ITE\ expressions, (iii) \LETIN\ expressions, and (iv) tuple expressions. While \ITE\ and \LETIN\ expressions are also available in the SMT-LIB core language~\cite{BarFT-SMTLIB}, the standard input language for SMT solvers, FOOL is a strict superset of SMT-LIB as tuple expressions are not part of SMT-LIB and \LETIN\ expressions in FOOL can define non-constant functions and predicate symbols. 
 
 There is a model-preserving translation of \folb{} formulas to FOL (see \cite{FOOL})
 that works by replacing parts of a \folb{} formula with applications of fresh function and predicate symbols and extending the set of assumptions with definitions of these symbols.
@@ -43,10 +43,10 @@ also avoids clauses that can make theorem provers inefficient.
 We show that in practice this leads to a significant increase in the performance of a theorem prover).
 %that implements it compared e.g. to the use of the translation to full first-order logic from~\cite{FOOL}.
 
-Our \nfcnf{} algorithm  is a non-trivial  extension of the recent \newcnf{} clausification algorithm for FOL~\cite{newcnf_fol}. The extension employs several clausification techniques for handling the features of FOOL, namely boolean terms and \ITE, \LETIN\ and tuple expressions. These techniques comprise the contributions of this work and are listed below.
+Our \nfcnf{} algorithm  is a non-trivial  extension of the recent \newcnf{} clausification algorithm for FOL~\cite{newcnf_fol}. The extension employs several clausification techniques for handling the features of FOOL, namely Boolean terms and \ITE, \LETIN\ and tuple expressions. These techniques comprise the contributions of this work and are listed below.
 
 % To this end,
-% we (i) skolemise boolean variables using predicates and not functions and thus avoid introducing boolean equalities, 
+% we (i) Skolemise Boolean variables using predicates and not functions and thus avoid introducing Boolean equalities, 
 % (ii) name common subexpressions of FOOL formulas by using guards, 
 % and (iii) control the translation of \ITE\ and \LETIN\ expressions by inlining or using new definitions, depending on a threshold level counting formula occurrences. 
 %The extension employes several clausification techniques for handling features of FOOL. These techniques comprise the contributions of this work. 
@@ -57,7 +57,7 @@ Our \nfcnf{} algorithm  is a non-trivial  extension of the recent \newcnf{} clau
 \paragraph{Contributions.} The main contributions of this paper are the following.
 \begin{enumerate}
   \item We present a new clausification algorithm for translating \folb{} formulas to an equisatisfiable set of first-order clauses. 
-  \item We handle boolean variables in FOOL formulas by skolemising them using \skolem{} predicates instead of \skolem{} functions, thus avoiding the introduction of new boolean equalities. 
+  \item We handle Boolean variables in FOOL formulas by Skolemising them using \Skolem{} predicates instead of \Skolem{} functions, thus avoiding the introduction of new Boolean equalities. 
   \item We control the clausification of FOOL formulas with \ITE\ and \LETIN\ expressions by a threshold level on the number of formula occurrences. Depending on the threshold, our algorithms decides on the fly whether to inline \ITE\ and \LETIN\ expressions or introduce a new name and definition for them. 
 \item We handle tuple expressions in FOOL by introducing so-called projection functions  and use these projection functions in the translation of \LETIN\ expressions with tuple definition. 
   \item We implemented our work in the Vampire theorem prover~\cite{Vampire13}, 

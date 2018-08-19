@@ -1,15 +1,15 @@
 % !TEX root = ../main.tex
-Our recent work~\cite{FOOL} presented a modification of many-sorted first-order logic that contains a boolean sort with a fixed interpretation and treats terms of the boolean sort as formulas. We called this logic FOOL, standing for first-order logic (FOL) + boolean sort. FOOL extends FOL by (i) treating boolean terms as formulas; (ii) \ITE\ expressions; and (iii) \LETIN\ expressions. There is a model-preserving transformation of FOOL formulas to FOL formulas, hence an implementation of this transformation makes it possible to prove FOOL formulas using a first-order theorem prover.
+Our recent work~\cite{FOOL} presented a modification of many-sorted first-order logic that contains a Boolean sort with a fixed interpretation and treats terms of the Boolean sort as formulas. We called this logic FOOL, standing for first-order logic (FOL) + Boolean sort. FOOL extends FOL by (i) treating Boolean terms as formulas; (ii) \ITE\ expressions; and (iii) \LETIN\ expressions. There is a model-preserving transformation of FOOL formulas to FOL formulas, hence an implementation of this transformation makes it possible to prove FOOL formulas using a first-order theorem prover.
 
 The language of FOOL is, essentially, a superset of the core language of SMT-LIB~2~\cite{SMT-LIB}, the library of problems for SMT solvers. The difference between FOOL and the core language is that the former has richer \LETIN\ expressions, which support local definitions of functions symbols of arbitrary arity, while the latter only supports local binding of variables.
 
-FOOL can be regarded as the smallest superset of the SMT-LIB~2 Core language and TFF0. An implementation of a translation of FOOL to FOL thus also makes it possible to translate SMT-LIB problems to TPTP. Consider, for example, the following tautology, written in the SMT-LIB syntax: \lstinline'(exists ((x Bool)) x)'. It quantifies over boolean variables and uses a boolean variable as a formula. Neither is allowed in the standard TPTP language, but can be directly expressed in an extended TPTP that represents FOOL.
+FOOL can be regarded as the smallest superset of the SMT-LIB~2 Core language and TFF0. An implementation of a translation of FOOL to FOL thus also makes it possible to translate SMT-LIB problems to TPTP. Consider, for example, the following tautology, written in the SMT-LIB syntax: \lstinline'(exists ((x Bool)) x)'. It quantifies over Boolean variables and uses a Boolean variable as a formula. Neither is allowed in the standard TPTP language, but can be directly expressed in an extended TPTP that represents FOOL.
 
 The rest of this section presents features of FOOL not included in FOL, explains how they are implemented in Vampire and how they can be represented in an extended TPTP syntax understood by Vampire.
 
 \subsection{Proving with the Boolean Sort}
 
-Vampire supports many-sorted predicate logic and the TFF0 syntax for this logic. In many-sorted predicate logic all sorts are uninterpreted, while the boolean sort should be interpreted as a two-element set. There are several ways to support the boolean sort in a first-order theorem prover, for example, one can axiomatise it by adding two constants $\true$ and $\false$ of this sort and two axioms: $(\forall x:\bool)(x \eql \true \lor x \eql \false)$ and $\true \neql \false$. However, as we discuss in \cite{FOOL}, using this axiomatisation in a superposition theorem prover may result in performance problems caused by self-paramodulation of $x \eql \true \lor x \eql \false$.
+Vampire supports many-sorted predicate logic and the TFF0 syntax for this logic. In many-sorted predicate logic all sorts are uninterpreted, while the Boolean sort should be interpreted as a two-element set. There are several ways to support the Boolean sort in a first-order theorem prover, for example, one can axiomatise it by adding two constants $\true$ and $\false$ of this sort and two axioms: $(\forall x:\bool)(x \eql \true \lor x \eql \false)$ and $\true \neql \false$. However, as we discuss in \cite{FOOL}, using this axiomatisation in a superposition theorem prover may result in performance problems caused by self-paramodulation of $x \eql \true \lor x \eql \false$.
 
 To overcome this problem, in \cite{FOOL} we proposed the following modification of the superposition calculus.
 \begin{enumerate}
@@ -28,9 +28,9 @@ where
 \end{enumerate}
 \end{enumerate}
 
-Both ways of dealing with the boolean sort are supported in Vampire. The option \verb|--fool_paramodulation|, which can be set to \verb|on| or \verb|off|, chooses one of them. The default value is \verb|on|, which enables the modification.
+Both ways of dealing with the Boolean sort are supported in Vampire. The option \verb|--fool_paramodulation|, which can be set to \verb|on| or \verb|off|, chooses one of them. The default value is \verb|on|, which enables the modification.
 
-Vampire uses the TFF0 subset of the TPTP syntax, which does not fully support FOOL. To write FOOL formulas in the input, one uses the standard TPTP notation: \tptpo\ for the boolean sort, \dtrue\ for $\true$ and \dfalse\ for $\false$. There are, however, two ways to output the boolean sort and the constants. One way will use the same notation as in the input and is the default, which is sufficient for most applications. The other way can be activated by the option \verb'--show_fool on', it will
+Vampire uses the TFF0 subset of the TPTP syntax, which does not fully support FOOL. To write FOOL formulas in the input, one uses the standard TPTP notation: \tptpo\ for the Boolean sort, \dtrue\ for $\true$ and \dfalse\ for $\false$. There are, however, two ways to output the Boolean sort and the constants. One way will use the same notation as in the input and is the default, which is sufficient for most applications. The other way can be activated by the option \verb'--show_fool on', it will
 \begin{enumerate}
   \item denote as \dbool\ every occurrence of $\bool$ as a sort of a variable or an argument (to a function or a predicate symbol);
   \item denote as \ddtrue\ every occurrence of $\true$ as an argument; and
@@ -48,17 +48,17 @@ In the next subsections we present the features of FOOL that are not present in 
 
 \subsection{Quantifiers over the Boolean Sort}
 
-FOOL allows quantification over $\bool$ and usage of boolean variables as formulas. For example, the formula $(\forall x:\bool)(x \lor \neg x)$ is a syntactically correct tautology in FOOL. It is not however syntactically correct in the standard FOL where variables can only occur as arguments.
+FOOL allows quantification over $\bool$ and usage of Boolean variables as formulas. For example, the formula $(\forall x:\bool)(x \lor \neg x)$ is a syntactically correct tautology in FOOL. It is not however syntactically correct in the standard FOL where variables can only occur as arguments.
 
-Vampire translates boolean variables to FOL in the following way. First, every formula of the form $x \liff y$, where $x$ and $y$ are boolean variables, is replaced by $x \eql y$. Then, every occurrence of a boolean variable $x$ anywhere other than in an argument is replaced by $x \eql \true$. For example, the tautology $(\forall x:\bool)(x \lor \neg x)$ will be converted to the FOL formula $(\forall x:\bool)(x \eql \true \lor x \neql \true)$ during preprocessing.
+Vampire translates Boolean variables to FOL in the following way. First, every formula of the form $x \liff y$, where $x$ and $y$ are Boolean variables, is replaced by $x \eql y$. Then, every occurrence of a Boolean variable $x$ anywhere other than in an argument is replaced by $x \eql \true$. For example, the tautology $(\forall x:\bool)(x \lor \neg x)$ will be converted to the FOL formula $(\forall x:\bool)(x \eql \true \lor x \neql \true)$ during preprocessing.
 
-Note that it is possible to directly express quantified boolean formulas (QBF) in FOOL, and use Vampire to reason about them.
+Note that it is possible to directly express quantified Boolean formulas (QBF) in FOOL, and use Vampire to reason about them.
 
-TFF0 does not support quantification over booleans. Vampire supports an extended version of TFF0 where the sort symbol \tptpo\ is allowed to occur as the sort of a quantifier and boolean variables are allowed to occur as formulas. The formula $(\forall x:\bool)(x \lor \neg x)$ can be expressed in this syntax as \lstinline[language=tptp]{![X:$o]: (X | ~X)}. %$
+TFF0 does not support quantification over Booleans. Vampire supports an extended version of TFF0 where the sort symbol \tptpo\ is allowed to occur as the sort of a quantifier and Boolean variables are allowed to occur as formulas. The formula $(\forall x:\bool)(x \lor \neg x)$ can be expressed in this syntax as \lstinline[language=tptp]{![X:$o]: (X | ~X)}. %$
 
 \subsection[Functions and Predicates with Boolean Arguments]{Functions and Predicates\\with Boolean Arguments}
 
-Functions and predicates in FOOL are allowed to take booleans as arguments. For example, one can define the logical implication as a binary function $\mathit{impl}$ of the type $\bool \times \bool \to \bool$ using the following axiom:
+Functions and predicates in FOOL are allowed to take Booleans as arguments. For example, one can define the logical implication as a binary function $\mathit{impl}$ of the type $\bool \times \bool \to \bool$ using the following axiom:
 \[
   (\forall x: \bool)(\forall y: \bool)(\mathit{impl}(x, y) \liff \neg x \lor y).
 \]
@@ -74,7 +74,7 @@ tff(impl_definition, axiom,
 
 \subsection{Formulas as Arguments}
 
-Unlike the standard FOL, FOOL does not make a distinction between formulas and boolean terms. It means that a function or a predicate can take a formula as a boolean argument, and formulas can be used as arguments to equality between booleans. For example, with the definition of $\mathit{impl}$, given earlier, we can express in FOOL that
+Unlike the standard FOL, FOOL does not make a distinction between formulas and Boolean terms. It means that a function or a predicate can take a formula as a Boolean argument, and formulas can be used as arguments to equality between Booleans. For example, with the definition of $\mathit{impl}$, given earlier, we can express in FOOL that
 $P$ is a graph of a (partial) function of the type $\sigma \to \tau$ as follows:
 \begin{equation}\label{eq:bool-arg-example}
   (\forall x:\sigma)(\forall y:\tau)(\forall z:\tau)\mathit{impl}(P(x,y) \land P(x,z), y \eql z).
@@ -82,7 +82,7 @@ $P$ is a graph of a (partial) function of the type $\sigma \to \tau$ as follows:
 
 Note that the definition of $\mathit{impl}$ could as well use equality instead of equivalence.
 
-In order to support formulas occurring as arguments, Vampire does the following. First, every expression of the form $\varphi \eql \psi$ is replaced by $\varphi \liff \psi$. Then, for each formula $\psi$ occurring as an argument the following translation is applied. If $\psi$ is a nullary predicate $\top$ or $\bot$, it is replaced by $\true$ or $\false$, respectively. If $\psi$ is a boolean variable, it is left as is. Otherwise, the translation is done in several steps. Let $x_1,\ldots,x_n$ be all free variables of $\psi$ and $\sigma_1,\ldots,\sigma_n$ be their sorts. Then Vampire
+In order to support formulas occurring as arguments, Vampire does the following. First, every expression of the form $\varphi \eql \psi$ is replaced by $\varphi \liff \psi$. Then, for each formula $\psi$ occurring as an argument the following translation is applied. If $\psi$ is a nullary predicate $\top$ or $\bot$, it is replaced by $\true$ or $\false$, respectively. If $\psi$ is a Boolean variable, it is left as is. Otherwise, the translation is done in several steps. Let $x_1,\ldots,x_n$ be all free variables of $\psi$ and $\sigma_1,\ldots,\sigma_n$ be their sorts. Then Vampire
 \begin{enumerate}
   \item introduces a fresh function symbol $g$ of the type $$\sigma_1 \times \ldots \times \sigma_n \to \bool;$$
   \item adds the definition $$(\forall x_1:\sigma_1)\ldots(\forall x_n:\sigma_n)(\psi \liff g(x_1,\ldots,x_n) \eql \true)$$ to its set of assumptions;
@@ -95,7 +95,7 @@ For example, after this translation has been applied for both arguments of $\mat
   \item $(\forall y:\tau)(\forall z:\tau)(y \eql z \liff g_2(y,z) \eql \true)$.
 \end{enumerate}
 
-TFF0 does not allow formulas to occur as arguments. The extended version of TFF0, supported by Vampire, removes this restriction for arguments of the boolean sort. Formula~\eqref{eq:bool-arg-example} can be expressed in this syntax as follows:
+TFF0 does not allow formulas to occur as arguments. The extended version of TFF0, supported by Vampire, removes this restriction for arguments of the Boolean sort. Formula~\eqref{eq:bool-arg-example} can be expressed in this syntax as follows:
 \begin{lstlisting}[language=tptp]
 ![X: s, Y: t, Z: t]: impl(p(X, Y) & p(X, Z), Y = Z)
 \end{lstlisting}
@@ -112,7 +112,7 @@ For a more interesting example, consider the following logical puzzle taken from
 \newcommand{\person}{\mathit{person}}
 \newcommand{\zoye}{\mathit{zoye}}
 \newcommand{\mel}{\mathit{mel}}
-To solve the puzzle, one can formalise it as a problem in FOOL and give a corresponding extended TFF0 representation to Vampire. Let $\zoye$ and $\mel$ be terms of a fixed sort $\person$ that represent Zoye and Mel, respectively. Let $\says$ be a predicate that takes a term of the sort $\person$ and a boolean term. We will write $\says(p, s)$ to denote that a person $p$ made a logical statement $s$. Let $\knight$ and $\knave$ be predicates that take a term of the sort $\person$. We will write $\knight(p)$ or $\knave(p)$ to denote that a person $p$ is a knight or a knave, respectively. We will express the fact that knights only tell the truth and knaves only lie by axioms $(\forall p:\person)(\forall s:\bool)(\knight(p) \land \says(p, s) \implies s)$ and $(\forall p:\person)(\forall s:\bool)(\knave(p) \land \says(p, s) \implies \neg s)$, respectively. We will express the fact that every person is either a knight or a knave by the axiom $(\forall p:\person)(\knight(p) \oplus \knave(p))$, where $\oplus$ is the ``exclusive or'' connective. Finally, we will express the statements that Zoye and Mel make in the puzzle by axioms $\says(\zoye, \knave(\mel))$ and $\says(\mel, \neg\knave(\zoye) \land \neg\knave(\mel))$, respectively.
+To solve the puzzle, one can formalise it as a problem in FOOL and give a corresponding extended TFF0 representation to Vampire. Let $\zoye$ and $\mel$ be terms of a fixed sort $\person$ that represent Zoye and Mel, respectively. Let $\says$ be a predicate that takes a term of the sort $\person$ and a Boolean term. We will write $\says(p, s)$ to denote that a person $p$ made a logical statement $s$. Let $\knight$ and $\knave$ be predicates that take a term of the sort $\person$. We will write $\knight(p)$ or $\knave(p)$ to denote that a person $p$ is a knight or a knave, respectively. We will express the fact that knights only tell the truth and knaves only lie by axioms $(\forall p:\person)(\forall s:\bool)(\knight(p) \land \says(p, s) \implies s)$ and $(\forall p:\person)(\forall s:\bool)(\knave(p) \land \says(p, s) \implies \neg s)$, respectively. We will express the fact that every person is either a knight or a knave by the axiom $(\forall p:\person)(\knight(p) \oplus \knave(p))$, where $\oplus$ is the ``exclusive or'' connective. Finally, we will express the statements that Zoye and Mel make in the puzzle by axioms $\says(\zoye, \knave(\mel))$ and $\says(\mel, \neg\knave(\zoye) \land \neg\knave(\mel))$, respectively.
 
 The axioms and definitions, given above, can be written in the extended TFF0 syntax in the following way.
 \begin{lstlisting}[language=tptp]
@@ -175,13 +175,13 @@ Vampire accepts this code, finds that the problem is satisfiable and outputs the
 %    says(mel, bG1)).
 %\end{lstlisting}
 %
-%Note that definitions \lstinline'type_def_0', \lstinline'func_def_0' and \lstinline'func_def_1', and units \lstinline'u4' and \lstinline'u5' axiomatise the theory of booleans. Units \verb'func_def_4' and \verb'func_def_5' introduce fresh function symbols, and units \verb'u7' and \verb'u9' are their definitions.
+%Note that definitions \lstinline'type_def_0', \lstinline'func_def_0' and \lstinline'func_def_1', and units \lstinline'u4' and \lstinline'u5' axiomatise the theory of Booleans. Units \verb'func_def_4' and \verb'func_def_5' introduce fresh function symbols, and units \verb'u7' and \verb'u9' are their definitions.
 
 This example makes one think about representing sentences in various epistemic or first-order modal logics in FOOL.
 
 \subsection{\ITE\ Expressions}
 
-FOOL contains expressions of the form $\ite{\psi}{s}{t}$, where $\psi$ is a boolean term, and $s$ and $t$ are terms of the same sort. The semantics of such expressions mirrors the semantics of conditional expressions in programming languages.
+FOOL contains expressions of the form $\ite{\psi}{s}{t}$, where $\psi$ is a Boolean term, and $s$ and $t$ are terms of the same sort. The semantics of such expressions mirrors the semantics of conditional expressions in programming languages.
 
 \ITE\ expressions are convenient for expressing formulas coming from program analysis and interactive theorem provers. For example, consider the $\mathit{max}$ function of the type $\Z \times \Z \to \Z$ that returns the maximum of its arguments. Its definition can be expressed in FOOL as
 \begin{equation}\label{eq:ite-t-example}
@@ -215,7 +215,7 @@ For example, after this translation \eqref{eq:ite-t-example} becomes $$(\forall 
 
 TPTP has two different expressions for \ITE: \ditet\ for constructing terms and \ditef\ for constructing formulas. \ditet\ takes a formula and two terms of the same sort as arguments. \ditef\ takes three formulas as arguments.
 
-Since FOOL does not distinguish formulas and boolean terms, it does not require separate expressions for the formula-level and term-level \ITE. The extended version of TFF0, supported by Vampire, uses a new expression \dite, that unifies \ditet\ and \ditef. \dite\ takes a formula and two terms of the same sort as arguments. If the second and the third arguments are boolean, such \dite\  expression is equivalent to \ditef, otherwise it is equivalent to \ditet.
+Since FOOL does not distinguish formulas and Boolean terms, it does not require separate expressions for the formula-level and term-level \ITE. The extended version of TFF0, supported by Vampire, uses a new expression \dite, that unifies \ditet\ and \ditef. \dite\ takes a formula and two terms of the same sort as arguments. If the second and the third arguments are Boolean, such \dite\  expression is equivalent to \ditef, otherwise it is equivalent to \ditet.
 
 Consider, for example, the above definition of $\mathit{max}$. It can be encoded in the extended TFF0 as follows.
 \begin{lstlisting}[language=tptp]

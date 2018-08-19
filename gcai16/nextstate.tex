@@ -1,7 +1,7 @@
 % !TEX root = ../main.tex
 
 
-%FOOL extends ordinary first-order logic with first-class boolean sort,
+%FOOL extends ordinary first-order logic with first-class Boolean sort,
 %\ITE\ and \LETIN\ expressions. 
 In this experiment we evaluated Vampire on FOOL problems that express partial correctness property of imperative programs. We obtained these problems manually from a collection of loop-free programs that we in turn generated from a small set of programs with loops by unrolling their loops. Both the benchmarks and the results are available at \url{www.cse.chalmers.se/~evgenyk/fool-tuple-experiments/}.
 
@@ -18,7 +18,7 @@ In this experiment we evaluated Vampire on FOOL problems that express partial co
 %For this experiment 
 We used five small programs with loops annotated with a safety property using the {\tt assert} command. They are listed in Appendix \thechapter.A. Each program contains one loop with one or more
 \ITE\ expressions, assignments and tests over integers,
-integer arrays and booleans. Table~\ref{table:examples-results}
+integer arrays and Booleans. Table~\ref{table:examples-results}
 summarises the programs used in our experiments: the programs
 \verb'count_two',  \verb'count_two_flag' and \verb'count_three'
 implement versions of counting elements in an input array using
@@ -28,10 +28,10 @@ and compare
 two, and respectively three arrays element-wise. 
 We unrolled these program loops 2, 3, 4 and 5
 times, resulting in a set of 20 annotated loop-free programs.
-%We used a collection of 20 code fragments that we extracted from five programs with loops by unrolling each program's loop 2, 3, 4, or 5 times. Appendix~\ref{sec:newcnf/examples} lists the code of the five programs with loops, and we give their description below. Each program uses a loop with one or many \ITE\ expressions inside, assignments for integers, integer arrays and booleans. Each program has an empty pre-condition and one or many post-conditions. 
+%We used a collection of 20 code fragments that we extracted from five programs with loops by unrolling each program's loop 2, 3, 4, or 5 times. Appendix~\ref{sec:newcnf/examples} lists the code of the five programs with loops, and we give their description below. Each program uses a loop with one or many \ITE\ expressions inside, assignments for integers, integer arrays and Booleans. Each program has an empty pre-condition and one or many post-conditions. 
 %\begin{itemize}
 %  \item \verb'count_two' counts the number of negative and non-negative elements of an array. Its post-condition checks that the sum of the number of negative and non-negative elements of the array is equal to the length of the array.
-%  \item \verb'count_two_flag' does the same thing as \verb'count_two' but assigns a condition to a boolean flag.
+%  \item \verb'count_two_flag' does the same thing as \verb'count_two' but assigns a condition to a Boolean flag.
 %  \item \verb'count_three' counts the number of elements of an array that are negative, non-negative and greater than 5, and non-negative and less or equal to 5. Its post-condition checks that the sum of values of the three counters is equal to the length of the array.
 %  \item \verb'two_arrays' sorts two arrays element-wise. Its post-conditions check that every element of one array is less or equal than the element of the other array at the same index.
 %  \item \verb'three_arrays' sorts three arrays element-wise.

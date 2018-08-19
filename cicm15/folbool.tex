@@ -1,10 +1,10 @@
 % !TEX root = ../main.tex
-First-order logic with the boolean sort (\folb) extends many-sorted first-order logic (FOL) in two ways:
+First-order logic with the Boolean sort (\folb) extends many-sorted first-order logic (FOL) in two ways:
 \begin{enumerate}
-\item formulas can be treated as terms of the built-in boolean sort; and
+\item formulas can be treated as terms of the built-in Boolean sort; and
 \item one can use \ITE\ and \LETIN\ expressions defined below.
 \end{enumerate}
-\folb\ is the smallest logic containing both the SMT-LIB core theory and the monomorphic first-order part of the TPTP language. It extends the SMT-LIB core theory by adding \LETIN\ expressions defining functions and TPTP by the first-class boolean sort.
+\folb\ is the smallest logic containing both the SMT-LIB core theory and the monomorphic first-order part of the TPTP language. It extends the SMT-LIB core theory by adding \LETIN\ expressions defining functions and TPTP by the first-class Boolean sort.
 
 
 \subsection{Syntax}
@@ -12,7 +12,7 @@ First-order logic with the boolean sort (\folb) extends many-sorted first-order 
 We assume a countable infinite set of \emph{variables}.
 
 \begin{definition}\label{def:folb-signature}\em
-  A \emph{signature} of first-order logic with the boolean sort is a triple $\Sigma = (S, F, \context)$, where:
+  A \emph{signature} of first-order logic with the Boolean sort is a triple $\Sigma = (S, F, \context)$, where:
 
   \begin{enumerate}
   \item $S$ is a set of \emph{sorts}, which contains a special sort $\bool$. A \emph{type} is either a sort or a non-empty sequence $\sigma_1,\ldots,\sigma_n,\sigma$ of sorts, written as $\sigma_1 \times \ldots \times \sigma_n \to \sigma$. When $n = 0$, we will simply write $\sigma$ instead of $\to\sigma$. We call a \emph{type assignment} a mapping from a set of variables and function symbols to types, which maps variables to sorts.
@@ -73,10 +73,10 @@ All other occurrences are called \emph{free}. We say that a variable or a functi
 
 \begin{definition}
   A \emph{predicate symbol} is any function symbol of the type $\sigma_1 \times \ldots \times \sigma_n \to \bool$.
-  A \emph{$\Sigma$-formula} is a $\Sigma$-term of the sort $\bool$. All $\Sigma$-terms that are not $\Sigma$-formulas are called \emph{non-boolean terms}. \QED
+  A \emph{$\Sigma$-formula} is a $\Sigma$-term of the sort $\bool$. All $\Sigma$-terms that are not $\Sigma$-formulas are called \emph{non-Boolean terms}. \QED
 \end{definition}
 
-Note that, in addition to the use of \LETIN\ and \ITE, \folb\ is a proper extension of first-order logic. For example, in \folb\ formulas can be used as arguments to terms and one can quantify over booleans. As a consequence, every quantified boolean formula is a formula in \folb.
+Note that, in addition to the use of \LETIN\ and \ITE, \folb\ is a proper extension of first-order logic. For example, in \folb\ formulas can be used as arguments to terms and one can quantify over Booleans. As a consequence, every quantified Boolean formula is a formula in \folb.
 
 \subsection{Semantics}
 

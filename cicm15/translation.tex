@@ -3,7 +3,7 @@
 
 We do not formally define many-sorted FOL with equality here, since FOL is essentially a subset of \folb, which we will discuss now.  
 
-We say that an occurrence of a subterm $s$ of the sort $\bool$ in a term $t$ is in a \emph{formula context} if it is an argument of a logical connective or the occurrence in either $(\forall x:\sigma)s$ or $(\exists x:\sigma)s$. We say that an occurrence of $s$ in $t$ is in a \emph{term context} if this occurrence is an argument of a function symbol, different from a logical connective, or an equality. We say that a formula of \folb\ is \emph{syntactically first order} if it contains no \ITE\ and \LETIN\ expressions, no variables occurring in a formula context and no formulas occurring in a term context. By restricting the definition of terms to the subset of syntactically first-order formulas, we obtain the standard definition of many-sorted first-order logic, with the only exception of having a distinguished boolean sort and constants $\true$ and $\false$ occurring in a formula context.
+We say that an occurrence of a subterm $s$ of the sort $\bool$ in a term $t$ is in a \emph{formula context} if it is an argument of a logical connective or the occurrence in either $(\forall x:\sigma)s$ or $(\exists x:\sigma)s$. We say that an occurrence of $s$ in $t$ is in a \emph{term context} if this occurrence is an argument of a function symbol, different from a logical connective, or an equality. We say that a formula of \folb\ is \emph{syntactically first order} if it contains no \ITE\ and \LETIN\ expressions, no variables occurring in a formula context and no formulas occurring in a term context. By restricting the definition of terms to the subset of syntactically first-order formulas, we obtain the standard definition of many-sorted first-order logic, with the only exception of having a distinguished Boolean sort and constants $\true$ and $\false$ occurring in a formula context.
 
 Let $\phi$ be a closed $\Sigma$-formula of \folb{}. We will perform the following steps to translate $\phi$ into a first-order formula. During the translation we will maintain a set of formulas $D$, which initially is empty. The purpose of $D$ is to collect a set of formulas (definitions of new symbols), which guarantee that the transformation preserves models.
 
@@ -12,7 +12,7 @@ Let $\phi$ be a closed $\Sigma$-formula of \folb{}. We will perform the followin
 
 \item Replace the constants $\true$ and $\false$, standing in a formula context, by nullary predicates $\top$ and $\bot$ respectively, obtaining a first-order formula.
 
-\item Add special boolean sort axioms.
+\item Add special Boolean sort axioms.
 \end{enumerate}
 During the translation, we will say that a function symbol or a variable is \emph{fresh} if it neither appears in $\phi$ nor in any of the definitions, nor in the domain of $\context$.
 
@@ -28,7 +28,7 @@ If $\context \vdash t:\sigma$, $s$ is a subterm of $t$ and $x$ a free variable i
 The translation steps are defined below. We start with an empty set $D$ and an initial \folb\ formula $\phi$, which we would like to change into a syntactically first-order formula. At every translation step we will select a formula $\chi$, which is either $\phi$ or a formula in $D$, which is not syntactically first-order, replace a subterm in $\chi$ it by another subterm, and maybe add a formula to $D$. The translation steps can be applied in any order.
 
 \begin{enumerate}
-  \item Replace a boolean variable $x$ occurring in a formula context, by $x \eql \true$.
+  \item Replace a Boolean variable $x$ occurring in a formula context, by $x \eql \true$.
 
   \item Suppose that $\psi$ is a formula occurring in a term context such that (i) $\psi$ is different from $\true$ and $\false$, (ii) $\psi$ is not a variable, and (iii) $\psi$ contains no free occurrences of function symbols bound in $\chi$. Let $x_1,\ldots,x_n$ be all free variables of $\psi$ and $\sigma_1,\ldots,\sigma_n$ be their sorts. Take a fresh function symbol $g$, add the formula $(\forall x_1:\sigma_1)\ldots(\forall x_n:\sigma_n) (\psi \liff g(x_1,\ldots,x_n) \eql \true)$ to $D$ and replace $\psi$ by $g(x_1,\ldots,x_n)$. Finally, change $\context$ to $\context,g : \sigma_1 \times \ldots \times \sigma_n \to \bool$.
 
@@ -75,9 +75,9 @@ These properties imply the following result on model preservation.
 \end{theorem}
 This theorem implies that $\phi$ and $\bigwedge_{\psi \in D} \psi \wedge \phi'$ have the same models, as far as the original type assignment (the type assignment of $\Sigma$) is concerned. The formula $\bigwedge_{\psi \in D} \psi \wedge \phi'$ in this theorem is syntactically first-order. Denote this formula by $\gamma$. Our next step is to define a model-preserving translation from syntactically first-order formulas to first-order formulas.
 
-To make $\gamma$ into a first-order formula, we should get rid of $\true$ and $\false$ occurring in a formula context. To preserve the semantics, we should also add axioms for the boolean sort, since in first-order logic all sorts are uninterpreted, while in \folb\ the interpretations of the boolean sort and constants $\true$ and $\false$ are fixed. 
+To make $\gamma$ into a first-order formula, we should get rid of $\true$ and $\false$ occurring in a formula context. To preserve the semantics, we should also add axioms for the Boolean sort, since in first-order logic all sorts are uninterpreted, while in \folb\ the interpretations of the Boolean sort and constants $\true$ and $\false$ are fixed. 
 
-To fix the problem, we will add axioms expressing that the boolean sort has two elements and that $\true$ and $\false$ represent the two distinct elements of this sort.
+To fix the problem, we will add axioms expressing that the Boolean sort has two elements and that $\true$ and $\false$ represent the two distinct elements of this sort.
 \begin{equation}\label{axiom:bool}
   \forall (x:\bool)(x \eql \true \vee x \eql \false) \wedge \true \not\eql \false.
 \end{equation}
@@ -89,8 +89,8 @@ Given a syntactically first-order formula $\gamma$, we denote by $\toFOL{\gamma}
   Let $\context$ is a type assignment and $\gamma$ be a syntactically first-order formula such that $\context \vdash \gamma:\bool$.
   \begin{enumerate}
   \item Suppose that $\intI$ is a $\context$-interpretation and $\intI \models \gamma$ in \folb. Then $\intI \models \toFOL{\gamma}$ in first-order logic.
-  \item Suppose that $\intI$ is a $\context$-interpretation and $\intI \models \toFOL{\gamma}$ in first-order logic. Consider the \folb-interpretation $\intI'$ that is obtained from $\intI$ by changing the interpretation of the boolean sort $\bool$ by $\{0,1\}$ and the interpretations of $\true$ and $\false$ by the elements $1$ and $0$, respectively, of this sort. Then $\intI' \models \gamma$ in \folb. \QED
+  \item Suppose that $\intI$ is a $\context$-interpretation and $\intI \models \toFOL{\gamma}$ in first-order logic. Consider the \folb-interpretation $\intI'$ that is obtained from $\intI$ by changing the interpretation of the Boolean sort $\bool$ by $\{0,1\}$ and the interpretations of $\true$ and $\false$ by the elements $1$ and $0$, respectively, of this sort. Then $\intI' \models \gamma$ in \folb. \QED
   \end{enumerate}
 \end{theorem}
 
-Theorems~\ref{thm:model:preservation} and~\ref{thm:model:preservation:2} show that our translation preserves models. Every model of the original formula can be extended to a model of the translated formulas by adding values of the function symbols introduced during the translation. Likewise, any first-order model of the translated formula becomes a model of the original formula after changing the interpretation of the boolean sort to coincide with its interpretation in \folb.
+Theorems~\ref{thm:model:preservation} and~\ref{thm:model:preservation:2} show that our translation preserves models. Every model of the original formula can be extended to a model of the translated formulas by adding values of the function symbols introduced during the translation. Likewise, any first-order model of the translated formula becomes a model of the original formula after changing the interpretation of the Boolean sort to coincide with its interpretation in \folb.

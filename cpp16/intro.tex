@@ -5,9 +5,9 @@ The performance of a theorem prover on the result of a translation crucially dep
 
 If a theorem prover natively supports expressions that mirror the semantics of programming language constructs, we solve both above mentioned problems. First, the users do not have to design translations of such constructs. Second, the users do not have to possess a deep knowledge of how the theorem prover works~--- the efficiency becomes the responsibility of the prover itself.
 
-In this work we present new features recently implemented in the theorem prover Vampire~\cite{Vampire13} to natively support mirroring programming language constructs in its input language. They include (i) FOOL~\cite{FOOL}, that is the extension of first-order logic by a first-class boolean sort, \ITE\ and \LETIN\ expressions, and (ii) polymorphic arrays.
+In this work we present new features recently implemented in the theorem prover Vampire~\cite{Vampire13} to natively support mirroring programming language constructs in its input language. They include (i) FOOL~\cite{FOOL}, that is the extension of first-order logic by a first-class Boolean sort, \ITE\ and \LETIN\ expressions, and (ii) polymorphic arrays.
 
-This paper is structured as follows. Section~\ref{sect:fool} presents how FOOL is implemented in Vampire and focuses on new extensions to the TPTP input language~\cite{TPTP} of first-order provers. Section~\ref{sect:fool}  extends the TPTP language of monomorphic many-sorted first-order formulas, called TFF0~\cite{tff0}, and allows users to treat the built-in boolean sort \tptpo\ as a first class sort. Moreover, it introduces expressions \dite\ and \dlet, which unify various TPTP \ITE\ and \LETIN\ expressions.
+This paper is structured as follows. Section~\ref{sect:fool} presents how FOOL is implemented in Vampire and focuses on new extensions to the TPTP input language~\cite{TPTP} of first-order provers. Section~\ref{sect:fool}  extends the TPTP language of monomorphic many-sorted first-order formulas, called TFF0~\cite{tff0}, and allows users to treat the built-in Boolean sort \tptpo\ as a first class sort. Moreover, it introduces expressions \dite\ and \dlet, which unify various TPTP \ITE\ and \LETIN\ expressions.
 
 Section~\ref{sect:arrays} presents a formalisation of a polymorphic theory of arrays in TPTP and its implementation in Vampire. It extends TPTP with features of the TFF1 language~\cite{tff1} of rank-1 polymorphic  first-order formulas, namely, sort arguments for the built-in array sort constructor \darraySymb. Sort variables however are not supported.
 
@@ -21,13 +21,13 @@ Finally, Section~\ref{sect:related} discusses related work and Section~\ref{sect
 
 \noindent\paragraph{Summary of the main results.}
 \begin{itemize}
-\item We describe an implementation of first-order logic with a first-class boolean sort. This bridges the gap between input languages for theorem provers and logics and tools used in program analysis. We believe it is a first ever implementation of first-class boolean sorts in superposition theorem provers.
+\item We describe an implementation of first-order logic with a first-class Boolean sort. This bridges the gap between input languages for theorem provers and logics and tools used in program analysis. We believe it is a first ever implementation of first-class Boolean sorts in superposition theorem provers.
 
 \item We extend and simplify the TPTP language~\cite{TPTP}, by providing more powerful and more uniform representations of \ITE\ and \LETIN\ expressions. To the best of our knowledge, Vampire is the only superposition theorem prover implementing these constructs.
 
 \item We formalise and describe an implementation in Vampire of a polymorphic theory of arrays. Again, we believe that Vampire is the only superposition theorem prover implementing this theory.
 
-\item We give a simple extension of FOOL, allowing to express the next state relation of a program as a boolean formula which is linear in the size of the program. This  boolean formula captures the exact semantics of the program and can be used by a first-order theorem prover. We are not aware of any other work on extending theorem provers with support for representing fragments of imperative programs.
+\item We give a simple extension of FOOL, allowing to express the next state relation of a program as a Boolean formula which is linear in the size of the program. This  Boolean formula captures the exact semantics of the program and can be used by a first-order theorem prover. We are not aware of any other work on extending theorem provers with support for representing fragments of imperative programs.
 
 \item We demonstrate usability and high performance of our implementation on two collections of examples, coming from the higher-order part of the TPTP library and from the Isabelle interactive theorem prover~\cite{Isabelle}. Our experimental results show that Vampire outperforms systems which could previously be used to solve such problems:
 higher-order theorem provers and satisfiability modulo theory (SMT) solvers.
@@ -35,4 +35,4 @@ higher-order theorem provers and satisfiability modulo theory (SMT) solvers.
 
 The paper focuses on new, practical features extending first-order theorem provers for making them better suited for applications of reasoning in various theories, program analysis and verification. While the paper describes implementation details and challenges in the Vampire theorem prover, the described features and their implementation can be carried out in any other first-order prover.
 
-Summarising, we believe that our paper advances the state-of-the-art in formal certification of programs and proofs. With the use of FOOL and polymorphic arrays, we bring first-order theorem proving closer to program logics and make first-order theorem proving better suited for program analysis and verification. We also believe that an implementation of FOOL advances automation of mathematics, making many problems using the boolean type directly understood by a first-order theorem prover, while they previously were treated as higher-order problems.
+Summarising, we believe that our paper advances the state-of-the-art in formal certification of programs and proofs. With the use of FOOL and polymorphic arrays, we bring first-order theorem proving closer to program logics and make first-order theorem proving better suited for program analysis and verification. We also believe that an implementation of FOOL advances automation of mathematics, making many problems using the Boolean type directly understood by a first-order theorem prover, while they previously were treated as higher-order problems.

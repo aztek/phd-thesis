@@ -114,9 +114,9 @@ $let(array := $store(array, 3, 5),
 %------------------------------------------------------------------------------
 \subsection{Theory of Boolean Arrays}
 
-An interesting special case of the polymorphic theory of arrays is the theory of boolean arrays. In that theory the $\selectf$ function has the type $\arrayt(\tau,\bool) \times \tau \to \bool$ and the $\storef$ function has the type $\arrayt(\tau,\bool) \times \tau \times \bool \to \arrayt(\tau,\bool)$. This means that applications of $\selectf$ can be used as formulas and $\storef$ can have a formula as the third argument.
+An interesting special case of the polymorphic theory of arrays is the theory of Boolean arrays. In that theory the $\selectf$ function has the type $\arrayt(\tau,\bool) \times \tau \to \bool$ and the $\storef$ function has the type $\arrayt(\tau,\bool) \times \tau \times \bool \to \arrayt(\tau,\bool)$. This means that applications of $\selectf$ can be used as formulas and $\storef$ can have a formula as the third argument.
 
-Vampire implements the theory of booleans arrays similarly to other sorts, by adding theory axioms when the option \verb'--theory_axioms' is enabled. However, the theory axioms are different for the following reason. The axioms of the theory of boolean arrays are syntactically correct in FOOL but not in FOL, because they use quantification over booleans. However, Vampire adds theory axioms only after a translation of FOOL to FOL. For this reason, Vampire uses the following set of axioms for boolean arrays:
+Vampire implements the theory of Booleans arrays similarly to other sorts, by adding theory axioms when the option \verb'--theory_axioms' is enabled. However, the theory axioms are different for the following reason. The axioms of the theory of Boolean arrays are syntactically correct in FOOL but not in FOL, because they use quantification over Booleans. However, Vampire adds theory axioms only after a translation of FOOL to FOL. For this reason, Vampire uses the following set of axioms for Boolean arrays:
 \begin{equation*}
   \begin{aligned}
     &(\forall a:\arrayt(\tau,\bool))(\forall i:\tau)(\forall v:\bool)\\
@@ -143,7 +143,7 @@ where $\oplus$ is the ``exclusive or'' connective.
 \newcommand{\plaintext}{\mathit{plaintext}}
 \newcommand{\cipher}{\mathit{cipher}}
 
-One can use the theory of boolean arrays, for example, to express properties of bit vectors. In the following example we give a formalisation of a basic property of XOR encryption, where the key, the message and the cipher are bit vectors. Let $\encrypt$ be a function of the type $\arrayt(\Z,\bool) \times \arrayt(\Z,\bool) \to \arrayt(\Z,\bool)$. We will write $\encrypt(\msg, \key)$ to denote the result of bit-wise application of the XOR operation to $\msg$ and $\key$. For simplicity we will assume that the message and the key are of equal length. The definition of $\encrypt$ can be expressed with the following axiom:
+One can use the theory of Boolean arrays, for example, to express properties of bit vectors. In the following example we give a formalisation of a basic property of XOR encryption, where the key, the message and the cipher are bit vectors. Let $\encrypt$ be a function of the type $\arrayt(\Z,\bool) \times \arrayt(\Z,\bool) \to \arrayt(\Z,\bool)$. We will write $\encrypt(\msg, \key)$ to denote the result of bit-wise application of the XOR operation to $\msg$ and $\key$. For simplicity we will assume that the message and the key are of equal length. The definition of $\encrypt$ can be expressed with the following axiom:
 \begin{align*}
   &(\forall \msg:\arrayt(\Z,\bool))(\forall \key:\arrayt(\Z,\bool))(\forall i:\Z)\\
   &\quad(\select{\encrypt(\msg,\key)}{i} \eql \\

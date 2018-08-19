@@ -1,12 +1,12 @@
 % !TEX root = ../main.tex
-We presented new features recently implemented in Vampire. They include FOOL: the extension of first-order logic by a first-class boolean sort, \ITE\ and \LETIN\ expressions, and polymorphic arrays. Vampire implements FOOL by translating FOOL formulas into FOL formulas. We described how this translation is done for each of the new features. Furthermore, we described a modification of the superposition calculus by FOOL paramodulation that makes Vampire reasoning in FOOL more efficient. 
-We also gave a simple extension to FOOL that allows one to express the next state relation of a program as a boolean formula which is linear in the size of the program.
+We presented new features recently implemented in Vampire. They include FOOL: the extension of first-order logic by a first-class Boolean sort, \ITE\ and \LETIN\ expressions, and polymorphic arrays. Vampire implements FOOL by translating FOOL formulas into FOL formulas. We described how this translation is done for each of the new features. Furthermore, we described a modification of the superposition calculus by FOOL paramodulation that makes Vampire reasoning in FOOL more efficient. 
+We also gave a simple extension to FOOL that allows one to express the next state relation of a program as a Boolean formula which is linear in the size of the program.
 
 Neither FOOL nor polymorphic arrays can be expressed in TFF0. In order to support them Vampire uses a modification of the TFF0 syntax with the following features:
 
 \begin{enumerate}
-  \item the boolean sort \tptpo\ can be used as the sort of arguments and quantifiers;
-  \item boolean variables can be used as formulas, and formulas can be used as boolean arguments;
+  \item the Boolean sort \tptpo\ can be used as the sort of arguments and quantifiers;
+  \item Boolean variables can be used as formulas, and formulas can be used as Boolean arguments;
   \item \ITE\ expressions are represented using a single keyword \dite\ rather than two different keywords \ditet\ and \ditef;
   \item \LETIN\ expressions are represented using a single keyword \dlet\ rather than four different keywords \dlettt, \mbox{\dlettf,} \dletft\ and \dletff;
   \item \darraySymb, \dselect\ and \dstore\ are used to represent arrays of arbitrary types.

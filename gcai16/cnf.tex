@@ -3,7 +3,7 @@
 % nonnengart2001computing also have (in the simple approach): 
 % elimination of equivalences as part of NNF transform 
 % (but one wants to decide about equivalences during naming)
-% miniscoping and variable renaming just before skolemisation
+% miniscoping and variable renaming just before Skolemisation
 % (but let's ignore miniscoping and assume nice variables rightaway or a detail below the level of this presentation) 
 %
 %???? polarity dependent elimination of equivalences section has an argument about ugly invisible tautologies 
@@ -14,11 +14,11 @@ Traditional approaches to
 clausification in FOL \cite{nonnengart2001computing,Vampire13} produce a clausal normal
 form in several stages, where each stage
 represents a single pass through the formula tree. These stages may include formula simplification, translation into (equivalence) negation normal form,
-formula naming, elimination of equivalences, skolemisation, and distribution of
+formula naming, elimination of equivalences, Skolemisation, and distribution of
 disjunctions over conjunctions. The \newcnf{} clausification algorithm
 of~\cite{newcnf_fol} takes a different approach and employs a single top-down
 traversal of the formula in which these stages are combined.  
-This enables optimisations that are not available if the stages of clausification are independent. For example, compared to the traditional staged approach, \newcnf{} can introduce fewer \skolem{} functions on formulas with complex nesting of equivalences and quantifiers. Moreover, it can detect and discard intermediate tautologies, 
+This enables optimisations that are not available if the stages of clausification are independent. For example, compared to the traditional staged approach, \newcnf{} can introduce fewer \Skolem{} functions on formulas with complex nesting of equivalences and quantifiers. Moreover, it can detect and discard intermediate tautologies, 
 which are much more difficult to recognise by the staged approach.
 %
  %Another example is an easy detection of intermediate tautologies, which are discarded on the fly. \newcnf{} thus maintains a more accurate count of sub-formula occurrences, on which the decision whether to name a sub-formula is based.
@@ -36,7 +36,7 @@ Our setting is that of many-sorted first-order predicate logic with equality.
 
 % The following definition is taken from \cite{FOOL}.
 %\begin{definition}\label{def:folb-signature}\em
-%  A \emph{signature} of first-order logic with the boolean sort is a triple $\Sigma = (S, F, \context)$, where:
+%  A \emph{signature} of first-order logic with the Boolean sort is a triple $\Sigma = (S, F, \context)$, where:
 %  \begin{enumerate}
 %  \item $S$ is a set of \emph{sorts}, which contains a special sort $\bool$. A \emph{type} is either a sort or a non-empty sequence $\sigma_1,\ldots,\sigma_n,\sigma$ of sorts, written as $\sigma_1 \times \ldots \times \sigma_n \to \sigma$. When $n = 0$, we will simply write $\sigma$ instead of $\to\sigma$. We call a \emph{type assignment} a mapping from a set of variables and function symbols to types, which maps variables to sorts.
 %

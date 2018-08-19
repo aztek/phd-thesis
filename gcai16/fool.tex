@@ -6,12 +6,12 @@ We write \nfcnf{} to refer to this algorithm, and \oldcnf{} to refer to the algo
 
 \subsection{\folb{}}
 
-\folb{} \cite{FOOL} extends the standard many-sorted FOL with an interpreted boolean sort. 
+\folb{} \cite{FOOL} extends the standard many-sorted FOL with an interpreted Boolean sort. 
 Boolean variables can be used as formulas in \folb{} and formulas may be used as
-arguments to function and predicate symbols. In addition to its first-class boolean sort,
+arguments to function and predicate symbols. In addition to its first-class Boolean sort,
 \folb{} extends standard FOL with following constructs:
 \begin{enumerate}
-  %\item boolean variables used as formulas; %LK: these are not constructs
+  %\item Boolean variables used as formulas; %LK: these are not constructs
  % \item formulas used as arguments to function and predicate symbols;%LK: these are not constructs
   \item \ITE\ expressions that can occur as terms and formulas;
   \item \LETIN\ expressions that can occur as terms and formulas and can define an arbitrary number of function and predicate symbols.
@@ -26,12 +26,12 @@ A \LETIN\ expression with a tuple definition has the form $\letin{\tuple{c_1,\ld
 
 Note that tuple expressions are not first class terms. They can only occur on the right-hand side of tuple definitions, but not as arguments to function or predicate symbols. Moreover, we do not assign sorts to tuple expressions and do not allow nested tuple expressions. It is however straightforward to extend \folb{} with a theory of first class tuples. For that, one needs to assign tuple sorts of the form $\tuple{\tau_1,\ldots,\tau_n}$ to tuple expressions of the form $\tuple{s_1,\ldots,s_n}$ if $s_1:\tau_1,\ldots,s_n:\tau_n$, and allow tuple expression to appear as terms. Such extension is not considered in this paper.
 
-There are several ways to support the interpreted boolean sort in first-order theorem proving. 
+There are several ways to support the interpreted Boolean sort in first-order theorem proving. 
 The approach taken in~\cite{FOOL} proposes to axiomatise it by adding two constants $\true$ and $\false$ of this sorts and two axioms: $\true \neql \false$ and $(\forall x:\bool)(x \eql \true \lor x \eql \false)$. Furthermore, \cite{FOOL} proposes a modification in superposition calculus of first-order provers: it (i)
-changes the  simplification ordering of first-order prover by making $\true$ and $\false$ the smallest terms of boolean sort 
+changes the  simplification ordering of first-order prover by making $\true$ and $\false$ the smallest terms of Boolean sort 
 and (ii) replaces the second axiom with a so-called \folb{} paramodulation rule. These modifications block self-paramodulation of $x \eql \true \lor x \eql \false$ and hence prevent performance problems arising from self-paramodulation in superposition theorem proving. 
-In this paper, we however argue that neither boolean axiom nor modifications of superposition calculus are needed to support the interpreted boolean sort. 
-Rather, we propose special processing of boolean variables and boolean equalities during clausification and avoid the introduction of new boolean equalities. 
+In this paper, we however argue that neither Boolean axiom nor modifications of superposition calculus are needed to support the interpreted Boolean sort. 
+Rather, we propose special processing of Boolean variables and Boolean equalities during clausification and avoid the introduction of new Boolean equalities. 
 
 \subsection{Introducing \nfcnf{}}
 
@@ -47,10 +47,10 @@ The \nfcnf{} algorithm   extends \newcnf{} by adding support for \folb{} formula
 %\newcnf{} to translate \folb{} and not just first-order formula we make the following changes to it.
 \begin{itemize}
   \item We allow sequents to contain signed \folb{} formulas, and not just first-order formulas.
-  \item We extend the \newcnf{} tautology elimination with the support for boolean variables. Whenever a boolean variable occurs in a sequent twice with the opposite signs, that sequent is not added to $\GC$. Whenever a boolean variable occurs in a sequent multiple times with the same sign, only one occurrence is kept in the sequent.
+  \item We extend the \newcnf{} tautology elimination with the support for Boolean variables. Whenever a Boolean variable occurs in a sequent twice with the opposite signs, that sequent is not added to $\GC$. Whenever a Boolean variable occurs in a sequent multiple times with the same sign, only one occurrence is kept in the sequent.
   \item We add extra rules that guide how sequents are replaced in the set $\GC$ detailed below. These rules correspond to syntactical constructs available in \folb{} but not in ordinary first-order logic.
-  \item We change the rule that translates existentially quantified formulas to sko\-le\-mi\-se boolean variables using \skolem{} predicates and not \skolem{} functions. For that, we also allow substitutions to map boolean variables to \skolem{} literals. 
-  \item We add an extra step of translation. After the input formula has been traversed, we apply substitutions of boolean variables to every formula in each respective sequent. The resulting set of sequents might have \skolem{} literals occurring as terms. We run the clausification algorithm again on this set of sequents. The second run does not introduce new substitutions and results with a set of sequents that only contain atomic formulas and substitutions of non-boolean variables.
+  \item We change the rule that translates existentially quantified formulas to sko\-le\-mi\-se Boolean variables using \Skolem{} predicates and not \Skolem{} functions. For that, we also allow substitutions to map Boolean variables to \Skolem{} literals. 
+  \item We add an extra step of translation. After the input formula has been traversed, we apply substitutions of Boolean variables to every formula in each respective sequent. The resulting set of sequents might have \Skolem{} literals occurring as terms. We run the clausification algorithm again on this set of sequents. The second run does not introduce new substitutions and results with a set of sequents that only contain atomic formulas and substitutions of non-Boolean variables.
 \end{itemize}
 
 In the sequel, we detail the rules of \nfcnf{} for replacing sequents. To simplify the exposition and without the loss of generality, we make the following assumptions about the input FOOL formula.
@@ -81,15 +81,15 @@ In the sequel we assume that $\phi$ and $\psi$ are fixed and give all definition
 Let $\genclause{D}{\subst}$ be a sequent such that $D$ has an occurrence of $\genlit{\psi}{\sign}$. 
 
 \subsection*{Boolean Variables}
-Suppose that $\psi$ is a boolean variable $x$. 
+Suppose that $\psi$ is a Boolean variable $x$. 
 If $\subst$ does map $x$, \nfcnf{} adds $\genclause{D}{\subst}$ to $\GC$.
 % Explanation, idea of correctness:
-This corresponds to the case in which $x$ was an existentially quantified variable skolemised in some previous step.
+This corresponds to the case in which $x$ was an existentially quantified variable Skolemised in some previous step.
         
 If $\subst$ does not map $x$, \nfcnf{} adds the sequent $\genclause{D'}{\subst'}$ to $\GC$, where $D'$ is obtained from $D$ by removing the occurrence of $\genlit{\psi}{\sign}$ and $\subst'$ extends $\subst$ with $x \mapsto \false$ if $\sign=\possign$, and $x \mapsto \true$ if $\sign=\negsign$. 
 % Explanation, idea of correctness:
 This corresponds to the case in which $x$ was a universally quantified variable.
-Treating the boolean universal quantifier as a conjunction, we are implicitly replacing the sequent $D$ with two extensions, one for $x \mapsto \false$ and the other for $x \mapsto \true$. However, one of them is always true due to the occurrence of $\genlit{\psi}{\sign}$ in $D$ and so is not considered anymore. Thus only $\genclause{D'}{\subst'}$ is further processed by \nfcnf{}.
+Treating the Boolean universal quantifier as a conjunction, we are implicitly replacing the sequent $D$ with two extensions, one for $x \mapsto \false$ and the other for $x \mapsto \true$. However, one of them is always true due to the occurrence of $\genlit{\psi}{\sign}$ in $D$ and so is not considered anymore. Thus only $\genclause{D'}{\subst'}$ is further processed by \nfcnf{}.
 
 \begin{example*} Let $\psi_1 = (\forall x:\bool)(x \lor P(x))$, $\psi_2 = (\exists y:\bool)(P(y) \land y)$,
 where $P$ is a predicate symbol of the sort $\bool \to \bool$ and let us consider the formula $\varphi = \psi_1 \lor \psi_2$.
@@ -105,10 +105,10 @@ $\psi_1$ and its subformulas:
 \{x^\possign, P(x)^\possign, \psi_2^\possign\}_{\{x \mapsto \false\}}.\\
 \end{array}
 \]
-Notice how the substitution is extended by $x \mapsto \false$ because of the positive occurrence of the boolean variable $x$.
+Notice how the substitution is extended by $x \mapsto \false$ because of the positive occurrence of the Boolean variable $x$.
 
 Next, we show how $\psi_2$ and its subformulas get processed. 
-We introduce $\mathit{sk}$, a nullary skolem predicate symbol for the existential quantifier:
+We introduce $\mathit{sk}$, a nullary Skolem predicate symbol for the existential quantifier:
 \[
 \begin{array}{ll}
 \{x^\possign, P(x)^\possign, (\exists y:\bool)(P(y) \land y)^\possign\}_{\{x \mapsto \false\}} & \Rightarrow\\
@@ -117,7 +117,7 @@ We introduce $\mathit{sk}$, a nullary skolem predicate symbol for the existentia
 \{x^\possign, P(x)^\possign, y^\possign\}_{\{x \mapsto \false, y \mapsto \mathit{sk}\}}.
 \end{array}
 \]
-Recall that dealing with boolean variables in \nfcnf{} requires an extra stage in which boolean substitutions are applied:
+Recall that dealing with Boolean variables in \nfcnf{} requires an extra stage in which Boolean substitutions are applied:
 \[
 \{\false^\possign, P(\false)^\possign, P(\mathit{sk})^\possign\}_\epsilon, 
 \{\false^\possign, P(\false)^\possign, \mathit{sk}^\possign\}_\epsilon.
@@ -135,37 +135,37 @@ However, \nfcnf{} is not designed to do that.}
 
 \oldcnf{} converts $\varphi$ to the following set of clauses:
 $$\{ x \eql \true, P(x), P(\mathit{sk}) \}, \{ x \eql \true, P(x), \mathit{sk}\eql \true \},$$
-where $\mathit{sk}$ is a skolem constant of the sort $\bool$.
+where $\mathit{sk}$ is a Skolem constant of the sort $\bool$.
 \QED\end{example*}
 
 %The translation of \folb{} formulas to full first-order logic in~\cite{FOOL} 
 The \oldcnf{} algorithm of~\cite{FOOL} 
-replaces each boolean variable $x$ occurring as formula with $x \eql \true$ and skolemises boolean variables using boolean \skolem{} functions. 
-Unlike \oldcnf{}, \nfcnf{} skolemises boolean variables using \skolem{} predicates and substitutes boolean variables that do not need skolemisation with constants $\true$ and $\false$. 
+replaces each Boolean variable $x$ occurring as formula with $x \eql \true$ and Skolemises Boolean variables using Boolean \Skolem{} functions. 
+Unlike \oldcnf{}, \nfcnf{} Skolemises Boolean variables using \Skolem{} predicates and substitutes Boolean variables that do not need Skolemisation with constants $\true$ and $\false$. 
 The approach taken in \nfcnf{} is superior in two regards.
 \begin{enumerate}
-  \item \oldcnf{} converts each skolemised boolean variable $x$ occurring as formula to an equality between \skolem{} terms and $\true$. \nfcnf{} converts $x$ to a \skolem{} literal which can be handled by standard superposition more efficiently. 
-  \item Substitution of a universally quantified boolean variable with $\true$ and $\false$ can decrease the size of the translation. If the boolean variable occurs as formula, after applying the substitution,  the occurrence is either removed or the whole sequent is discarded by tautology elimination in \nfcnf{}.
+  \item \oldcnf{} converts each Skolemised Boolean variable $x$ occurring as formula to an equality between \Skolem{} terms and $\true$. \nfcnf{} converts $x$ to a \Skolem{} literal which can be handled by standard superposition more efficiently. 
+  \item Substitution of a universally quantified Boolean variable with $\true$ and $\false$ can decrease the size of the translation. If the Boolean variable occurs as formula, after applying the substitution,  the occurrence is either removed or the whole sequent is discarded by tautology elimination in \nfcnf{}.
 \end{enumerate}
 
 % Hence, \oldcnf{} requires a modification of the superposition calculus in order to avoid self-paramodulation during superposition theorem proving. 
 
 % That is, \nfcnf{} brings no changes in the superposition calculus of the theorem prover. 
 
-Our treatment of boolean variables never introduces new equalities and uses \skolem{} predicates instead of \skolem{} functions.
+Our treatment of Boolean variables never introduces new equalities and uses \Skolem{} predicates instead of \Skolem{} functions.
 %\todo{Aren't we repeating this?} EK: Perhapse, but it's an important thing to mention, without it, we cannot claim that modifications of superposition calculus are not needed
-We process boolean equalities as logical equivalences and use guards to name \ITE\ expressions occurring as terms. The usage of these techniques give the resulting set of clauses the following two properties.
+We process Boolean equalities as logical equivalences and use guards to name \ITE\ expressions occurring as terms. The usage of these techniques give the resulting set of clauses the following two properties.
 \begin{enumerate}
-  \item It can only contain boolean variables and constants $\true$ and $\false$ as boolean terms. 
+  \item It can only contain Boolean variables and constants $\true$ and $\false$ as Boolean terms. 
   
-  Every boolean term that occurs in $\phi$ is translated as formula and no boolean terms other than variables, $\true$ and $\false$ are introduced. 
-  \item It does not contain equalities between boolean terms. \label{item_no_eq} 
+  Every Boolean term that occurs in $\phi$ is translated as formula and no Boolean terms other than variables, $\true$ and $\false$ are introduced. 
+  \item It does not contain equalities between Boolean terms. \label{item_no_eq} 
   
-  Every boolean equality occurring in the input is translated as equivalence between its arguments, and no new boolean equalities are eventually introduced.
+  Every Boolean equality occurring in the input is translated as equivalence between its arguments, and no new Boolean equalities are eventually introduced.
 \end{enumerate}
 These two properties ensure that 
-% boolean variables will only be unified with $\true$ and $\false$ during superposition. Constants $\true$ and $\false$ cannot be unified with each other, therefore all inferences that involve clauses with boolean terms are sound. As a result, 
-no extra axioms or inference rules are required to handle the interpreted boolean sort in a theorem prover.
+% Boolean variables will only be unified with $\true$ and $\false$ during superposition. Constants $\true$ and $\false$ cannot be unified with each other, therefore all inferences that involve clauses with Boolean terms are sound. As a result, 
+no extra axioms or inference rules are required to handle the interpreted Boolean sort in a theorem prover.
 In particular, thanks to the second property we do not need any form of equational reasoning for this sort.
 
 % Proof idea: 
@@ -178,7 +178,7 @@ Suppose that $\psi$ is $\gamma_1 \eql \gamma_2$, where $\gamma_1$ and $\gamma_2$
 \nfcnf{} adds a sequent to $\GC$ that is obtained from $D$ by replacing the occurrence of $\genlit{\psi}{\sign}$ 
 with $(\gamma_1 \liff \gamma_2)^{\sign}$.
 
-In effect, \nfcnf{} reduces the case of boolean equality to that of formula equivalence, 
+In effect, \nfcnf{} reduces the case of Boolean equality to that of formula equivalence, 
 delegating the processing to the respective rule inherited from \newcnf.
 
 % The \nfcnf{} algorithm adds two sequents to $\GC$ obtained from $D$ by replacing the occurrence of $\psi$ with 
@@ -248,9 +248,9 @@ the expansion threshold
 provides a trade-off between the increase of the number of sequents and the number of introduced symbols. For a large number of \ITE\ expressions it avoids the exponential increase in the number of sequents. For a small number of \ITE\ expressions inside an atomic formula it avoids growing the signature.
 
 % Formula naming averts the exponential increase in the number of sequents caused by expansion of nested \ITE\ expressions that occur as terms. 
-% To illustrate this point, consider the TPTP problem \verb'SYO500^1.003' that contains a conjecture of the form $$f_0(f_1(f_1(f_1(f_2(x))))) \eql f_0(f_0(f_0(f_1(f_2(f_2(f_2(x))))))),$$ where $f_0$, $f_1$ and $f_2$ are predicates of the sort $\bool \to \bool$, and $x$ is a boolean constant. The \nfcnf{} translates as an \ITE\ expression each application of $f_i$ that occurs as argument. Expansion of every \ITE\ expression doubles the number of sequents. However, the growth stops once the naming threshold is reached.
+% To illustrate this point, consider the TPTP problem \verb'SYO500^1.003' that contains a conjecture of the form $$f_0(f_1(f_1(f_1(f_2(x))))) \eql f_0(f_0(f_0(f_1(f_2(f_2(f_2(x))))))),$$ where $f_0$, $f_1$ and $f_2$ are predicates of the sort $\bool \to \bool$, and $x$ is a Boolean constant. The \nfcnf{} translates as an \ITE\ expression each application of $f_i$ that occurs as argument. Expansion of every \ITE\ expression doubles the number of sequents. However, the growth stops once the naming threshold is reached.
 
-To compare to \oldcnf{}, we recall that \oldcnf{} replaces each non-boolean \ITE\ expression with an application of a fresh function symbol and adds the definition of the symbol to the set of assumptions. The definition is expressed as an equality. 
+To compare to \oldcnf{}, we recall that \oldcnf{} replaces each non-Boolean \ITE\ expression with an application of a fresh function symbol and adds the definition of the symbol to the set of assumptions. The definition is expressed as an equality. 
 Unlike~\oldcnf{}, our new \nfcnf{} algorithm avoids introducing new equalities and uses predicate guards for naming, thus avoiding possible self-paramodulation triggered by equality literals. % This avoids possible performance problems caused by self-paramodulation similar to the ones described in~\cite{FOOL}.
 
 \subsection*{\ITE\ Expressions as Formulas}
@@ -288,7 +288,7 @@ These three formulas ultimately yield the following set of clauses:
 \label{subsect:letin}
 Suppose that $\psi$ is $\letin{f(x_1:\tau_1,\ldots,x_n:\tau_n)}{t}{\gamma}$. 
 The \nfcnf{} algorithms translates $\psi$ either by inlining or by naming, as discussed below.  
-The choice of inlining or naming of \LETIN\ expressions in the problem is determined by a pre-specified boolean parameter of the algorithm. %boolean option. % provided by the user of the algorithm.
+The choice of inlining or naming of \LETIN\ expressions in the problem is determined by a pre-specified Boolean parameter of the algorithm. %Boolean option. % provided by the user of the algorithm.
     
 \paragraph{Inlining.} \nfcnf{} adds a sequent to $\GC$ that is obtained from $D$ by replacing the occurrence of $\genlit{\psi}{\sign}$ with $\genlit{\gamma'}{\sign}$. $\gamma'$ is obtained from $\gamma$ by replacing each application $f(s_1,\ldots,s_n)$ of an % free -- not needed anymore (we assume f is not bound twice)
 occurrence of $f$ in $\gamma$ with $t'$ and renaming of binding variables. $t'$ is obtained from $t$ by replacing each free occurrence of $x_1,\ldots,x_n$ in $t$ with $s_1,\ldots,s_n$, respectively. We point out that inlining predicate symbols of zero arity does not hinder identification of tautologies thanks to tautology removal inside sequents.
@@ -298,7 +298,7 @@ Further, \nfcnf{} also adds the sequent $\genclause{\{f(x_1,\ldots,x_n) \eql t\}
     
 % Let $\tau$ be the sort of $t$. If $\tau$ is $\bool$, add sequents $\genclause{\{\genlit{f(x_1,\ldots,x_n)}{\negsign},\genlit{t}{\possign}\}}{\emptySubst}$ and $\genclause{\{\genlit{f(x_1,\ldots,x_n)}{\possign},\genlit{t}{\negsign}\}}{\emptySubst}$ to $\GC$. Otherwise, add a sequent $\genclause{\{f(x_1,\ldots,x_n) \eql t\}}{\emptySubst}$ to $\GC$.
 
-Naming introduces a fresh function or predicate symbol and does not multiply the number of resulting clauses. Inlining, on the other hand, does not introduce any symbols, but can drastically increase the number of clauses. Either of the translations might make a theorem prover inefficient. We point out that the number of clauses and the size of the resulting signature are not the only factors in that. For example, consider inlining of a \LETIN\ expression that defines a non-boolean term. It does not introduce a fresh function symbol and does not increase the number of clauses. However, the inlined definition might increase the size of the term with respect to the simplification ordering. This affects the order in which literals will be selected during superposition, and ultimately the performance of the prover.
+Naming introduces a fresh function or predicate symbol and does not multiply the number of resulting clauses. Inlining, on the other hand, does not introduce any symbols, but can drastically increase the number of clauses. Either of the translations might make a theorem prover inefficient. We point out that the number of clauses and the size of the resulting signature are not the only factors in that. For example, consider inlining of a \LETIN\ expression that defines a non-Boolean term. It does not introduce a fresh function symbol and does not increase the number of clauses. However, the inlined definition might increase the size of the term with respect to the simplification ordering. This affects the order in which literals will be selected during superposition, and ultimately the performance of the prover.
 
 % Designing a syntactical criteria for choosing between naming and inlining is an interesting task for future work.
 

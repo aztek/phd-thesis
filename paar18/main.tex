@@ -48,9 +48,9 @@ Recently, conditional expressions and let expressions have become more
 important because of their use in software verification applications.
 In an independent development, Evgenii Kotelnikov et al. introduced FOOL
 \cite{FOOL}, a variant of many-sorted first-order logic (FOL).
-FOOL extends FOL in that it (i)~contains an interpreted boolean type, which
-allows boolean variables to be used as formulae, and allows all formulae to be 
-used as boolean terms, (ii)~contains conditional expressions, and 
+FOOL extends FOL in that it (i)~contains an interpreted Boolean type, which
+allows Boolean variables to be used as formulae, and allows all formulae to be 
+used as Boolean terms, (ii)~contains conditional expressions, and 
 (iii)~contains let expressions.
 FOOL can be straightforwardly extended with the polymorphic theory of tuples 
 that defines first class tuple types and terms \cite{KKV18}.
@@ -130,7 +130,7 @@ a {\em type signature} that specifies the types of the symbol's arguments
 and result. Each TF0 type is one of
 \begin{itemize}
 \item the predefined types \lstinline'$i' for $\iota$ (individuals) and
-      \lstinline'$o' for $o$ (booleans);
+      \lstinline'$o' for $o$ (Booleans);
 \item the predefined arithmetic types \lstinline'$int' (integers), \lstinline'$rat'
       (rationals), and \lstinline'$real' (reals); or
 \item user-defined types (constants).
@@ -247,9 +247,9 @@ An example of TF1 formulae can be found in \cite{KSR16}.
 
 FOOL \cite{FOOL}, standing for First-Order Logic (FOL) + bOoleans, is a 
 variant of many-sorted first-order logic. 
-FOOL extends FOL in that it (i)~contains an interpreted boolean type, which
-allows boolean variables to be used as formulae, and allows all formulae to be 
-used as boolean terms, (ii)~contains conditional expressions, and 
+FOOL extends FOL in that it (i)~contains an interpreted Boolean type, which
+allows Boolean variables to be used as formulae, and allows all formulae to be 
+used as Boolean terms, (ii)~contains conditional expressions, and 
 (iii)~contains let expressions.
 FOOL can be straightforwardly extended with the polymorphic theory of tuples 
 that defines first class tuple types and terms \cite{KKV18}.
@@ -265,11 +265,11 @@ The complete formal semantics of FOOL is given in~\cite{FOOL}.
 %------------------------------------------------------------------------------
 \subsubsection{Boolean Terms and Formulae}
 
-FOOL contains an interpreted two-element boolean type $\bool$, allows 
+FOOL contains an interpreted two-element Boolean type $\bool$, allows 
 quantification over variables of type $\bool$, and considers formulae to 
 be terms of type $\bool$.
-This allows boolean variables to be used as formulae, and all formulae to be 
-used as boolean terms.
+This allows Boolean variables to be used as formulae, and all formulae to be 
+used as Boolean terms.
 For example, Formula~\ref{eq:tfx/fool-bool-var} is a syntactically correct 
 tautology in FOOL.
 \begin{equation}\label{eq:tfx/fool-bool-var}
@@ -355,7 +355,7 @@ symbol $\mathit{max}$.
 The definition of a predicate symbol $p:\sigma_1\times\ldots\times\sigma_n$ has 
 the form $\binding{p(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{\phi}$, where 
 $n \geq 0$, $x_1,\ldots,x_n$ are distinct variables, and $\phi$ is a formula.
-For example, the following let expression denotes equivalence of two boolean 
+For example, the following let expression denotes equivalence of two Boolean 
 constants $A$ and $B$, using a local definition of the predicate symbol 
 $\mathit{imply}$.
 \begin{equation}\label{eq:tfx/fool-let-imply2}
@@ -491,7 +491,7 @@ tff(imply_defn, axiom,
 \end{lstlisting}
 
 % No longer necessary
-% Notice that the negation of a boolean variable used as a formula must be
+% Notice that the negation of a Boolean variable used as a formula must be
 % placed inside parenthesis.
 
 The definition of a graph of a function on Formula~\ref{eq:tfx/bool-arg-example} can be written in TFX as
@@ -901,7 +901,7 @@ tff(c_says, hypothesis, says(c, says(b, $false))).
 
 This paper has introduced the eXtended Typed First-order form (TFX) of the
 TPTP's TFF language.
-TFX includes boolean variables as formulae, formulae as terms, tuple types and
+TFX includes Boolean variables as formulae, formulae as terms, tuple types and
 terms, conditional expressions, and let expressions.
 TFX is useful for (at least) concisely expressing problems coming from 
 program analysis, and translated from more expressive logics.

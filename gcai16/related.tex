@@ -4,11 +4,11 @@
 Most notably, Wisniewski et al.~propose in % their recent work 
 \cite{DBLP:conf/cade/WisniewskiSKB16}
 methods for normalising formulas in higher-order logic (HOL). Similarly to \folb{},
-HOL natively contains the boolean sort. Wisniewski et al.~deal with 
+HOL natively contains the Boolean sort. Wisniewski et al.~deal with 
 formulas occurring at argument positions by a technique called \emph{argument extraction} 
 which, similarly to our naming schemes, extends the signature and defines a new symbol
-outside the original formula. Moreover, also Wisniewski et al. introduce skolem predicates 
-instead of skolem functions when dealing with existential boolean quantifiers. 
+outside the original formula. Moreover, also Wisniewski et al. introduce Skolem predicates 
+instead of Skolem functions when dealing with existential Boolean quantifiers. 
 This happens implicitly for them, since in HOL there is no distinction between formulas and terms.
 
 \folb{} can be regarded as a superset of SMT-LIB \cite{BarFT-SMTLIB} core logic and formulas of SMT-LIB core logic can be directly expressed in \folb{}. The language of \folb{} extends the SMT-LIB core language with local function definitions, using \LETIN\ expressions defining functions of arbitrary, and not just zero, arity. 
@@ -21,14 +21,14 @@ there is no great need to optimise extensions of the signature
 and clausification usually follows the simple Tseitin encoding~\cite{tseitin_enc} of the formula tree.
 %
 % E-matching \cite{DBLP:journals/jacm/DetlefsNS05,DBLP:conf/cade/MouraB07}
-Moreover, modern SMT solvers employ an alternative approach to dealing with quantifiers over interpreted sorts such as the booleans, 
-which is complementary to skolemisation
+Moreover, modern SMT solvers employ an alternative approach to dealing with quantifiers over interpreted sorts such as the Booleans, 
+which is complementary to Skolemisation
 and relies on a guidance by counter-examples~\cite{DBLP:journals/corr/Reynolds0K15} or on model-based projections~\cite{LPAR-20:Playing_with_Quantified_Satisfaction}.
 
-Finally, it is interesting to note that our \nfcnf{} algorithm naturally translates a quantified boolean formula (QBF),
+Finally, it is interesting to note that our \nfcnf{} algorithm naturally translates a quantified Boolean formula (QBF),
 as realised in the FOOL language, into a CNF in effectively propositional logic (EPR).
 Specifically, every literal in this translation is 
-a skolem predicate applied to boolean variables and constants $\true$ and $\false$.
+a Skolem predicate applied to Boolean variables and constants $\true$ and $\false$.
 This result is similar to the one proposed in \cite{DBLP:conf/cade/SeidlLB12},
 where the authors explicitly focus on QBF as the source and EPR as the target language, respectively.
 Obtaining a formula in EPR is a desirable property % to have 

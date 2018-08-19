@@ -21,24 +21,24 @@ In what follows, we describe the collection of imperative programs used in our e
 \newcommand{\iter}{i}
 
 \subsection{Examples of Imperative Programs}\label{sec:boogie/experiments/programs}
-We demonstrate the work of our translation on a collection of imperative programs that only use variable assignments, \ITE\ statements, and sequential composition. Unfortunately, no large collections of such programs are available. There are many benchmarks for software verification tools, but most of them use control flow statements not covered in this work, such as gotos and exceptions. We also cannot use benchmarks from the hardware verification and model checking communities, because they are mostly about boolean values and bit-vectors. For our experiments we generated our own imperative programs in two steps described below.
+We demonstrate the work of our translation on a collection of imperative programs that only use variable assignments, \ITE\ statements, and sequential composition. Unfortunately, no large collections of such programs are available. There are many benchmarks for software verification tools, but most of them use control flow statements not covered in this work, such as gotos and exceptions. We also cannot use benchmarks from the hardware verification and model checking communities, because they are mostly about Boolean values and bit-vectors. For our experiments we generated our own imperative programs in two steps described below.
 
 %\begin{enumerate}
 %  \item 
-First, we crafted 10 programs that implement textbook algorithms and solutions to program verification competitions. Each program uses variables of the integer, boolean, and array type. Each program contains a single \verb'while' loop
-of the form $\while{\expr}{\stmt}$, where $\expr$ is a boolean expression and $\stmt$ is a statement. In addition, each program contains 
+First, we crafted 10 programs that implement textbook algorithms and solutions to program verification competitions. Each program uses variables of the integer, Boolean, and array type. Each program contains a single \verb'while' loop
+of the form $\while{\expr}{\stmt}$, where $\expr$ is a Boolean expression and $\stmt$ is a statement. In addition, each program contains 
 variable assignments, \ITE\ statements, and sequential composition. We annotated each program with its pre-condition $\varphi$ and each loop with its invariant $\psi$. The formulas $\varphi$ and $\psi$ are expressed in first-order logic.
 %  \item
 
 Then, we unrolled the loop of each program $k$ times, where $k$ is an integer between 1 and 5. This resulted in 50 loop-free programs that retain the annotated properties.
-%Using the notation above, the pre-condition of this loop-free annotated program is $\varphi \wedge \chi$. The post-condition states that $\psi$ holds after exactly $k$ iterations of the loop. We expressed the post-condition as $\neg\bad \implies \psi$, where $\bad$ is a fresh boolean variable. $\bad$ encodes the under-specified state of the program. $\bad$ is set to $\true$ before each unrolled iteration of the loop if $\expr$ does not hold, and at the end of the program if $\expr$ does hold.
+%Using the notation above, the pre-condition of this loop-free annotated program is $\varphi \wedge \chi$. The post-condition states that $\psi$ holds after exactly $k$ iterations of the loop. We expressed the post-condition as $\neg\bad \implies \psi$, where $\bad$ is a fresh Boolean variable. $\bad$ encodes the under-specified state of the program. $\bad$ is set to $\true$ before each unrolled iteration of the loop if $\expr$ does not hold, and at the end of the program if $\expr$ does hold.
 %
 %\end{enumerate}
 %
-%Each of the 10 programs with loops consists of declarations of variables and a single loop of the form $\while{\expr}{\stmt}$, where $\expr$ is a boolean expression and $\stmt$ is a statement. $\expr$ and $\stmt$ fit the definitions of an expression and a statement, respectively, given in Section~\ref{sec:boogie/technique}. Each program is annotated with its pre-condition $\varphi$ and its post-condition $\psi$, and each loop is annotated with its loop invariant $\chi$. $\varphi$, $\psi$, and $\chi$ are formulas in first-order logic.
+%Each of the 10 programs with loops consists of declarations of variables and a single loop of the form $\while{\expr}{\stmt}$, where $\expr$ is a Boolean expression and $\stmt$ is a statement. $\expr$ and $\stmt$ fit the definitions of an expression and a statement, respectively, given in Section~\ref{sec:boogie/technique}. Each program is annotated with its pre-condition $\varphi$ and its post-condition $\psi$, and each loop is annotated with its loop invariant $\chi$. $\varphi$, $\psi$, and $\chi$ are formulas in first-order logic.
 %
 %While transforming programs with loops into loop-free programs by taking finite unrollings of the loop, we also annotated the resultin loop-free programs We transformed each program with a loop into an annotated program by unrolling the loop $k \ge 1$ times. 
-%The pre-condition of this annotated program is $\varphi \wedge \chi$. The post-condition states that $\psi$ holds after exactly $k$ iterations of the loop. We expressed the post-condition as $\neg\bad \implies \psi$, where $\bad$ is a fresh boolean variable. $\bad$ encodes the underspecified state of the program. $\bad$ is set to $\true$ before each unrolled iteration of the loop if $\expr$ does not hold, and at the end of the program if $\expr$ does hold.
+%The pre-condition of this annotated program is $\varphi \wedge \chi$. The post-condition states that $\psi$ holds after exactly $k$ iterations of the loop. We expressed the post-condition as $\neg\bad \implies \psi$, where $\bad$ is a fresh Boolean variable. $\bad$ encodes the underspecified state of the program. $\bad$ is set to $\true$ before each unrolled iteration of the loop if $\expr$ does not hold, and at the end of the program if $\expr$ does hold.
 %\end{enumerate}
 Each program encodes the loop invariant property of the original program. 
 % AV : commented out since not true in view of pre-conditions:
@@ -48,7 +48,7 @@ Multiple unrollings provide us with programs with long sequences of variables up
 %In summary, our loop unrolling program transformation consisted of the following steps.
 Our loop unrolling program transformation consisted of the following steps.
 \begin{enumerate}
-  \item Introduce a fresh boolean variable $\bad$ that encodes the under-specified state of the program.
+  \item Introduce a fresh Boolean variable $\bad$ that encodes the under-specified state of the program.
   \item Construct a guarded loop iteration $\iter$ as $$\seq{\ite{\neg e}{\assigns{\bad}{\true}}{\emptyStatement}}{\stmt}.$$
   \item Construct a sequence of iterations $\seq{\seq{\iter}{\ldots}}{\iter}$, where $\iter$ is repeated $k$ times. 
   \item Finally, construct the annotated program $$\hoare{\varphi \wedge \psi}{\seq{\seq{\iter}{\ldots}}{\iter}}{\neg\bad \implies \psi}.$$
@@ -79,14 +79,14 @@ The fragment of the Boogie language supported by Voogie can be seen as the small
   \item a single procedure \verb'main' annotated with its pre- and post-conditions;
   \item assignments to variables, including parallel assignments, and assignments to array elements;
   \item \ITE\ statements; and
-  \item arithmetic and boolean operations.
+  \item arithmetic and Boolean operations.
 \end{enumerate*}
 % \begin{enumerate}
 %   \item Top level variable declarations of types \verb'int', \verb'bool', or the type of nested arrays.
 %   \item A single procedure \verb'main' with property annotations marked with keywords \verb'requires' and \verb'ensures'.
 %   \item Assignments to variables, including parallel assignments, and assignments to array elements.
 %   \item \ITE\ statements.
-%   \item Arithmetic and boolean operations.
+%   \item Arithmetic and Boolean operations.
 % \end{enumerate}
 Running Voogie on each loop-free program in our collection gave us 50 TPTP benchmarks.
 An example of the TPTP benchmark obtained from running Voogie on the \texttt{maxarray} program with its loops unrolled twice is available at \url{http://www.cse.chalmers.se/~evgenyk/ijcar18/}.
@@ -102,7 +102,7 @@ The representation of program expressions coincides in all three translations. A
 % \begin{enumerate}
 %   \item introduces a fresh constant for each state of each program variable;
 %   \item encodes each variable assignment as logical equality and each sequence of assignments as logical conjunction;
-%   \item introduces a fresh boolean constant for each branch of each \ITE\ statement. Each such constant is defined using a \LETIN\ expression and encodes the next state relation of the branch.
+%   \item introduces a fresh Boolean constant for each branch of each \ITE\ statement. Each such constant is defined using a \LETIN\ expression and encodes the next state relation of the branch.
 % \end{enumerate}
 
 % The Voogie translation 
