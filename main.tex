@@ -1,8 +1,8 @@
 %%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 %% OBS
 %% Paper version must use 'twoside' in the document class options
-% \documentclass[10pt,twoside]{book}
-\documentclass[10pt,oneside]{book}
+\documentclass[10pt,twoside]{book}
+% \documentclass[10pt,oneside]{book}
 %%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 % Text
@@ -38,8 +38,8 @@
 \input{layout}
 
 \newif\if@paper
-% \@papertrue
-\@paperfalse
+\@papertrue
+% \@paperfalse
 
 \newif\if@draft
 % \@drafttrue
@@ -130,7 +130,7 @@
   {\small\sc\@department}\\[-1mm]
   {\small\sc\@institution}\\
   \vspace{1.2em}
-  {\fontsize{16}{18}\selectfont\@title\unskip\strut\par}
+  {\fontsize{16}{17.5}\selectfont\@title\unskip\strut\par}
   \vspace{1.8em}
   {\large\emph\@author}\\
   \vspace{0.7em}
