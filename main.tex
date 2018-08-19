@@ -123,9 +123,19 @@
 
 \maketitle
 
-\chapter*{Abstract}
+% \chapter*{Abstract}
 %\addcontentsline{toc}{chapter}{Abstract}
-\input{abstract}
+{
+  \centering
+  {\small\sc\@department}\\[-1mm]
+  {\small\sc\@institution}\\
+  \vspace{1.2em}
+  {\fontsize{16}{18}\selectfont\@title\unskip\strut\par}
+  \vspace{1.8em}
+  {\large\emph\@author}\\
+  \vspace{0.7em}
+}
+\paragraph{Abstract.} \input{abstract}
 
 \chapter*{List of Publications}
 %\addcontentsline{toc}{chapter}{List of Publications}
