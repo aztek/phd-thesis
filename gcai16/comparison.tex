@@ -1,13 +1,13 @@
 % !TEX root = ../main.tex
 
-Our extended \newcnf{} algorithm translates \folb{} formulas to sets of first-order clauses. It can be used in first-order theorem provers to support reasoning in \folb{}. This algorithm combines translation of \folb{} to first-order logic and clausification. This allowed us to enhance the translation by integrating clausification techniques into it. In particular, our extension integrates Skolemisation, formula naming and tautology elimination. 
+Our extended \newcnf{} algorithm translates \folb{} formulas to sets of first-order clauses. It can be used in first-order theorem provers to support reasoning in \folb{}. This algorithm combines translation of \folb{} to first-order logic and clausification. This allowed us to enhance the translation by integrating clausification techniques into it. In particular, our extension integrates skolemisation, formula naming and tautology elimination. 
 
 In what follows, we look at the translation of different features of \folb{} done by the extended \newcnf{} and point out how the integrated clausification techniques help to obtain smaller clausal normal forms. We compare the extended \newcnf{} with our translation of \folb{} formulas to full first-order logic presented in~\cite{FOOL}.
 
 \subsection{Boolean Variables}
-Our translation of \folb{} formulas to full first-order logic replaces each Boolean variable $x$ occurring as formula with $x \eql \true$ and Skolemises Boolean variables using Boolean Skolem functions. The extended \newcnf{} Skolemises Boolean variables using Skolem predicates and substitutes Boolean variables that do not need Skolemisation with constants $\true$ and $\false$. The approach taken in \newcnf{} is superior in two regards.
+Our translation of \folb{} formulas to full first-order logic replaces each Boolean variable $x$ occurring as formula with $x \eql \true$ and skolemises Boolean variables using Boolean Skolem functions. The extended \newcnf{} skolemises Boolean variables using Skolem predicates and substitutes Boolean variables that do not need skolemisation with constants $\true$ and $\false$. The approach taken in \newcnf{} is superior in two regards.
 \begin{enumerate}
-  \item The translation of \folb{} to full first-order logic converts each Skolemised Boolean variable $x$ occurring as formula to an equality between Skolem terms and $\true$. This translation requires a modification of superposition calculus presented in~\cite{FOOL} in order to avoid possible performance problems during superposition. \newcnf{} converts $x$ to a Skolem literal, that can be efficiently handled by standard superposition.  
+  \item The translation of \folb{} to full first-order logic converts each skolemised Boolean variable $x$ occurring as formula to an equality between Skolem terms and $\true$. This translation requires a modification of superposition calculus presented in~\cite{FOOL} in order to avoid possible performance problems during superposition. \newcnf{} converts $x$ to a Skolem literal, that can be efficiently handled by standard superposition.  
   \item Substitution of a universally quantified Boolean variable with $\true$ and $\false$ can decrease the size of the translation. If the variable occurs as formula, after applying the substitution, the occurrence is either removed or the whole sequent is discarded by tautology elimination.
 \end{enumerate}
 
@@ -17,7 +17,7 @@ as realised in the FOOL language, into a clausal normal form in effectively prop
 This is a desirable property to have since there are first-order proving methods 
 known to be efficient for dealing with this fragment (see e.g.~\cite{DBLP:conf/birthday/Korovin13}).
 An alternative approach to dealing with quantifiers over interpreted sorts (such as the Booleans), 
-which is complementary to Skolemisation,
+which is complementary to skolemisation,
 is employed by modern SMT solvers and relies on a guidance by counter-examples 
 \cite{DBLP:journals/corr/Reynolds0K15} or on model-based projections \cite{LPAR-20:Playing_with_Quantified_Satisfaction}.
 

@@ -84,7 +84,7 @@ Let $\genclause{D}{\subst}$ be a sequent such that $D$ has an occurrence of $\ge
 Suppose that $\psi$ is a Boolean variable $x$. 
 If $\subst$ does map $x$, \nfcnf{} adds $\genclause{D}{\subst}$ to $\GC$.
 % Explanation, idea of correctness:
-This corresponds to the case in which $x$ was an existentially quantified variable Skolemised in some previous step.
+This corresponds to the case in which $x$ was an existentially quantified variable skolemised in some previous step.
         
 If $\subst$ does not map $x$, \nfcnf{} adds the sequent $\genclause{D'}{\subst'}$ to $\GC$, where $D'$ is obtained from $D$ by removing the occurrence of $\genlit{\psi}{\sign}$ and $\subst'$ extends $\subst$ with $x \mapsto \false$ if $\sign=\possign$, and $x \mapsto \true$ if $\sign=\negsign$. 
 % Explanation, idea of correctness:
@@ -140,11 +140,11 @@ where $\mathit{sk}$ is a Skolem constant of the sort $\bool$.
 
 %The translation of \folb{} formulas to full first-order logic in~\cite{FOOL} 
 The \oldcnf{} algorithm of~\cite{FOOL} 
-replaces each Boolean variable $x$ occurring as formula with $x \eql \true$ and Skolemises Boolean variables using Boolean \Skolem{} functions. 
-Unlike \oldcnf{}, \nfcnf{} Skolemises Boolean variables using \Skolem{} predicates and substitutes Boolean variables that do not need Skolemisation with constants $\true$ and $\false$. 
+replaces each Boolean variable $x$ occurring as formula with $x \eql \true$ and skolemises Boolean variables using Boolean \Skolem{} functions. 
+Unlike \oldcnf{}, \nfcnf{} skolemises Boolean variables using \Skolem{} predicates and substitutes Boolean variables that do not need skolemisation with constants $\true$ and $\false$. 
 The approach taken in \nfcnf{} is superior in two regards.
 \begin{enumerate}
-  \item \oldcnf{} converts each Skolemised Boolean variable $x$ occurring as formula to an equality between \Skolem{} terms and $\true$. \nfcnf{} converts $x$ to a \Skolem{} literal which can be handled by standard superposition more efficiently. 
+  \item \oldcnf{} converts each skolemised Boolean variable $x$ occurring as formula to an equality between \Skolem{} terms and $\true$. \nfcnf{} converts $x$ to a \Skolem{} literal which can be handled by standard superposition more efficiently. 
   \item Substitution of a universally quantified Boolean variable with $\true$ and $\false$ can decrease the size of the translation. If the Boolean variable occurs as formula, after applying the substitution,  the occurrence is either removed or the whole sequent is discarded by tautology elimination in \nfcnf{}.
 \end{enumerate}
 

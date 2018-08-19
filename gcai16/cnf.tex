@@ -3,7 +3,7 @@
 % nonnengart2001computing also have (in the simple approach): 
 % elimination of equivalences as part of NNF transform 
 % (but one wants to decide about equivalences during naming)
-% miniscoping and variable renaming just before Skolemisation
+% miniscoping and variable renaming just before skolemisation
 % (but let's ignore miniscoping and assume nice variables rightaway or a detail below the level of this presentation) 
 %
 %???? polarity dependent elimination of equivalences section has an argument about ugly invisible tautologies 
@@ -14,7 +14,7 @@ Traditional approaches to
 clausification in FOL \cite{nonnengart2001computing,Vampire13} produce a clausal normal
 form in several stages, where each stage
 represents a single pass through the formula tree. These stages may include formula simplification, translation into (equivalence) negation normal form,
-formula naming, elimination of equivalences, Skolemisation, and distribution of
+formula naming, elimination of equivalences, skolemisation, and distribution of
 disjunctions over conjunctions. The \newcnf{} clausification algorithm
 of~\cite{newcnf_fol} takes a different approach and employs a single top-down
 traversal of the formula in which these stages are combined.  
