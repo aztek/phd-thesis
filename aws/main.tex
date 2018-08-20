@@ -43,12 +43,28 @@ Computer networks are typically built from a variety of specialised heterogeneou
 
 Modern platforms for cloud computing such as Amazon Elastic Compute Cloud, Google Compute Engine and Azure Virtual Machines offer their users means of configuring \emph{virtual private cloud} (VPC) networks in the style of SDN. Administrators of such networks use a centralised control panel or a specialised API to launch network nodes, set up subnets and route tables, and tune connectivity and security settings of the network. Despite the increase of usability provided by the cloud platforms, VPC networks remain prone to misconfigurations. These misconfigurations are caused by the complexity of large-scale enterprise networks and might lead to downtimes and breaches of security. Discovering such misconfigurations in industrial-sized networks is both labor-intensive and computationally hard. %Therefore, verifying the correctness of network configurations is an important and challenging task.
 
-The presence of a centralised network configuration facilitates automated analysis and synthesis of SDN networks. Indeed, several tools have been developed~\cite{batfish,jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15,DBLP:conf/pldi/BallBGIKSSV14,Veriflow,ConfigChecker,Anteater,DBLP:conf/cav/El-HassanyTVV17} in an effort to verify various SDN components. These tools employ specialised algorithms~\cite{Veriflow} as well as general purpose reasoning engines such as \Datalog~\cite{muZ, DBLP:conf/cav/El-HassanyTVV17,batfish}, BDD~\cite{ConfigChecker}, SMT~\cite{jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15} and SAT~\cite{Anteater,DBLP:conf/pldi/BallBGIKSSV14}.
+The presence of a centralised network configuration facilitates automated analysis and synthesis of SDN networks. Indeed, several tools have been developed~\cite{batfish,jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15,DBLP:conf/pldi/BallBGIKSSV14,Veriflow,ConfigChecker,Anteater,DBLP:conf/cav/El-HassanyTVV17,DBLP:conf/fmcad/HojjatRMCF16} in an effort to verify, synthesise and repair various SDN components. These tools employ specialised algorithms~\cite{Veriflow} as well as general purpose reasoning engines such as \Datalog~\cite{muZ, DBLP:conf/cav/El-HassanyTVV17,batfish}, BDD~\cite{ConfigChecker}, SMT~\cite{jayaraman2014automated,DBLP:conf/icdcit/BjornerJ15} and SAT~\cite{Anteater,DBLP:conf/pldi/BallBGIKSSV14}.
 
 %
 % Problem 1: Size of networks, \Datalog works good in this however certain subproblems are hard for datalog
 %
 Despite the vast body of available tools, the problem of practical verification of enterprise networks remains a challenge. The size and intricacy of modern industrial-sized networks results in very difficult constraint satisfaction problems. While most network verification tools depend on a single constraint solving paradigm, we find that no single solver achieves best performance on all verification problems. We are interested in checking properties of VPC networks using complementary constraint solvers. Our ultimate goal is to build a portfolio of constraint solvers that leverages the advantages of different types of solvers on different types of properties. In an effort towards this goal in this work we describe an approach to network verification that relies on automated reasoning for first-order logic. Our plan is to integrate this approach in our ongoing work on the portfolio of solvers.
+
+% In an effort towards this goal in this work we investigate whether certain network verification problems can be solved more efficiently using automated reasoning tools in first-order logic, such as saturation-based theorem provers and finite model builders, than other solvers. The intuition
+
+% First-order logic with theories provides a convenient framework for expressing both the configuration of a network and its properties.
+
+% In an effort towards this goal in this work we investigate whether certain network verification problems can be solved more efficiently using automated reasoning tools in first-order logic than other solvers. Our motivation for that is twofold. On one hand, first-order logic with theories provides a convenient framework for expressing both the configuration of a network and its properties. Whereas other paradigms might rely on translations, first-order logic allows for more direct encodings .
+
+% On the other hand, the continuous advances in automated reasoning have made
+% theorem provers into powerful tools capable of efficiently solving problems coming from real
+% world domains.
+
+% In an effort towards this goal in this work we describe an approach to network verification that relies on automated reasoning in first-order logic. Our motivation for investigating this area . First-order logic is highly expressive for encoding both configurations and properties of networks. 
+
+% Our plan is to integrate this approach in our ongoing work on the portfolio of solvers. 
+
+% In addition, continuous advances in automated reasoning in first-order logic have made theorem provers into powerful tools capable of efficiently solving problems coming from real world domains.
 
 We consider reachability properties that express whether the network traffic is able to flow between given nodes of a VPC network. The traffic flow in these networks is typically controlled by the rules assigned to various networking components provided by the cloud platform. These components include subnets, route tables, access control lists, internet gateways and others. Let us illustrate these properties using the following example of a VPC network. 
 \begin{figure*}[th]
@@ -69,7 +85,7 @@ All network nodes that have the port 22 (SSH) accessible from the internet.
 
 We will refer to questions that network administrators might want to answer, such as the ones in Examples~\ref{prop:bool-property} and \ref{prop:list-property}, as \emph{network questions}. In particular, we will refer to questions similar to Example~\ref{prop:bool-property} as \emph{yes-no questions}, because an answer to them is ``yes'' or ``no'', and to questions similar to Example~\ref{prop:list-property} as \emph{list questions}, because an answer to them is a list of networking components. Each yes-no question can be equivalently phrased as a list question such that the answer to the yes-no question is ``yes'' iff the answer to the correspondent list questions is not empty. However, we distinguish these two types of questions because, as we show later, we can more efficiently answer them using different techniques.
 
-Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialised tools. In this work we employ automated reasoning tools for first-order logic. To this end, we build static models of VPC networks (Section~\ref{sect:aws/specification}), translate these models and network questions about them to problems in first-order logic (Section~\ref{sect:aws/fol}) and check these problems using finite model builders and saturation-based theorem provers (Section~\ref{sect:aws/fol-provers}). In Section~\ref{sect:aws/fol-provers} we argue that for our purposes these two types of reasoning tools complement each other: finite model builders can more efficiently answer list questions and saturation-based theorem prover can more efficiently answer yes-no questions. In Section~\ref{sect:aws/related} we cite related work and in Section~\ref{sect:aws/challenges} we describe the challenges that we faced in this work and outline future work.
+Answering network questions manually might be tedious and error-prone in an industrial-size network. For this reason it is necessary to automate this task with specialised tools. In this work we employ automated reasoning tools for first-order logic. To this end, we build static models of VPC networks (Section~\ref{sect:aws/specification}), translate these models and network questions about them to problems in first-order logic (Section~\ref{sect:aws/fol}) and check these problems using finite model builders and saturation-based theorem provers (Section~\ref{sect:aws/fol-provers}). In Section~\ref{sect:aws/fol-provers} we argue that for our purposes these two types of reasoning tools complement each other: finite model builders can more efficiently answer list questions and saturation-based theorem provers can more efficiently answer yes-no questions. In Section~\ref{sect:aws/related} we cite related work and in Section~\ref{sect:aws/challenges} we describe the challenges that we faced in this work and outline future work.
 
 \EK{In summary, this paper...}
 
@@ -125,7 +141,7 @@ Finally, we assume that for each type $\tau\in T$ the signature contains the pre
 
 The specification of Amazon~VPC networks that we used in this work consists of approximately 50 types, 200 predicates and over 240 rules.
 
-%\EK{Mention how large network snapshots get?}
+% Mention how large network snapshots get?
 
 \subsection{Network Questions}
 \label{sect:aws/reachability/properties}
@@ -148,12 +164,12 @@ Formula~\ref{eq:bool-property} expresses the yes-no question in Example~\ref{pro
 % instance-can-connect-to-instance(W, D).
 %In this formula predicates $\pred{instanceHasSubnet}$ and $\pred{instanceCanConnectToInstance}$, and constants $\const{subnet}_\text{Web}$ and $\const{subnet}_\text{Database}$ are part of the signature of the network model~--- the predicate are available in the specification, and the constants are available in the snapshot.
 
-% \EK{We illustrate this difference with the following property.
+% We illustrate this difference with the following property.
 % \[
 % (\forall \mathit{eni}:\type{eni})(\pred{eniOk(\mathit{eni})\vee\neg\pred{eniOk}(\mathit{eni})})
 % \]
 % % all Eni: (eni-ok(Eni) || !eni-ok(Eni))
-% If this query was a formula in first-order logic, it would be a tautology. However, we interpret the property as true iff there exists at least one ENI in the network, that is, if the $\type{eni}$ type is inhabited by at least one value.}
+% If this query was a formula in first-order logic, it would be a tautology. However, we interpret the property as true iff there exists at least one ENI in the network, that is, if the $\type{eni}$ type is inhabited by at least one value.
 
 Formula~\ref{eq:list-property} expresses the list question in Example~\ref{prop:list-property}. In this formula $n$ of the type $\type{node}$ and $e$ of the type $\type{eni}$ are free variables.
 \begin{equation}\label{eq:list-property}
@@ -190,7 +206,7 @@ Finite model builders (finders) construct finite counter-models of first-order p
 
 We translate
 \begin{enumerate*}[label=(\roman*)]
-  \item each yes-no question to a first-order problem that is unsatisfiable iff the answer to the question is true; and
+  \item each yes-no question to a first-order problem that is unsatisfiable iff the answer to the question is ``yes''; and
   \item each list question to a first-order problem such that each of its finite models corresponds to an answer to the network question.
 \end{enumerate*}
 Table~\ref{fig:fol-answering-questions} summarises how we interpret a solution found by a theorem prover as the answer to the network question. Saturation-based theorem provers generally cannot answer list questions except for the degenerate case when the answer is empty. With this exception, both types of provers are able to answer both types of network questions. 
@@ -210,14 +226,12 @@ Table~\ref{fig:fol-answering-questions} summarises how we interpret a solution f
   \label{fig:fol-answering-questions}
 \end{table}
 
-\EK{Explain why the translated formulas only have finite models. Can we use Infinox~\cite{Infinox} to check finite unsatisfiability, i.e. the absence of models with finite domains?}
-
 %Informally speaking, finite model builders can efficiently answer list questions and saturation-based provers can efficiently answer yes-no questions. To complement the performance of a finite model builder and a saturation-based prover, we run both of them in parallel on each first-order problem and record the result of the fastest successful run.
 
 We run a finite model builder and a saturation-based prover in parallel on each problem and record the result of the fastest successful run. We expect that in most cases
 \begin{enumerate*}[label=(\roman*)]
-  \item a yes-no question is answered with ``yes'' by the saturation-based prover and with ``no'' by the finite model builder; and
-  \item a list question is answered with the empty list by the saturation-based prover and with a non-empty list by the finite model builder.
+  \item a yes-no question can be answered with ``yes'' by the saturation-based prover and with ``no'' by the finite model builder; and
+  \item a list question can be answered with the empty list by the saturation-based prover and with a non-empty list by the finite model builder.
 \end{enumerate*}
 
 In this work we used the \vampire theorem prover both as a saturation-based theorem prover and a finite model builder. Our translation produces problems expressed in a logic supported by \vampire, namely many-sorted first-order logic with equality, extended with the theory of linear integer arithmetic, the theory of arrays~\cite{VampireAndFOOL} and the theory of tuples~\cite{KKV18}. We wrote the problems in the TPTP language~\cite{TPTP}.
@@ -302,7 +316,6 @@ We translate
   \item each of the 16-bit predicates to their correspondent predicate symbol in the theory of linear integer arithmetic.
   \item predicate $\pred{=}_\type{bits16}$ to the standard equality.
 \end{enumerate*}
-\EK{We are translating uint16 to $\mathbb{Z}$~--- explain why it is sound.}
 
 \paragraph{32-bit vectors to tuples.}
 We translate
@@ -419,9 +432,13 @@ Overall we found the precomputation of theories to be the most efficient strateg
 
 Network verification is an attractive target for automated reasoning tools, some of which we mentioned earlier in Section~\ref{sect:aws/introduction}. In this section we focus on approaches to network verification that are most similar to this work and applications of finite model building and saturation theorem proving to similar problems.
 
-Bj\o{}rner et al.~\cite{DBLP:conf/icdcit/BjornerJ15} checked properties of ACLs, routing tables and Border Gateway Protocol policies in Microsoft Azure networks using SMT solver Z3~\cite{Z3}. To that end \cite{DBLP:conf/icdcit/BjornerJ15} implemented a translation of network properties to quantifier-free logical formulas over bit vectors that is aware of the semantics of network components. In comparison, our translation encodes the complete semantics of a VPC network in the quantified problem solved by the theorem prover. We argue that our approach is more scalable at the expense of having to deal with more difficult problems.
+Bj\o{}rner et al.~\cite{DBLP:conf/icdcit/BjornerJ15} checked properties of ACLs, routing tables and Border Gateway Protocol policies in Microsoft Azure networks using SMT solver Z3~\cite{Z3}. To that end \cite{DBLP:conf/icdcit/BjornerJ15} implemented a translation of network properties to quantifier-free logical formulas over bit vectors that is aware of the semantics of network components. In comparison, our translation encodes the complete semantics of a VPC network in the quantified problem solved by the theorem prover. We argue that our approach is more flexible at the expense of having to deal with more difficult problems.
 
-Weidenbach~\cite{Weidenbach99} and Goubault-Larrecq~\cite{DBLP:journals/jcs/Goubault-Larrecq10} used finite model building for first-order logic to check unrechability in security protocols.
+Weidenbach~\cite{Weidenbach99} and Goubault-Larrecq~\cite{DBLP:journals/jcs/Goubault-Larrecq10} used finite model building for first-order logic to check unreachability in security protocols.
+
+\EK{
+  Weidenbach~\cite{Weidenbach99} checked properties of the Neuman-Stubblebine key exchange protocol by expressing them as sets of monadic Horn clauses. Similarly to this work, \cite{Weidenbach99} encodes reachability as a problem in first-order logic. Properties of this protocol were verified using finite saturation in the Spass theorem prover thanks to decidability of the monadic Horn clauses. It is
+}
 
 \EK{
 Lisitsa used superposition to proof reachability \cite{DBLP:conf/atva/Lisitsa10}.
@@ -445,13 +462,13 @@ This paper presents a work in progress and some of the challenges that we faced 
 \paragraph{Good translation to first-order logic.}
 Automated theorem provers for first-order logic are known to be sensitive to the encoding of the problem they are solving. To ensure efficient representation of practical problems in a theorem prover, these problems should be encoded using theories and syntactical constructs beyond plain first-order logic. Yet not all automated theorem provers efficiently implement these features. While the Vampire theorem prover used in this work supports many useful theories, we miss a support for the theory of bit vectors. The need to work around this limitation hinders a good translation of our network model to first-order logic. %The lack of support for bit vectors led us to device multiple translations for this theory and experiment with these translations.
 
-%\EK{In addition, theorem provers differ in the extensions of plain first-order logic and theories that they support, so one has to target a logic supported by a specific prover when devising a translation.}
+% In addition, theorem provers differ in the extensions of plain first-order logic and theories that they support, so one has to target a logic supported by a specific prover when devising a translation.
 
 \paragraph{Configuration of theorem provers.}
 Automated theorem provers typically offer many settings for configuring proof search. For example, Vampire has dozens of options~\cite{DBLP:conf/cade/Reger0V14} that describe a colossal number of possible proof strategies. There is no proof strategy that would be the best for all kinds of problems, and we found that changing the default options of Vampire might result in a strategy that works better on our problems than the default strategy. At the same time, hand-picking good options is tedious and unintuitive, and there is no way of knowing if a hand-picked strategy will work well on all of our problems. Many modern automated theorem provers rely not on one single strategy, but on a portfolio of strategies, which they try one by one during proof search. Theorem provers typically implement portfolios for existing large collections of problems such as TPTP~\cite{TPTP} and SMT-LIB~\cite{SMT-LIB}. To our knowledge, there is no systematic way of assembling a custom portfolio tailored to a specific class of problems.
 
 % \paragraph{Unpredictable runtime.}
-% \EK{When comparing the performance of \Datalog and theorem provers we saw that the performance time of \Datalog grows accordingly to the complexity of the problem. Performance of theorem provers looks unpredictable due to the nature of the saturation-based proof search. It's cool when a seemingly hard problem has an easy solution, not so cool the other way around. We wonder if a theorem proving community has an answer to it.}
+% When comparing the performance of \Datalog and theorem provers we saw that the performance time of \Datalog grows accordingly to the complexity of the problem. Performance of theorem provers looks unpredictable due to the nature of the saturation-based proof search. It's cool when a seemingly hard problem has an easy solution, not so cool the other way around. We wonder if a theorem proving community has an answer to it.
 
 \paragraph{Finite domains.}
 Our formalisation of VPC networks uses large finite domains to describe the topology of a network and the semantics of its components. While finite domains is good news for finite model builders, saturation-based theorem provers are known to have hard time reasoning with them. Domain closure axioms $(\forall x:\tau)(x=c_1 \vee\ldots\vee x=c_n)$ for large values of $n$ result in long clauses that degrade performance of the prover. A technique for efficient superposition theorem proving with these axioms is discussed e.g. in \cite{HillenbrandWeidenbach13}, but this technique is not implemented in any modern theorem prover.

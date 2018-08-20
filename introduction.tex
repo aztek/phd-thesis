@@ -27,19 +27,6 @@ First-order theorem provers construct proofs by \emph{refutation}. Given a first
 
 Modern theorem provers employ inference systems that include refinements of the calculus of resolution, derived from the work of Robinson~\cite{Robinson65}, and superposition, derived from the work of Bachmair and Ganzinger~\cite{BG94} (see also \cite{Ganzinger01,NieuwenhuisRubio:HandbookAR:paramodulation:2001}). The inference rules in this calculus are guarded with side conditions which determine whether a rule can be applied. These conditions prevent the search space of clauses from growing too fast and are essential in practice. The key concepts used in these conditions are a \emph{simplification ordering} and a \emph{literal selection function}. They are understood as parameters of the calculus. A simplification ordering on terms $\succ$ captures the notion of simplicity (see e.g. \cite{DBLP:books/el/RV01/DershowitzP01}) i.e. $t_1 \succ t_2$ implies that $t_2$ is in some way simpler than $t_1$. There are direct extensions of simplification ordering to literals and clauses. A literal selection function determines for a given clause which literals should be used for inferences. Figure~\ref{fig:intro/calculus} shows the most important inference rules of the superposition and resolution calculus (selected literals are underlined). In this figure, $\mathrm{mgu}$ denotes a most general unifier of two first-order terms and $L[s]$ ($t[s]$) denotes that a term $s$ occurs in a literal $L$ (term $t$).
 
-% An example of such ordering, used in some theorem provers, is Knuth-Bendix ordering~\cite{KB83}.
-
-% \paragraph{Saturation-based proof search.}
-  % \EK{TODO
-
-% attempts to saturate this set with respect to some inference system $\mathcal{I}$. The clause set is saturated if for every inference from $I$ with premises in $S$ the conclusion of the inference is also added to $S$.
-
-% Even for small problems this search space can grow quickly and provers often employ heuristics to control its exploration.
-
-% Robinsons's resolution calculus and many of its refinements are refutationally complete, meaning that a contradiction can be deduced from any unsatisfiable set of clauses.
-
-% }
-
 \begin{figure}[ht]
   \begin{equation*}
     \begin{aligned}
@@ -228,8 +215,6 @@ The paper presents the new language TFX that extends and simplifies the language
 %\section*{Conclusion}
 %\addcontentsline{toc}{section}{Conclusion}
 %FOOL can be used to express quantified Boolean formulas (QBF) thanks to its first class Boolean sort. The clausification algorithm \nfcnf{}, presented in Chapter~\ref{chap:cnf}, translates these formulas into a CNF in effectively propositional logic (EPR). Obtaining a formula in EPR is a desirable property to have since there are first-order proving methods known to be efficient for dealing with the fragment (see e.g.~\cite{DBLP:conf/birthday/Korovin13}).
-
-%\EK{This example makes one think about representing sentences in various epistemic or first-order modal logics in FOOL.}
 
 %The thesis focuses on practical features extending first-order theorem provers for making them better suited for applications of program verification and proof automation for interactive theorem provers.
 
