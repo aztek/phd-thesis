@@ -50,12 +50,13 @@ The presence of a centralised network configuration facilitates automated analys
 %
 Despite the vast body of available tools, the problem of practical verification of enterprise networks remains a challenge. The size and intricacy of modern industrial-sized networks results in very difficult constraint satisfaction problems. While most network verification tools depend on a single constraint solving paradigm, we find that no single solver achieves best performance on all verification problems. We are interested in checking properties of VPC networks using complementary constraint solvers. Our ultimate goal is to build a portfolio of constraint solvers that leverages the advantages of different types of solvers on different types of properties.
 
-In an effort towards this goal in this work we investigate whether automated reasoning tools in first-order logic can be in some cases more efficient at solving network verification problems than other types of solvers. In particular, we are interested in using saturation-based theorem provers and finite model builders. Saturation-based theorem prover employ various techniques and heuristics to control the exploration of the search space. In contrast, many other type of solvers explore the search space exhaustively. Therefore, we expect superposition-based theorem provers to have an advantage over other solvers on network properties encoded as unsatisfiability of first-order formulas. This work presents such an encoding.
+In an effort towards this goal in this work we investigate whether automated reasoning tools in first-order logic can be in some cases more efficient at solving network verification problems than other types of solvers. In particular, we are interested in using saturation-based theorem provers and finite model builders. Saturation-based theorem provers employ various techniques and heuristics to control the exploration of the search space. In contrast, many other type of solvers explore the search space exhaustively. Therefore, we expect superposition-based theorem provers to have an advantage over other solvers on network properties encoded as unsatisfiability of first-order formulas. This work presents such an encoding.
 
-We consider reachability properties that express whether the network traffic is able to flow between given nodes of a VPC network. The traffic flow in these networks is typically controlled by the rules assigned to various networking components provided by the cloud platform. These components include subnets, route tables, access control lists, internet gateways and others. Let us illustrate these properties using the following example of a VPC network. 
-\begin{figure*}[th]
+We consider reachability properties that express whether the network traffic is able to flow between given nodes of a VPC network. The traffic flow in these networks is typically controlled by the rules assigned to various networking components provided by the cloud platform. These components include subnets, route tables, access control lists, internet gateways and others. Let us illustrate these properties using the following example of a VPC network on Figure~\ref{fig:aws/vpc}.
+\begin{figure}[th]
 \centering\includegraphics[width=1.0\textwidth]{./aws/fig/vpc2.pdf}
-\end{figure*}
+\caption{An example of a VPC network.\label{fig:aws/vpc}}
+\end{figure}
 
 This network consists of an internet gateway, two subnets ``Web'' and ``Database'' and three network nodes in each of them. Each of the subnets is assigned with a route table (on the right) and an access control list (ACL, on the left). The route tables allow the network traffic to flow between the subnets and between the ``Web'' subnet and the internet gateway. In other words, the network nodes in the ``Web'' subnet are accessible from the internet, while the nodes in the ``Database'' subnet are not. An ACL consists of rules that filter the network traffic to and from its subnet. In our example, one of the ACL rules of the ``Database'' subnet forbids SSH access to its nodes, both directly and through an intermediate node.
 
@@ -155,14 +156,11 @@ Formula~\ref{eq:bool-property} expresses the yes-no question in Example~\ref{pro
 % % all Eni: (eni-ok(Eni) || !eni-ok(Eni))
 % If this query was a formula in first-order logic, it would be a tautology. However, we interpret the property as true iff there exists at least one ENI in the network, that is, if the $\type{eni}$ type is inhabited by at least one value.
 
-Formula~\ref{eq:list-property} expresses the list question in Example~\ref{prop:list-property}. In this formula $n$ of the type $\type{node}$ and $e$ of the type $\type{eni}$ are free variables.
+Formula~\ref{eq:list-property} expresses the list question in Example~\ref{prop:list-property}. In this formula $n$ of the type $\type{node}$ is a free variables.
 \begin{equation}\label{eq:list-property}
 \begin{aligned}
-&\pred{nodeHasEni}(n,e)\:\wedge~\\
-&\begin{aligned}
-   \pred{reachablePublicTcpUdp}(&\const{dir}_\text{ingress}, \const{proto}_6, e, \const{port}_{22},\\
-                                &\const{publicIp}_\text{8:8:8:8}, \const{port}_\text{40000})
- \end{aligned}
+\pred{reachablePublicTcpUdp}(&\const{dir}_\text{ingress}, \const{proto}_6, n, \const{port}_{22},\\
+                             &\const{publicIp}_\text{8:8:8:8}, \const{port}_\text{40000})
 \end{aligned}
 \end{equation}
 % list: instance-has-eni(Instance, Eni) &&
@@ -281,7 +279,7 @@ We translate the equality predicate $\pred{=}_\tau$ for each type $\tau$ to the 
 
 \subsection{Theories}
 \label{sect:aws/fol/theories}
-Our early experiments with translating the theory of bit vectors revealed that the quality of this translation crucially affects the performance of Vampire. This led us to develop and compare multiple translations. In this section we first describe translations of bit vectors that use other theories supported by Vampire. Then, we describe a network model transformation that eliminates theories from network models by precomputing the results of theory operations. Finally, we compare these translations.
+Our experiments with translating the theory of bit vectors revealed that the quality of this translation crucially affects the performance of Vampire. This led us to develop and compare multiple translations. In this section we first describe translations of bit vectors that use other theories supported by Vampire. Then, we describe a network model transformation that eliminates theories from network models by precomputing the results of theory operations. Finally, we compare these translations.
 
 \subsubsection*{Translations to Other Theories}
 Recall that our network models use
@@ -290,7 +288,7 @@ Recall that our network models use
   \item the type $\type{bits32}$ and predicates $\pred{bits32}_\wedge$ (bitwise conjunction) and $\pred{=}_\type{bits32}$.
 \end{enumerate*}
 %These two theories use different predicates, therefore we translate 16-bit and 32-bit vectors differently.
-We translate 16-bit vectors to integers and 32-bit vectors to tuples and arrays.
+We translate 16-bit vectors to integers and 32-bit vectors to arrays and tuples.
 
 \paragraph{16-bit vectors to integers.}
 We translate
@@ -300,20 +298,6 @@ We translate
   \item each of the 16-bit predicates to their correspondent predicate symbol in the theory of linear integer arithmetic.
   \item predicate $\pred{=}_\type{bits16}$ to the standard equality.
 \end{enumerate*}
-
-\paragraph{32-bit vectors to tuples.}
-We translate
-(i) the type $\type{bits32}$ to the tuple sort $(\mathit{bool},\ldots,\mathit{bool})$ where $\mathit{bool}$ is repeated 32 times,
-(ii) each of the 32-bit vector constants to a term $(b_1,\ldots,b_{32})$ of this sort, where each of $b_1,\ldots,b_{32}$ is either $\mathit{true}$ or $\mathit{false}$, and
-(iii) predicate $\pred{bits32}_\wedge$ to a predicate defined by the following axiom of bitwise conjunction for Boolean tuples.
-\begin{equation*}
-\begin{aligned}
-&(\forall x_1\ldots x_{32}:\bool)(\forall y_1\ldots y_{32}:\bool)(\forall z_1\ldots z_{32}:\bool)\\
-&\quad(\mathit{bits32}_\wedge((x_1,\ldots,x_{32}),(y_1,\ldots,y_{32}),(z_1,\ldots,z_{32}))\liff\\
-&\quad\quad (z_1\liff x_1\wedge y_1)\wedge\ldots\wedge(z_{32}\liff x_{32}\wedge y_{32}))
-\end{aligned}
-\end{equation*}
-(iv) predicate $\pred{=}_\type{bits32}$ to the standard equality.
 
 \paragraph{32-bit vectors to arrays.}
 We translate
@@ -342,6 +326,20 @@ We translate
 \end{aligned}
 \end{equation*}
 
+\paragraph{32-bit vectors to tuples.}
+We translate
+(i) the type $\type{bits32}$ to the tuple sort $(\mathit{bool},\ldots,\mathit{bool})$ where $\mathit{bool}$ is repeated 32 times,
+(ii) each of the 32-bit vector constants to a term $(b_1,\ldots,b_{32})$ of this sort, where each of $b_1,\ldots,b_{32}$ is either $\mathit{true}$ or $\mathit{false}$, and
+(iii) predicate $\pred{bits32}_\wedge$ to a predicate defined by the following axiom of bitwise conjunction for Boolean tuples.
+\begin{equation*}
+\begin{aligned}
+&(\forall x_1\ldots x_{32}:\bool)(\forall y_1\ldots y_{32}:\bool)(\forall z_1\ldots z_{32}:\bool)\\
+&\quad(\mathit{bits32}_\wedge((x_1,\ldots,x_{32}),(y_1,\ldots,y_{32}),(z_1,\ldots,z_{32}))\liff\\
+&\quad\quad (z_1\liff x_1\wedge y_1)\wedge\ldots\wedge(z_{32}\liff x_{32}\wedge y_{32}))
+\end{aligned}
+\end{equation*}
+(iv) predicate $\pred{=}_\type{bits32}$ to the standard equality.
+
 % \paragraph{Extra optimisation.}
 % We discovered that operators over 32-bit vectors are only ever used in the following context:
 % \begin{equation*}
@@ -361,7 +359,7 @@ We translate
 \subsubsection*{Precomputation of Theories}
 Our network models use 16-bit vectors to describe port numbers and port ranges and 32-bit vectors to describe IPv4 addresses and subnet masks. Bit vector predicates are only used in the definitions of predicates for network primitives. For example, 16-bit vectors only occur in the definitions of predicates that encode set-theoretic operations over port ranges, such as $\pred{portRangeOverlap}$ mentioned in Section~\ref{sect:aws/reachability/properties}. Definitions of higher level predicates only use these operations over port ranges and never the bit vectors predicates.
 
-We eliminate theories from network models by rewriting the definitions of set-theoretic operations over network primitives with results of precomputation of these operations for all primitives used in the network. For example, we precompute the $\pred{portRangeOverlap}$ predicate in the following way. First, we compute the set $S$ of all pairs of overlapping port ranges among the ones used in the network. This requires a quadratic number of integer comparisons. Then, we use set $S$ to build a definition of $\pred{portRangeOverlap}$ that consists of facts of the form $\pred{portRangeOverlap}(\const{portRange}_X,\const{portRange}_Y)$ where $(X,Y)\in S$. We optimise precomputation of some operations by considering their algebraic properties. For example, $\pred{portRangeOverlap}$ is a reflexive symmetric binary relation and 0--65535 overlaps with any other port range. Therefore, we avoid comparing each port range with itself, comparing two port ranges twice and comparing 0--65535 with other port ranges. Instead, we use the following rules in the definition of $\pred{portRangeOverlap}$.
+We eliminate theory terms and literals from network models by rewriting the definitions of set-theoretic operations over network primitives with results of precomputation of these operations for all primitives used in the network. For example, we precompute the $\pred{portRangeOverlap}$ predicate in the following way. First, we compute the set $S$ of all pairs of overlapping port ranges among the ones used in the network. This requires a quadratic number of integer comparisons. Then, we use set $S$ to build a definition of $\pred{portRangeOverlap}$ that consists of facts of the form $\pred{portRangeOverlap}(\const{portRange}_X,\const{portRange}_Y)$ where $(X,Y)\in S$. We optimise precomputation of some operations by considering their algebraic properties. For example, $\pred{portRangeOverlap}$ is a reflexive symmetric binary relation and 0--65535 overlaps with any other port range. Therefore, we avoid comparing each port range with itself, comparing two port ranges twice and comparing 0--65535 with other port ranges. Instead, we use the following rules in the definition of $\pred{portRangeOverlap}$.
 \begin{equation}\label{eq:aws/port-range-algebraic}
 \begin{aligned}
 &\pred{portRangeOverlap}(\mathit{Range},\mathit{Range}).\\
@@ -397,18 +395,52 @@ We eliminate theories from network models by rewriting the definitions of set-th
 
 Consider a network that only uses port ranges 0--65535, 22--22, 443--443, 5432--5432, 80--80 and 80--81 in any of the configurations of its components. We found that it is not uncommon for our networks to use trivial port ranges that span one port number. The definition of $\pred{portRangeOverlap}$ precomputed for this network consists of 12 facts or the rule $\pred{portRangeOverlap}(\const{portRange}_\text{80--80},\const{portRange}_\text{80--81})$ together with the rules (\ref{eq:aws/port-range-algebraic}).
 
+The precomputation of theories is the only applicable strategy for translating network models for Vampire's finite model builder, because it only supports plain many-sorted first-order logic without theories.
+
 \subsubsection*{Comparison of Translations}
-We observed that formulas produced by the translation of 32-bit vectors to tuples are generally easier for \vampire than formulas produced by the translation to arrays. We explain it by the fact that the former end up using a more compact representation of bit vectors in first-order logic. The translation to tuples models a 32-bit vector as a single term, while the translation to arrays models it as conjunction of 32 literals. Furthermore, the translation to tuples uses the standard equality that Vampire supports efficiently, while the translation to arrays uses a heavy equality axiom for 32-element arrays. The compact representation of bit vectors as tuples allows Vampire infer bitwise conjunctions faster.
+To compare the translation methods, we used each of them to encode 10 network verification problems in first-order logic and run \vampire in the saturation mode on the resulting formulas. Our verification problems express the property (\ref{prop:bool-property}) of 10 VPC network configurations. These network configurations are variations of the example on Figure~\ref{fig:aws/vpc} with different number of network nodes in each of the subnets ``Web'' and ``Database'' (from 1 to 10).
 
-We observed that formulas produced by the translation with precomputed theories are generally easier for \vampire than formulas produced by any of the translations of bit vectors to other theories. We explain it by the fact that the bulky axioms for bitwise conjunction and equality slow down the proof search, whereas these operations are easy to precompute. Although the precomputation of a theory operation has polynomial complexity, we found that for the networks we used in this study it does not significantly slow down answering network questions. Realistic VPC networks only use a small number of distinct network primitives such as port numbers and IP addresses in any of the configurations of its components and the precomputation for them is not heavy. Furthermore, the precomputation of each theory operation usually involves a simple operation over machine integers that can be performed quickly.
+Table~\ref{table:aws/results} presents the runtimes of Vampire on each of the problems. Dashes indicate the absense of a solution within the given time limit of 1 minute. These results were obtained on a MacBook Pro with a 2,9 GHz Intel Core i5 and 8 Gb RAM.
 
-Overall we found the precomputation of theories to be the most efficient strategy for translating our network models. It is also the only applicable strategy for translating network models for Vampire's finite model builder, because it only supports plain many-sorted first-order logic without theories. % As mentioned here, we do not build models for bit vectors. Even if we did, why would they be huge? If represented as tuples, each 32-bit vector would be just a single term with 32 Boolean arguments.
+\begin{table}\center
+  \caption{Runtimes in seconds of Vampire on the network verification problems translated using different methods.}
+  \label{table:aws/results}
+  \begin{tabular}[ht]{lrrrrr}
+\hline
+\multirow{2}{*}{Translation} & \multicolumn{5}{c}{Number of network nodes} \\
+                             & \multicolumn{1}{c}{1} & \multicolumn{1}{c}{2} & \multicolumn{1}{c}{3} & \multicolumn{1}{c}{4} & \multicolumn{1}{c}{5} \\
+\hline
+Arrays         & ~0.67 & ~2.52 & ~7.86 & 43.19 &    -- \\
+Tuples         & ~0.44 & ~1.34 & ~2.92 & ~5.79 & ~8.81 \\
+Precomputation & ~0.23 & ~0.38 & ~1.06 & ~1.82 & ~3.70 \\
+  \end{tabular}
 
-%-------------------------------------------------------------------------------
-\section{Evaluation}
-\label{sect:aws/evaluation}
+%   \begin{tabular}[ht]{lrrrrrrrrrr}
+% \hline
+% \multirow{2}{*}{Translation} & \multicolumn{10}{c}{Number of network nodes in each subnet} \\
+%                              & \multicolumn{1}{c}{1} & \multicolumn{1}{c}{2} & \multicolumn{1}{c}{3} & \multicolumn{1}{c}{4} & \multicolumn{1}{c}{5} & \multicolumn{1}{c}{6} & \multicolumn{1}{c}{7} & \multicolumn{1}{c}{8} & \multicolumn{1}{c}{9} & \multicolumn{1}{c}{10} \\
+% \hline
+% Arrays         & 0.67 & 2.52 & 7.86 & 43.19 & -- & -- & -- & -- & -- & -- \\
+% Tuples         & 0.44 & 1.34 & 2.92 & 5.79 & 8.81 & 17.28 & -- & 27.29 & -- & -- \\
+% Precomputation & 0.23 & 0.38 & 1.06 & 1.82 & 3.70 & 6.61 & 10.90 & 7.12 & 14.57 & 37.11 \\
+%   \end{tabular}
+\vspace{1em}
+  \begin{tabular}[ht]{lrrrrr}
+\hline
+\multirow{2}{*}{Translation} & \multicolumn{5}{c}{Number of network nodes} \\
+                             & \multicolumn{1}{c}{6} & \multicolumn{1}{c}{7} & \multicolumn{1}{c}{8} & \multicolumn{1}{c}{9} & \multicolumn{1}{c}{10} \\
+\hline
+Arrays         &    -- &    -- &    -- &    -- &    -- \\
+Tuples         & 17.28 &    -- & 27.29 &    -- &    -- \\
+Precomputation & ~6.61 & 10.90 & ~7.12 & 14.57 & 37.11 \\
+  \end{tabular}
+\end{table}
 
-\EK{TODO}
+The results of this experiment show that on this collection of verification problems formulas produced by the translation of 32-bit vectors to tuples are easier for \vampire than formulas produced by the translation to arrays. We explain it by the fact that the former end up using a more compact representation of bit vectors in first-order logic. The translation to tuples models a 32-bit vector as a single term, while the translation to arrays models it as conjunction of 32 literals. Furthermore, the translation to tuples uses the standard equality that Vampire supports efficiently, while the translation to arrays uses a heavy equality axiom for 32-element arrays. The compact representation of bit vectors as tuples allows Vampire infer bitwise conjunctions faster.
+
+We observe that formulas produced by the translation with precomputed theories are easier for \vampire than formulas produced by any of the translations of bit vectors to other theories. We explain it by the fact that the bulky axioms for bitwise conjunction and equality slow down the proof search, whereas these operations are easy to precompute. Although the precomputation of a theory operation has polynomial complexity, we found that for the networks we used in this study it does not significantly slow down answering network questions. Realistic VPC networks only use a small number of distinct network primitives such as port numbers and IP addresses in any of the configurations of its components and the precomputation for them is not heavy. Furthermore, the precomputation of each theory operation usually involves a simple operation over machine integers that can be performed quickly.
+
+%Overall we found the precomputation of theories to be the most efficient strategy for translating our network models. It is also the only applicable strategy for translating network models for Vampire's finite model builder, because it only supports plain many-sorted first-order logic without theories. % As mentioned here, we do not build models for bit vectors. Even if we did, why would they be huge? If represented as tuples, each 32-bit vector would be just a single term with 32 Boolean arguments.
 
 %-------------------------------------------------------------------------------
 \section{Related Work}
@@ -420,7 +452,7 @@ Network analysis based on the modelling of network components and protocols in f
 
 Bj\o{}rner et al.~\cite{DBLP:conf/icdcit/BjornerJ15} checked properties of ACLs, routing tables and Border Gateway Protocol policies in Microsoft Azure networks using SMT solver Z3~\cite{Z3}. To that end \cite{DBLP:conf/icdcit/BjornerJ15} implemented a translation of network properties to quantifier-free logical formulas over bit vectors that is aware of the semantics of network components. In comparison, our translation encodes the complete semantics of a VPC network in the quantified problem solved by saturation-based theorem prover and finite model builders. We argue that our approach is more flexible at the expense of having to deal with more difficult problems.
 
-Weidenbach~\cite{Weidenbach99} verified security properties of the Neuman-Stubblebine key exchange protocol by expressing them as sets of monadic Horn clauses. Similarly to our work, \cite{Weidenbach99} expressed reachability as unsatisfiability in first-order logic and used Spass to construct proofs of reachability. Conversely, \cite{Weidenbach99} discovered unreachabilty by finite saturation in Spass. Goubault-Larrecq~\cite{DBLP:journals/jcs/Goubault-Larrecq10} used finite model building to check unreachability in the context of verification of security protocols.
+Weidenbach~\cite{Weidenbach99} verified security properties of the Neuman-Stubblebine key exchange protocol by expressing them as sets of monadic Horn clauses. Similarly to our work, \cite{Weidenbach99} expressed reachability as unsatisfiability in first-order logic and used a saturation-based theorem prover to construct proofs of reachability. Conversely, \cite{Weidenbach99} discovered unreachabilty by finite saturation in Spass. Goubault-Larrecq~\cite{DBLP:journals/jcs/Goubault-Larrecq10} used finite model building to check unreachability in the context of verification of security protocols.
 
 % ConfigChecker~\cite{ConfigChecker}~--- verification of ACLs, BDD, CRL symbolic model checking, not SDN though.
 
@@ -445,7 +477,7 @@ Automated theorem provers for first-order logic are known to be sensitive to the
 \paragraph{Configuration of theorem provers.}
 Automated theorem provers typically offer many settings for configuring proof search. For example, Vampire has dozens of options~\cite{DBLP:conf/cade/Reger0V14} that describe a colossal number of possible proof strategies. There is no proof strategy that would be the best for all kinds of problems, and we found that changing the default options of Vampire might result in a strategy that works better on our problems than the default strategy. At the same time, hand-picking good options is tedious and unintuitive, and there is no way of knowing if a hand-picked strategy will work well on all of our problems. Many modern automated theorem provers rely not on one single strategy, but on a portfolio of strategies, which they try one by one during proof search. Theorem provers typically implement portfolios for existing large collections of problems such as TPTP~\cite{TPTP} and SMT-LIB~\cite{SMT-LIB}. To our knowledge, there is no systematic way of assembling a custom portfolio tailored to a specific class of problems.
 
-% \paragraph{Unpredictable runtime.}
+% \paragraph{Surprising runtime.}
 % When comparing the performance of \Datalog and theorem provers we saw that the performance time of \Datalog grows accordingly to the complexity of the problem. Performance of theorem provers looks unpredictable due to the nature of the saturation-based proof search. It's cool when a seemingly hard problem has an easy solution, not so cool the other way around. We wonder if a theorem proving community has an answer to it.
 
 \paragraph{Finite domains.}
@@ -457,7 +489,7 @@ We translate network models to problems that almost fit into the effectively pro
 \paragraph{Solver-agnostic network models.}
 The work presented in this paper contributes to our ultimate goal of checking network properties with diverse complementary constraint solvers. In order to succesfully use different kinds of constraint solvers we need a formalisation of networks that can be equally efficiently translated to different kinds of constraint satisfaction problems. We find that our current formalisation, written in the logic programming style, is friendly for systems like \Datalog~\cite{Datalog}, but not necessarily for theorem provers for first-order logic. For example, some of the predicates in the specification can be more naturally expressed as functions in full first-order logic rather than translated from their encoding as Horn clauses. Ultimately this bias hinders efficient representation of the problem in first-order logic. Designing a more solver-agnostic formalisation of networks is an important direction of future work.
 
-\paragraph{Evaluation.} In this work we used a small collection of network configurations that we verified using Vampire playing a role of both a saturation-based theorem prover and a finite model builder. We leave for future work experiments with (i) other theorem provers for first-order logic, (ii) other kinds of constraint solvers, (iii) different encodings of network problems as constraint satisfaction problems, and (iv) large collections of real world network configurations.
+\paragraph{Evaluation.} In this work we used a small collection of network configurations that we verified using Vampire run as a saturation-based theorem prover. We leave for future work experiments with (i) other theorem provers for first-order logic, (ii) other kinds of constraint solvers, (iii) different encodings of network problems as constraint satisfaction problems, and (iv) large collections of real world network configurations.
 
 %-------------------------------------------------------------------------------
 \section*{Acknowledgments}
