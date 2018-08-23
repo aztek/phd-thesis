@@ -1,8 +1,8 @@
 %%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 %% OBS
 %% Paper version must use 'twoside' in the document class options
-\documentclass[10pt,twoside]{book}
-% \documentclass[10pt,oneside]{book}
+% \documentclass[10pt,twoside]{book}
+\documentclass[10pt,oneside]{book}
 %%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 % Text
@@ -20,6 +20,7 @@
 
 % Graphics and figures
 \usepackage{tikz,subfig,wrapfig}
+\usepackage{color}
 
 % References, cites, bibliography
 \usepackage[nottoc]{tocbibind}
@@ -38,8 +39,8 @@
 \input{layout}
 
 \newif\if@paper
-\@papertrue
-% \@paperfalse
+% \@papertrue
+\@paperfalse
 
 \newif\if@draft
 % \@drafttrue
@@ -85,6 +86,14 @@
     linkcolor=linkcolor,
     urlcolor=linkcolor
   }
+\fi
+
+\if@paper
+\definecolor{lstgrey}{rgb}{0.93,0.93,0.93}
+\definecolor{lstcommentgrey}{rgb}{0.45,0.45,0.45}
+\else
+\definecolor{lstgrey}{rgb}{0.96,0.96,0.96}
+\definecolor{lstcommentgrey}{rgb}{0.5,0.5,0.5}
 \fi
 
 \definecolor{chaptertitle}{RGB}{164, 238, 246}
